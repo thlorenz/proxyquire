@@ -1,45 +1,13 @@
 /*jshint asi:true */
 
-var require = require('../proxyquire');
-
-
-describe('config', function () {
-
-  it('initially has __reset function only', function () {
-    Object.keys(require()).should.have.length(1);
-    require().should.have.property('__reset');
-  })
-
-  describe('when I override path', function () {
-    
-    beforeEach(function () {
-      require().path = { };
-    });
-
-    it('has __reset function and path property', function () {
-      Object.keys(require()).should.have.length(2);
-      require().should.have.property('__reset');
-      require().should.have.property('path');
-    })
-
-    describe('and I reset it again', function () {
-
-      beforeEach(function () {
-        require().__reset();
-      });
-
-      it('has __reset function only', function () {
-        Object.keys(require()).should.have.length(1);
-        require().should.have.property('__reset');
-      })
-    })
-  })
-})
+var realRequire = require
+  , require = require('../proxyquire')
+  ;
 
 describe('when no module was overridden', function () {
 
   beforeEach(function () {
-    require().__reset();
+    require().reset();
   });
 
   describe('built in modules are used', function () {
@@ -51,24 +19,64 @@ describe('when no module was overridden', function () {
   
 })
 
-describe('when module was overridden', function () {
+describe('module overrides', function () {
 
-  describe('overrode extname to return ".xtx"', function () {
+  describe('override extname to return ".xtx"', function () {
+    var path 
 
     beforeEach(function () {
-      require().path = { 
-        extname: function () { return '.xtx'; }
-      }
+      require({ 
+          path: { 
+            extname: function () { return '.xtx'; }
+          }
+        });
+
+      path = require('path');
     });
 
     it('path.extname("a.txt") returns ".xtx"', function () {
-      var path = require('path');
       path.extname('a.txt').should.eql('.xtx');
     })
 
-    it('path.basename("/path/a.txt"', function () {
-      
+    it('path.basename("/path/a.txt" returns "a.txt"', function () {
+      path.basename('/path/a.txt').should.eql('a.txt');
     })
     
+  })
+
+  describe('strict override extname to return ".xtx"', function () {
+    var path 
+
+    beforeEach(function () {
+      require({ 
+          path: { 
+              extname: function () { return '.xtx'; }
+            , __proxyquire: { strict: true }
+          }
+        });
+
+      path = require('path');
+    });
+
+    it('path.extname("a.txt") returns ".xtx"', function () {
+      path.extname('a.txt').should.eql('.xtx');
+    })
+
+    it('path.basename("/path/a.txt" throws "has no method basename"', function () {
+      (function () {
+        path.basename('/path/a.txt')
+      }).should.throw(/has no method.*basename/);
+    })
+    
+  })
+})
+
+
+// foo requires bar using proxyquire
+describe('module path resolution', function () {
+  describe('when I require a module that is part of my project', function () {
+      it('resolves that module', function () {
+        realRequire('./samples/foo').gotoBar().should.eql('you are a drunk');
+      })     
   })
 })
