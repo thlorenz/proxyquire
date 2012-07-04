@@ -115,7 +115,6 @@ describe('overriding and removing overrides incrementally', function () {
       before(function () {
         addIncrementally();
         proxyquire().del({ path: 'basename' });
-        path = proxyquire('path');
       });
 
       it('path.basename("x") returns x', function () {
@@ -131,7 +130,6 @@ describe('overriding and removing overrides incrementally', function () {
       before(function () {
         addIncrementally();
         proxyquire().del({ path: ['basename', 'extname' ] });
-        path = proxyquire('path');
       });
 
       it('path.basename("x") returns x', function () {
@@ -147,7 +145,6 @@ describe('overriding and removing overrides incrementally', function () {
       before(function () {
         addIncrementally();
         proxyquire().del('path');
-        path = proxyquire('path');
       });
 
       it('path.basename("x") returns x', function () {

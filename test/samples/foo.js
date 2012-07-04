@@ -5,3 +5,7 @@ var require = require('../../proxyquire')
 module.exports.gotoBar = function () {
   return bar.drinkUp();
 };
+
+module.exports.throwRound = function () {
+  return bar.drinksOnMe();
+};

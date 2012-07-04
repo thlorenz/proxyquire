@@ -98,7 +98,13 @@ function getApi () {
 
         // Remove entire module
         if (typeof arg === 'string') {
-          delete config[arg];
+          // Cannot delete entire module here, since dependent holds reference to module
+          // Instead we need to remove all props to get them to point at the real required module
+
+          Object.keys(config[arg]).forEach( function (p) {
+            if (p !== '__proxyquire') removeProperty(arg, p);
+          });
+
           return self;
         }
 
