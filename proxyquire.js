@@ -1,16 +1,29 @@
 var path = require('path');
 
-var config = {
-  __api: {
-      reset: function () { 
-        Object.keys(config).forEach(function (x) { if (x != '__api') delete config[x]; });
-      }
-    , root: undefined
+var config = { }; 
+
+function getApi () {
+  var self = {
+    reset: function () { 
+      Object.keys(config).forEach(function (x) { delete config[x]; });
+      return module.exports;
     }
-};
+  }
+  return self;
+}
 
 function addOverrides(mdl, name, resolvedName) {
-  config[name] = mdl;
+
+  // Store it under the given name (resolvedName is only used to make real require work)
+  if (!config[name]) {
+    // configure entire module if it was not configured before
+    config[name] = mdl;
+  } else {
+    // otherwise just reconfigure it by adding/overriding given properties
+    Object.keys(mdl).forEach(function (key) {
+      config[name][key] = mdl[key];
+    });
+  }
   
   // In strict mode we 'require' all properties to be used in tests to be overridden beforehand
   if (mdl.__proxyquire && mdl.__proxyquire.strict) return;
@@ -73,7 +86,7 @@ module.exports = function (arg) {
   } else {
 
     // c) allow configuration
-    return config.__api;
+    return getApi();
 
   }
 };
