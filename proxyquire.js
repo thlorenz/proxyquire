@@ -1,14 +1,59 @@
-var path = require('path');
+var path = require('path')
+  , util = require('util')
+  ;
 
 var config = { }; 
 
+function removeProperty (mdl, prop) {
+  // replace overridden property with the original one from the real module 
+  // if strict mode was used, it will be undefined and will throw if called, which is what we want
+  config[mdl][prop] = config[mdl][prop].orig;
+}
+
 function getApi () {
   var self = {
-    reset: function () { 
-      Object.keys(config).forEach(function (x) { delete config[x]; });
-      return module.exports;
-    }
-  }
+      reset: function () { 
+        config = { };
+        return self;
+      }
+    , add: function (arg) {
+        proxyquire(arg);
+        return self;
+      }
+    , del: function (arg) {
+
+        // Remove entire module
+        if (typeof arg === 'string') {
+          delete config[arg];
+          return self;
+        }
+
+        // Remove only specified properties of the given module
+        Object.keys(arg).forEach( function (mdl) {
+
+          if (config[mdl]) {
+            var prop = arg[mdl];
+
+            if (typeof prop === 'string') {
+
+              removeProperty(mdl, prop);
+
+            } else if (Array.isArray(prop)) {
+
+              prop.forEach(function (p) {
+                removeProperty(mdl, p);
+              });
+
+            } else {
+              throw new Exception('argument to delete needs to be key: String, or key: Array[String] object');
+            }
+          }
+          
+        });
+
+        return self;
+      }
+  };
   return self;
 }
 
@@ -31,7 +76,12 @@ function addOverrides(mdl, name, resolvedName) {
   // In non strict mode (default), we fill in all missing properties from the original module
   var orig = require(resolvedName);
   Object.keys(orig).forEach(function (key) {
-    if (!mdl[key]) mdl[key] = orig[key];    
+    if (!mdl[key]) { 
+      mdl[key] = orig[key];   
+    } else {
+      // Remember the original method in case we delete/unoverride it later
+      mdl[key].orig = orig[key];
+    }
   });
 }
 
@@ -48,7 +98,7 @@ function resolve (mdl, caller__dirname) {
 
 }
 
-module.exports = function (arg) {
+function proxyquire(arg) {
   
   var callerArgs = arguments.callee.caller.arguments
     , caller__dirname = callerArgs[4]
@@ -91,3 +141,5 @@ module.exports = function (arg) {
   }
 };
 
+
+module.exports = proxyquire;

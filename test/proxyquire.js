@@ -48,7 +48,7 @@ describe('module overrides', function () {
     beforeEach(function () {
       proxyquire()
         .reset()
-        ({ 
+        .add({ 
           path: { 
               extname: function () { return '.xtx'; }
             , __proxyquire: { strict: true }
@@ -81,24 +81,27 @@ describe('module path resolution', function () {
   })
 })
 
-describe('overriding incrementally', function () {
+describe('overriding and removing overrides incrementally', function () {
   var path;
-  describe('when I override path.basename to return "1" and then path.extname to return "2"', function () {
-    before(function () {
-      proxyquire({
-        path: { 
-          basename: function () { return 1; }
-        }
-      });
-
-      proxyquire({
-        path: { 
-          extname: function () { return 2; }
-        }
-      });
+  function addIncrementally() {
+      proxyquire()
+        .reset()
+        .add({
+          path: { 
+            basename: function () { return 1; }
+          }
+        })
+        .add({
+          path: { 
+            extname: function () { return 2; }
+          }
+        });
 
       path = proxyquire('path');
-    });
+    }
+
+  describe('when I override path.basename to return "1" and then path.extname to return "2"', function () {
+    before(addIncrementally);
 
     it('path.basename("x") returns 1', function () {
       path.basename('x').should.eql(1);  
@@ -106,6 +109,54 @@ describe('overriding incrementally', function () {
     
     it('path.extname("x") returns 2', function () {
       path.extname('x').should.eql(2);  
+    })
+
+    describe('and then I remove path.basename override', function () {
+      before(function () {
+        addIncrementally();
+        proxyquire().del({ path: 'basename' });
+        path = proxyquire('path');
+      });
+
+      it('path.basename("x") returns x', function () {
+        path.basename('x').should.eql('x');  
+      })
+
+      it('path.extname("x") returns 2', function () {
+        path.extname('x').should.eql(2);  
+      })
+    })
+
+    describe('and then I remove path.basename  and path.extname overrides', function () {
+      before(function () {
+        addIncrementally();
+        proxyquire().del({ path: ['basename', 'extname' ] });
+        path = proxyquire('path');
+      });
+
+      it('path.basename("x") returns x', function () {
+        path.basename('x').should.eql('x');  
+      })
+
+      it('path.extname("x") returns ""', function () {
+        path.extname('x').should.eql('');  
+      })
+    })
+
+    describe('and then I remove path module entirely', function () {
+      before(function () {
+        addIncrementally();
+        proxyquire().del('path');
+        path = proxyquire('path');
+      });
+
+      it('path.basename("x") returns x', function () {
+        path.basename('x').should.eql('x');  
+      })
+
+      it('path.extname("x") returns ""', function () {
+        path.extname('x').should.eql('');  
+      })
     })
   })
 })
