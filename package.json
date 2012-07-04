@@ -1,14 +1,14 @@
 {
-  "name": "proquire",
+  "name": "proxyquire",
   "version": "0.0.0",
   "description": "Proxies nodejs require in order to allow overriding dependencies during testing.",
-  "main": "proquire.js",
+  "main": "proxyquire.js",
   "scripts": {
     "test": "mocha"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/thlorenz/proquire.git"
+    "url": "https://github.com/thlorenz/proxyquire.git"
   },
   "keywords": [
     "require",
@@ -18,8 +18,14 @@
     "stub"
   ],
   "author": "Thorsten Lorenz",
-  "licenses" : [{
-      "type" : "MIT",
-      "url" : "http://www.opensource.org/licenses/mit-license.php"
-  }],
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://www.opensource.org/licenses/mit-license.php"
+    }
+  ],
+  "devDependencies": {
+    "mocha": "~1.2.2",
+    "should": "~0.6.3"
+  }
 }
