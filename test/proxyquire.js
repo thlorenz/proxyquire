@@ -1,18 +1,16 @@
 /*jshint asi:true */
 
-var realRequire = require
-  , require = require('../proxyquire')
-  ;
+var proxyquire = require('../proxyquire');
 
 describe('when no module was overridden', function () {
 
   beforeEach(function () {
-    require().reset();
+    proxyquire().reset();
   });
 
   describe('built in modules are used', function () {
     it('path.extname("a.txt") returns ".txt"', function () {
-      var path = require('path');
+      var path = proxyquire('path');
       path.extname('a.txt').should.eql('.txt')
     })
   })
@@ -25,13 +23,13 @@ describe('module overrides', function () {
     var path 
 
     beforeEach(function () {
-      require({ 
+      proxyquire({ 
           path: { 
             extname: function () { return '.xtx'; }
           }
         });
 
-      path = require('path');
+      path = proxyquire('path');
     });
 
     it('path.extname("a.txt") returns ".xtx"', function () {
@@ -48,14 +46,14 @@ describe('module overrides', function () {
     var path 
 
     beforeEach(function () {
-      require({ 
+      proxyquire({ 
           path: { 
               extname: function () { return '.xtx'; }
             , __proxyquire: { strict: true }
           }
         });
 
-      path = require('path');
+      path = proxyquire('path');
     });
 
     it('path.extname("a.txt") returns ".xtx"', function () {
@@ -76,7 +74,7 @@ describe('module overrides', function () {
 describe('module path resolution', function () {
   describe('when I require a module that is part of my project', function () {
       it('resolves that module', function () {
-        realRequire('./samples/foo').gotoBar().should.eql('you are a drunk');
+        require('./samples/foo').gotoBar().should.eql('you are a drunk');
       })     
   })
 })
