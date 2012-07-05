@@ -8,6 +8,13 @@ function ProxyquireError(msg) {
 
 var config = { }; 
 
+function clearRequireCache() {
+  Object.keys(require.cache).forEach(function (key) {
+    if (key !==  __filename)
+      delete require.cache[key];
+  });
+}
+
 function addMissingProperties(mdl) {
   var orig = mdl.__proxyquire.original;
   
@@ -85,13 +92,10 @@ function removeProperty (mdl, prop) {
 
 function getApi () {
   var self = {
-      activate: function () {
-        active = true;
-        return self;
-      }
-    , reset: function () { 
+      reset: function () { 
         config = { };
-        console.log('reset');
+        clearRequireCache();
+        active = true;
         return self;
       }
     , add: function (arg) {
@@ -101,6 +105,7 @@ function getApi () {
 
         });
 
+        active = true;
         return self;
       }
     , del: function (arg) {
@@ -175,7 +180,6 @@ function proxyquire(arg) {
         // Here is the only sure way to resolve the original require, so we attach it to the overridden module for later use
         // If non-strict and we didn't fill missing properties before 
         if (!config[arg].__proxyquire.strict && !config[arg].__proxyquire.original) {
-          console.log('assigning original for %s', arg);
           config[arg].__proxyquire.original = require(resolvedPath);
           addMissingProperties(config[arg]);
         }
@@ -206,7 +210,7 @@ function proxyquire(arg) {
     return getApi();
 
   }
-};
+}
 
 
 module.exports = proxyquire;
