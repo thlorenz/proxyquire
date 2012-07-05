@@ -6,13 +6,25 @@ function ProxyquireError(msg) {
   this.message = msg || 'An error occurred inside proxyquire.';
 }
 
-var config = { }; 
+var config = { }
+  , api = proxyquireApi().create()
+  ;
 
-function clearRequireCache() {
-  Object.keys(require.cache).forEach(function (key) {
-    if (key !==  __filename)
-      delete require.cache[key];
-  });
+function resolve (mdl, caller__dirname) {
+  
+  // Resolve relative file requires, e.g., './mylib'
+  if ( mdl.match(/^(\.|\/)/) ) {
+
+    if (!caller__dirname) throw new ProxyquireError('In order to resolve relative modules, caller__dirname is required');
+
+    // We use the __dirname of the script that is requiring, to get same behavior as if real require was called from it directly.
+    return path.join(caller__dirname, mdl);
+
+  } else {
+    
+    // Don't change references to global or 'node_module' requires, e.g. 'path'
+    return mdl;
+  }
 }
 
 function addMissingProperties(mdl) {
@@ -32,81 +44,69 @@ function addMissingProperties(mdl) {
   });
 }
 
-function addOverrides(mdl, name) {
+function proxyquireApi () {
 
-  // Store it under the given name
-  if (!config[name]) {
-
-    // configure entire module if it was not configured before
-    config[name] = mdl;
-
-  } else {
-
-    // otherwise just reconfigure it by adding/overriding given properties
-    Object.keys(mdl).forEach(function (key) {
-      config[name][key] = mdl[key];
+  function clearRequireCache() {
+    Object.keys(require.cache).forEach(function (key) {
+      if (key !==  __filename)
+        delete require.cache[key];
     });
-
-  }
-}
-
-function resolve (mdl, caller__dirname) {
-  
-  // Resolve relative file requires, e.g., './mylib'
-  if ( mdl.match(/^(\.|\/)/) ) {
-
-    if (!caller__dirname) throw new ProxyquireError('In order to resolve relative modules, caller__dirname is required');
-
-    // We use the __dirname of the script that is requiring, to get same behavior as if real require was called from it directly.
-    return path.join(caller__dirname, mdl);
-
-  } else {
-    
-    // Don't change references to global or 'node_module' requires, e.g. 'path'
-    return mdl;
   }
 
-}
+  function addOverrides(mdl, name) {
 
-function removeProperty (mdl, prop) {
-  if (config[mdl].__proxyquire && config[mdl].__proxyquire.strict) {
-    delete config[mdl][prop];
-  } else {
-    
-    // replace overridden property with the original one from the real module 
-    if (config[mdl].__proxyquire && config[mdl].__proxyquire.original) { 
+    // Store it under the given name
+    if (!config[name]) {
 
-      if (!config[mdl].__proxyquire.original[prop]) {
-        throw new ProxyquireError('The property [' + prop + '] you are trying to remove does not exist on the original module!' + 
-                            ' What are you up to?');
-      }
-
-      config[mdl][prop] = config[mdl].__proxyquire.original[prop];
+      // configure entire module if it was not configured before
+      config[name] = mdl;
 
     } else {
-      throw new ProxyquireError('Did not find original module when trying to replace stubbed property with original one.' +
-                          '\nPlease make sure to cause the module to be required before removing properties.');
+
+      // otherwise just reconfigure it by adding/overriding given properties
+      Object.keys(mdl).forEach(function (key) {
+        config[name][key] = mdl[key];
+      });
+
     }
   }
-}
 
-function getApi () {
+  function removeProperty (mdl, prop) {
+    if (config[mdl].__proxyquire && config[mdl].__proxyquire.strict) {
+      delete config[mdl][prop];
+    } else {
+      
+      // replace overridden property with the original one from the real module 
+      if (config[mdl].__proxyquire && config[mdl].__proxyquire.original) { 
+
+        if (!config[mdl].__proxyquire.original[prop]) {
+          throw new ProxyquireError('The property [' + prop + '] you are trying to remove does not exist on the original module!' + 
+                              ' What are you up to?');
+        }
+
+        config[mdl][prop] = config[mdl].__proxyquire.original[prop];
+
+      } else {
+        throw new ProxyquireError('Did not find original module when trying to replace stubbed property with original one.' +
+                            '\nPlease make sure to cause the module to be required before removing properties.');
+      }
+    }
+  }
+
   var self = {
       reset: function () { 
         config = { };
         clearRequireCache();
         active = true;
-        return self;
+        return this;
       }
     , add: function (arg) {
         Object.keys(arg).forEach(function (key) {
-
           addOverrides(arg[key], key); 
-
         });
 
         active = true;
-        return self;
+        return this;
       }
     , del: function (arg) {
 
@@ -119,7 +119,7 @@ function getApi () {
             if (p !== '__proxyquire') removeProperty(arg, p);
           });
 
-          return self;
+          return this;
         }
 
         // Remove only specified properties of the given module
@@ -145,11 +145,15 @@ function getApi () {
           
         });
 
-        return self;
+        return this;
       }
     , __config: config
   };
-  return self;
+
+  function F () { }
+  F.prototype = self;
+
+  return { create: function () { return new F(); } };
 }
 
 function proxyquire(arg) {
@@ -172,13 +176,12 @@ function proxyquire(arg) {
       // Shortcut the process if we are not testing
       if (!active) return require(resolvedPath);
 
-
       // a) get overridden module or resolve it through original require
       if (config[arg]) {
         config[arg].__proxyquire = config[arg].__proxyquire || { };
 
         // Here is the only sure way to resolve the original require, so we attach it to the overridden module for later use
-        // If non-strict and we didn't fill missing properties before 
+        // If non-strict and we didn't fill missing properties before ...
         if (!config[arg].__proxyquire.strict && !config[arg].__proxyquire.original) {
           config[arg].__proxyquire.original = require(resolvedPath);
           addMissingProperties(config[arg]);
@@ -186,7 +189,6 @@ function proxyquire(arg) {
 
         return config[arg];
       } else {
-
         
         var original = require(resolvedPath);
         return original;
@@ -195,7 +197,7 @@ function proxyquire(arg) {
     } else if (typeof arg === 'object') {
       
       // b) shortcut to reset and add overrides in one call
-      getApi()
+      return api
         .reset()
         .add(arg);
 
@@ -207,10 +209,9 @@ function proxyquire(arg) {
   } else {
 
     // c) allow configuration
-    return getApi();
+    return api;
 
   }
 }
-
 
 module.exports = proxyquire;
