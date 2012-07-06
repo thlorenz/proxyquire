@@ -7,7 +7,7 @@ function ProxyquireError(msg) {
 }
 
 var config = { }
-  , api = proxyquireApi().create()
+  , api = proxyquireApi()
   ;
 
 function resolve (mdl, caller__dirname) {
@@ -150,10 +150,7 @@ function proxyquireApi () {
     , __config: config
   };
 
-  function F () { }
-  F.prototype = self;
-
-  return { create: function () { return new F(); } };
+  return self
 }
 
 function proxyquire(arg) {
