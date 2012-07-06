@@ -14,7 +14,7 @@
 	- [Chaining API Calls](#chaining-api-calls)
 	- [More Examples](#more-examples)
 
-# proxyquire 
+# proxyquire [![Build Status](https://secure.travis-ci.org/thlorenz/proxyquire.png)](http://travis-ci.org/thlorenz/proxyquire)
 
 Proxies nodejs require in order to allow overriding dependencies during testing.
 
