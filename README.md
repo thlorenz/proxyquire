@@ -10,7 +10,7 @@ Proxies nodejs require in order to allow overriding dependencies during testing.
 
 3 simple steps
 
-- include `require = require('proxyquire')` on top of any module whose requires you want to be able to control
+- include `var require = require('proxyquire');` on top of any module whose requires you want to be able to control
 - setup desired module overrides e.g., `proxyquire({ path: { extname: function () { return 'meh'; } });` in your test
 - require the module you want to test and excercise its methods
 
@@ -21,6 +21,7 @@ Proxies nodejs require in order to allow overriding dependencies during testing.
 - resets any registered overrides
 - flushes nodejs's require cache in order to force re-requiring the module you
   are testing, in order to cause any new overridden modules to be re-required as well
+- this is useful if you want to entirely start over in overriding dependencies
 
 ## proxyquire.add(Object)
 
@@ -42,9 +43,8 @@ proxyquire.add({
 
 Overrides given modules:
 
-- note that a relative path to the module can be given (this is the path as it
-  appears inside the module you are testing, proxyquire will resolve it as if
-  it was required from that module)
+- note that a relative path to the module can be given 
+    - **Important**: this is the path as it appears inside the module you are testing, proxyquire will resolve it as if it was required from that module
 - `__proxyquire` property allows to further configure overrides. In the case of
   module2 it is configured to be `strict` (see strict vs.  non-strict
   overrides)
@@ -53,11 +53,11 @@ Overrides given modules:
 
 A shortcut which calls `proxyquire.reset()` and then `proxyquire.add(Object)`
 
-## proxyquire.del(String|Object)
+## proxyquire.del(String | Object)
 
-Removes overrides and replaces them with property/function of the real module unless it was overridden using `strict` mode.
+Removes overrides and replaces them with method of the real module unless it was overridden using **strict** mode.
 
-**Examples:** (assuming `path.extname` and `path.basename` were overridden previously)
+**Examples:** *assuming `path.extname` and `path.basename` were overridden previously*
 
 ```javascript
 proxyquire.del('path');
@@ -123,7 +123,7 @@ proxyquire
   .add({
     fs: { realpath: function (x, y) { return 'no really, what?'; } 
   })
-  .del('path)
+  .del('path')
   ;
 ```
 
