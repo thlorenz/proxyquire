@@ -1,3 +1,19 @@
+**Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
+
+- [proxyquire](#proxyquire)
+- [Installation](#installation)
+- [Usage](#usage)
+- [API](#api)
+	- [proxyquire.reset()](#proxyquirereset)
+	- [proxyquire.add(Object)](#proxyquireaddobject)
+	- [proxyquire(Object)](#proxyquireobject)
+	- [proxyquire.del(String | Object)](#proxyquiredelstring-|-object)
+	- [strict vs. non-strict overrides](#strict-vs-non-strict-overrides)
+		- [Non-strict](#non-strict)
+		- [Strict](#strict)
+	- [Chaining API Calls](#chaining-api-calls)
+	- [More Examples](#more-examples)
+
 # proxyquire
 
 Proxies nodejs require in order to allow overriding dependencies during testing.
@@ -46,8 +62,8 @@ Overrides given modules:
 - note that a relative path to the module can be given 
     - **Important**: this is the path as it appears inside the module you are testing, proxyquire will resolve it as if it was required from that module
 - `__proxyquire` property allows to further configure overrides. In the case of
-  module2 it is configured to be `strict` (see strict vs.  non-strict
-  overrides)
+  module2 it is configured to be `strict` [see strict vs. non-strict
+  overrides](#strict-vs-non-strict-overrides)
 
 ## proxyquire(Object)
 
