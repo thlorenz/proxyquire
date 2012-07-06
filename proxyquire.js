@@ -159,10 +159,9 @@ function proxyquire(arg) {
     , caller__dirname = callerArgs[4]
     ;
     
-  // Three options:
-  //   a) arg is string 
-  //   b) arg is object
-  //   c) no arg at all
+  // Two options:
+  //   a) arg is string - used by module that we are testing when it requires its dependencies
+  //   b) arg is object - used as a shortcut to invoke reset and then add in one step
 
   if (arg) {
     
@@ -205,10 +204,15 @@ function proxyquire(arg) {
     }
   } else {
 
-    // c) allow configuration
-    return api;
+      throw new ProxyquireError('need to pass string or object argument');
 
   }
 }
+
+// Attach api to exported function to allow things like
+// proxyquire.reset() 
+Object.keys(api).forEach(function (key) {
+  proxyquire[key] = api[key];
+});
 
 module.exports = proxyquire;

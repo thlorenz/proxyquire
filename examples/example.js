@@ -56,7 +56,7 @@ console.log(path.basename(file));   // soccer
 // All back to normal
 // **************************************** 
 
-require().reset();
+require.reset();
 var path = require('path');
 console.log(path.extname(file));    // .js
 console.log(path.basename(file));   // file.js

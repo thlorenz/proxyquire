@@ -5,7 +5,7 @@ var proxyquire = require('../proxyquire');
 describe('when no module was overridden', function () {
 
   beforeEach(function () {
-    proxyquire().reset();
+    proxyquire.reset();
   });
 
   describe('built in modules are used', function () {
@@ -46,7 +46,7 @@ describe('module overrides', function () {
     var path 
 
     beforeEach(function () {
-      proxyquire()
+      proxyquire
         .reset()
         .add({ 
           path: { 
@@ -85,7 +85,7 @@ describe('adding and removing overrides incrementally', function () {
 
     var path;
     beforeEach(function () {
-      proxyquire()
+      proxyquire
         .reset()
         .add({
           path: { 
@@ -106,7 +106,7 @@ describe('adding and removing overrides incrementally', function () {
     describe('and then path.extname to return "2"', function () {
 
       beforeEach(function () {
-        proxyquire().add({
+        proxyquire.add({
           path: { 
             extname: function () { return 2; }
           }
@@ -123,7 +123,7 @@ describe('adding and removing overrides incrementally', function () {
 
       describe('and then I remove path.basename override', function () {
         beforeEach(function () {
-          proxyquire().del({ path: 'basename' });
+          proxyquire.del({ path: 'basename' });
         });
 
         it('path.basename("x") returns x', function () {
@@ -136,7 +136,7 @@ describe('adding and removing overrides incrementally', function () {
 
         describe('and then I remove path.extname override', function () {
           beforeEach(function () {
-            proxyquire().del({ path: 'extname' });
+            proxyquire.del({ path: 'extname' });
           });
 
           it('path.basename("x") returns x', function () {
@@ -185,7 +185,7 @@ describe('removing overrides for local module,', function () {
     
     describe('and then I remove drinkUp override,', function () {
       beforeEach( function () {
-        proxyquire().del({ './bar': 'drinkUp' });
+        proxyquire.del({ './bar': 'drinkUp' });
       });
 
       it('drinkUp returns original', function () {
@@ -198,7 +198,7 @@ describe('removing overrides for local module,', function () {
 
       describe('and then I remove drinksOnMe override,', function () {
         beforeEach( function () {
-          proxyquire().del({ './bar': 'drinksOnMe' });
+          proxyquire.del({ './bar': 'drinksOnMe' });
         });
 
         it('drinkUp returns original', function () {
@@ -213,7 +213,7 @@ describe('removing overrides for local module,', function () {
     
     describe('and then I remove both drinkUp and drinksOnMe overrides,', function () {
       beforeEach( function () {
-        proxyquire().del({ './bar': [ 'drinkUp', 'drinksOnMe' ] });
+        proxyquire.del({ './bar': [ 'drinkUp', 'drinksOnMe' ] });
       });
 
       it('drinkUp returns original', function () {
@@ -227,7 +227,7 @@ describe('removing overrides for local module,', function () {
 
     describe('and then I remove entire ./bar module', function () {
       beforeEach( function () {
-        proxyquire().del('./bar');  
+        proxyquire.del('./bar');  
       });
 
       it('drinkUp returns original', function () {
@@ -260,7 +260,7 @@ describe('when I override path.basename to return 1 in strict mode', function ()
 
   describe('and then remove path.basename override', function () {
     beforeEach(function () {
-      proxyquire().del({ path: 'basename' });
+      proxyquire.del({ path: 'basename' });
     })
 
     it('path.basename("/path/a.txt" throws "has no method basename"', function () {
