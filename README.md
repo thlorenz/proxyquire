@@ -132,6 +132,6 @@ Yes I know this example is totally contrived, but it shows lots of possibilities
 
 ## More Examples
 
-For more examples look inside the [examples folder](./blob/master/examples/) or
-look through the [tests](./blob/master/tests/proxyquire.js)
+For more examples look inside the [examples folder](./tree/master/examples/) or
+look through the [tests](./blob/master/test/proxyquire.js)
 
