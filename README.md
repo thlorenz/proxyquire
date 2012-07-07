@@ -24,7 +24,6 @@ Proxies nodejs require in order to allow overriding dependencies during testing.
 
 Just configure overrides in your tests and **proxyquire** does the rest.
 
-
 # Installation
 
     npm install proxyquire
@@ -39,7 +38,7 @@ Three simple steps to override require in your tests:
 
 Alternatively if you are more worried about test speed and/or are testing very large modules:
 
-- include var require = require('proxyquire'); on top of any module whose requires you want to be able to control
+- include `var require = require('proxyquire');` on top of any module whose requires you want to be able to control
 - setup desired module overrides (same as above)
 - use regular nodejs `require` in order to require the module you want to test and excercise its methods
 

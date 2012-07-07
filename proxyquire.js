@@ -1,6 +1,7 @@
 var path   =  require('path')
   , fs     =  require('fs')
   , util   =  require('util')
+  , existsSync = fs.existsSync || path.existsSync // support node 0.6 
   , active =  false
   ;
 
@@ -185,7 +186,7 @@ function proxyquireApi () {
           var jsfile;
 
           // finds foo.js even if it is required as foo
-          if (fs.existsSync(file)) 
+          if (existsSync(file)) 
             return file;
           else {
             jsfile = file + '.js';
