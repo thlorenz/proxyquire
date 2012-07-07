@@ -18,19 +18,44 @@
 
 Proxies nodejs require in order to allow overriding dependencies during testing.
 
+**No changes to your code** are necessary!
+
+Just configure overrides in your tests and **proxyquire** does the rest.
+
+
 # Installation
 
     npm install proxyquire
 
 # Usage
 
-3 simple steps
+Three simple steps to override require in your tests:
 
-- include `var require = require('proxyquire');` on top of any module whose requires you want to be able to control
+- `var proxyquire = require('proxyquire').setup();` on top level of your test file
 - setup desired module overrides e.g., `proxyquire({ path: { extname: function () { return 'meh'; } });` in your test
-- require the module you want to test and excercise its methods
+- `proxyquire.require(..)` the module you want to test and excercise its methods
+
+Alternatively if you are more worried about test speed and/or are testing very large modules:
+
+- include var require = require('proxyquire'); on top of any module whose requires you want to be able to control
+- setup desired module overrides (same as above)
+- use regular nodejs `require` in order to require the module you want to test and excercise its methods
 
 # API
+
+## proxyquire.setup()
+
+- needs to be called from **top level of test file**
+- needed to properly setup **proxyquire** for the use of `proxyquire.require(..)`
+- ideally you do this like so: `var proxyquire = require('proxyquire').setup();`
+
+## proxyquire.require(String [, String])
+
+Works the same as nodejs's `require` with one major difference:
+
+- without touching the original code `proxyquire.require` injects a `require` override before passing it on to nodejs's `require`
+- therefore you need to add **no changes to your code**
+- optional second argument can be used to manually pass `__dirname` of test file, but ideally this would be done via `proxyquire.setup`
 
 ## proxyquire.reset()
     
