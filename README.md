@@ -1,9 +1,11 @@
 **Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
 
-- [proxyquire](#proxyquire)
+- [proxyquire [![Build Status](https://secure.travis-ci.org/thlorenz/proxyquire.png)](http://travis-ci.org/thlorenz/proxyquire)](#proxyquire-[![build-status]https://securetravis-ciorg/thlorenz/proxyquirepng]http://travis-ciorg/thlorenz/proxyquire)
 - [Installation](#installation)
 - [Usage](#usage)
 - [API](#api)
+	- [proxyquire.setup()](#proxyquiresetup)
+	- [proxyquire.require(String [, String])](#proxyquirerequirestring-[-string])
 	- [proxyquire.reset()](#proxyquirereset)
 	- [proxyquire.add(Object)](#proxyquireaddobject)
 	- [proxyquire(Object)](#proxyquireobject)
