@@ -190,7 +190,7 @@ function proxyquireApi () {
             return file;
           else {
             jsfile = file + '.js';
-            if (fs.existsSync(jsfile))
+            if (existsSync(jsfile))
               return jsfile;
           }
 
