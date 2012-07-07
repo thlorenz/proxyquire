@@ -83,15 +83,19 @@ function proxyquireApi () {
       if (config[mdl].__proxyquire && config[mdl].__proxyquire.original) { 
 
         if (!config[mdl].__proxyquire.original[prop]) {
-          throw new ProxyquireError('The property [' + prop + '] you are trying to remove does not exist on the original module!' + 
-                              ' What are you up to?');
+          throw new ProxyquireError(
+            'The property [' + prop + '] you are trying to remove does not exist on the original module!' + 
+            ' What are you up to?'
+          );
         }
 
         config[mdl][prop] = config[mdl].__proxyquire.original[prop];
 
       } else {
-        throw new ProxyquireError('Did not find original module when trying to replace stubbed property with original one.' +
-                            '\nPlease make sure to cause the module to be required before removing properties.');
+        throw new ProxyquireError(
+          'Did not find original module when trying to replace stubbed property with original one.' +
+          '\nPlease make sure to cause the module to be required before removing properties.'
+        );
       }
     }
   }
@@ -101,6 +105,20 @@ function proxyquireApi () {
         config = { };
         clearRequireCache();
         active = true;
+        return this;
+      }
+    , setup: function () { 
+        // Needs to be called at root of test file, so we can resolve its __dirname
+        // Ideally this is done like so: var proxyquire = require('proxyquire').setup();
+      
+        var callerArgs = arguments.callee.caller.arguments
+        ,  caller__dirname = callerArgs[4];
+        
+        if (!caller__dirname) {
+          throw new ProxyquireError('Please call proxyquire.setup only from the TOP LEVEL of your test file!');
+        }
+
+        this.__testdirname = caller__dirname;
         return this;
       }
     , add: function (arg) {
@@ -152,6 +170,13 @@ function proxyquireApi () {
       }
     , require: function (arg, caller__dirname) {
 
+        if (!this.__testdirname && !caller__dirname) {
+          throw new ProxyquireError(
+            'Please call proxyquire.setup() from TOP LEVEL of your test file before using proxyquire.require!\n' +
+            'Alternatively pass __dirname of test file as second argument proxyquire.require.'
+          );
+        }
+
         // Automatically injects require override into code of the file to be required.
         // Saves result as new file and requires that file instead of the original one.
         // That way no change to original code is necessary in order to hook into proxyquire.
@@ -169,10 +194,14 @@ function proxyquireApi () {
           }
 
           // Cannot find file
-          throw new ProxyquireError(util.format('Cannot find file you required.\nTried [%s] and [%s]', file, jsfile));
+          throw new ProxyquireError(
+            util.format('Cannot find file you required.\nTried [%s] and [%s]', file, jsfile) +
+            '\nIf you are running tests from different files asynchronously, pass in scripts __dirname instead of using ' +
+            'proxyquire.setup().'
+          );
         }
 
-        var originalFile    =  find(resolve(arg, caller__dirname))
+        var originalFile    =  find(resolve(arg, caller__dirname || this.__testdirname))
           , originalCode    =  fs.readFileSync(originalFile)
           , proxyquiredFile =  originalFile + '.proxyquirefied'
           , proxyquiredCode =  
@@ -249,14 +278,10 @@ function proxyquire(arg) {
         .add(arg);
 
     } else {
-
       throw new ProxyquireError('arg needs to be string or object');
-
     }
   } else {
-
       throw new ProxyquireError('need to pass string or object argument');
-
   }
 }
 

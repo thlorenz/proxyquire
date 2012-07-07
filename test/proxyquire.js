@@ -1,7 +1,6 @@
 /*jshint asi:true */
 
-var proxyquire = require('../proxyquire');
-var dirname = __dirname;
+var proxyquire = require('../proxyquire').setup();
 
 proxyquire._proxyquire = '../../proxyquire';
 
@@ -292,7 +291,7 @@ describe('proxyquire.require automatically overrides require', function () {
   describe('when bar was stubbed and "foo-without-require-override.js" is proxyquire.required ', function () {
 
     beforeEach(function init() {
-      foo = proxyquire.require('./samples/foo-without-require-override.js', dirname);
+      foo = proxyquire.require('./samples/foo-without-require-override.js');
     });
 
     it('drinkUp returns stub', function () {
@@ -307,7 +306,7 @@ describe('proxyquire.require automatically overrides require', function () {
   describe('when bar was stubbed and "foo-without-require-override" is proxyquire.required ', function () {
 
     beforeEach(function init() {
-      foo = proxyquire.require('./samples/foo-without-require-override', dirname);
+      foo = proxyquire.require('./samples/foo-without-require-override');
     });
 
     it('drinkUp returns stub', function () {
@@ -322,8 +321,14 @@ describe('proxyquire.require automatically overrides require', function () {
   describe('when non existing file is required', function () {
     it('throws cannot find file error including the paths it tried', function () {
       (function () { 
-        proxyquire.require('./samples/foo-that-does-not-exist', dirname);
+        proxyquire.require('./samples/foo-that-does-not-exist');
       }).should.throw(/cannot find file(.|\n)+foo-that-does-not-exist.(.|\n)+foo-that-does-not-exist\.js/i);
     })
+  })
+})
+
+describe('when proxyquire.setup is called from anywhere else but the top level of the test file', function () {
+  it('throws an error explaining how to correct the problem', function () {
+    (function () { proxyquire.setup(); }).should.throw(/top level/i);
   })
 })
