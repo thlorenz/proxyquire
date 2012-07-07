@@ -1,6 +1,6 @@
 **Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
 
-- [proxyquire [![Build Status](https://secure.travis-ci.org/thlorenz/proxyquire.png)](http://travis-ci.org/thlorenz/proxyquire)](#proxyquire-[![build-status]https://securetravis-ciorg/thlorenz/proxyquirepng]http://travis-ciorg/thlorenz/proxyquire)
+- [proxyquire ](#proxyquire)
 - [Installation](#installation)
 - [Usage](#usage)
 - [API](#api)
@@ -16,7 +16,8 @@
 	- [Chaining API Calls](#chaining-api-calls)
 	- [More Examples](#more-examples)
 
-# proxyquire [![Build Status](https://secure.travis-ci.org/thlorenz/proxyquire.png)](http://travis-ci.org/thlorenz/proxyquire)
+# proxyquire 
+[![Build Status](https://secure.travis-ci.org/thlorenz/proxyquire.png)](http://travis-ci.org/thlorenz/proxyquire)
 
 Proxies nodejs require in order to allow overriding dependencies during testing.
 
