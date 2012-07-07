@@ -1,5 +1,8 @@
-var path = require('path');
-var active = false;
+var path   =  require('path')
+  , fs     =  require('fs')
+  , util   =  require('util')
+  , active =  false
+  ;
 
 function ProxyquireError(msg) {
   this.name = 'ProxyquireError';
@@ -93,7 +96,7 @@ function proxyquireApi () {
     }
   }
 
-  var self = {
+  return {
       reset: function () { 
         config = { };
         clearRequireCache();
@@ -147,10 +150,58 @@ function proxyquireApi () {
 
         return this;
       }
-    , __config: config
-  };
+    , require: function (arg, caller__dirname) {
 
-  return self
+        // Automatically injects require override into code of the file to be required.
+        // Saves result as new file and requires that file instead of the original one.
+        // That way no change to original code is necessary in order to hook into proxyquire.
+      
+        function find(file) {
+          var jsfile;
+
+          // finds foo.js even if it is required as foo
+          if (fs.existsSync(file)) 
+            return file;
+          else {
+            jsfile = file + '.js';
+            if (fs.existsSync(jsfile))
+              return jsfile;
+          }
+
+          // Cannot find file
+          throw new ProxyquireError(util.format('Cannot find file you required.\nTried [%s] and [%s]', file, jsfile));
+        }
+
+        var originalFile    =  find(resolve(arg, caller__dirname))
+          , originalCode    =  fs.readFileSync(originalFile)
+          , proxyquiredFile =  originalFile + '.proxyquirefied'
+          , proxyquiredCode =  
+              // all on first line (don't introduce new line in order to keep original and proxified line numbers matching)
+              '/* START proxyquirefying (This file should have been removed after testing, please remove!) */'  +
+              'var require = require("' + this._proxyquire + '"); '                                             +
+              '/* END proxyquirefying Original code on this line: */ '                                          +
+              originalCode
+          , dependency
+          ;
+          
+          fs.writeFileSync(proxyquiredFile, proxyquiredCode);
+
+          try {
+            dependency = require(proxyquiredFile);
+          } catch (err) {
+            throw (err);
+          } finally {
+            // Make sure we remove the generated file even if require fails
+            fs.unlinkSync(proxyquiredFile); 
+          }
+
+        return dependency;
+      }
+
+    // Don't touch below props as they are only here for diagnostics and testing
+    , _config: config
+    , _proxyquire: 'proxyquire'
+  };
 }
 
 function proxyquire(arg) {

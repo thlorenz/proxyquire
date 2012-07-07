@@ -1,6 +1,9 @@
 /*jshint asi:true */
 
 var proxyquire = require('../proxyquire');
+var dirname = __dirname;
+
+proxyquire._proxyquire = '../../proxyquire';
 
 describe('when no module was overridden', function () {
 
@@ -267,6 +270,60 @@ describe('when I override path.basename to return 1 in strict mode', function ()
       (function () {
         path.basename('/path/a.txt')
       }).should.throw(/has no method.*basename/);
+    })
+  })
+})
+
+describe('proxyquire.require automatically overrides require', function () {
+  var foo;
+  beforeEach(function () {
+    // foo requires bar
+    // foo.gotoBar calls bar.drinkUp
+    // foo.throwRound calls bar.drinksOnMe
+
+    proxyquire({
+      './bar': { 
+          drinkUp    :  function () { return 'keep it up'; }
+        , drinksOnMe :  function () { return 'you wish'; }
+      }
+    });
+  })
+
+  describe('when bar was stubbed and "foo-without-require-override.js" is proxyquire.required ', function () {
+
+    beforeEach(function init() {
+      foo = proxyquire.require('./samples/foo-without-require-override.js', dirname);
+    });
+
+    it('drinkUp returns stub', function () {
+      foo.gotoBar().should.eql('keep it up');
+    })
+
+    it('drinksOnMe returns stub', function () {
+      foo.throwRound().should.eql('you wish');  
+    })
+  })
+
+  describe('when bar was stubbed and "foo-without-require-override" is proxyquire.required ', function () {
+
+    beforeEach(function init() {
+      foo = proxyquire.require('./samples/foo-without-require-override', dirname);
+    });
+
+    it('drinkUp returns stub', function () {
+      foo.gotoBar().should.eql('keep it up');
+    })
+
+    it('drinksOnMe returns stub', function () {
+      foo.throwRound().should.eql('you wish');  
+    })
+  })
+  
+  describe('when non existing file is required', function () {
+    it('throws cannot find file error including the paths it tried', function () {
+      (function () { 
+        proxyquire.require('./samples/foo-that-does-not-exist', dirname);
+      }).should.throw(/cannot find file(.|\n)+foo-that-does-not-exist.(.|\n)+foo-that-does-not-exist\.js/i);
     })
   })
 })
