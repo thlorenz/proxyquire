@@ -41,10 +41,7 @@ function addMissingProperties(mdl) {
   Object.keys(orig).forEach(function (key) {
     if (!mdl[key]) { 
       mdl[key] = orig[key];   
-    } else {
-      // Remember the original method in case we delete/unoverride it later
-      mdl[key].orig = orig[key];
-    }
+    } 
   });
 }
 
