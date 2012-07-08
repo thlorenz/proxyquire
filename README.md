@@ -2,14 +2,14 @@
 
 Proxies nodejs's require in order to make overriding dependencies during testing easy while staying **totally unobstrusive**.
 
-## Features
+# Features
 
 - **no changes to your code** are necessary 
 - non overriden methods of a module behave like the original
 - overrides can be removed individually after they were added
 - strict mode to enforce overriding all methods used in a to be tested module
 
-## Example
+# Example
 
 **foo.js:**
 
@@ -17,11 +17,11 @@ Proxies nodejs's require in order to make overriding dependencies during testing
 var path = require('path');
 
 module.exports.extnameAllCaps = function (file) { 
-    return path.extname(file).toUpperCase();
+  return path.extname(file).toUpperCase();
 };
 
 module.exports.basenameAllCaps = function (file) { 
-    return path.basename(file).toUpperCase();
+  return path.basename(file).toUpperCase();
 };
 ```
 
@@ -29,7 +29,7 @@ module.exports.basenameAllCaps = function (file) {
 
 ```javascript
 var proxyquire = require('proxyquire').setup()
-    , assert = require('assert');
+  , assert = require('assert');
 
 // no overrides yet, so path.extname behaves normally
 var foo = proxyquire.require('./foo');
@@ -37,7 +37,7 @@ assert.equal(foo.extnameAllCaps('file.txt'), '.TXT');
 
 // override path.extname
 proxyquire({
-    path: { extname: function (file) { return 'Exterminate, exterminate the ' + file; } }
+  path: { extname: function (file) { return 'Exterminate, exterminate the ' + file; } }
 });
 
 // path.extname now behaves as we told it to
@@ -65,11 +65,11 @@ assert.equal(foo.basenameAllCaps('/a/b/file.txt'), 'FILE.TXT');
         - [Strict](#strict)
 - [More Examples](#more-examples)
 
-## Installation
+# Installation
 
     npm install proxyquire
 
-## Usage
+# Usage
 
 Three simple steps to override require in your tests:
 
@@ -83,16 +83,16 @@ Alternatively if you are worried about test speed and/or are testing very large 
 - setup desired module overrides (same as above)
 - use regular nodejs `require` in order to require the module you want to test and excercise its methods
 
-## API
+# API
 
-### Setup proxyquire inside test
+## Setup proxyquire inside test
 
 ***var proxyquire = require('proxyquire').setup();***
 
 - needs to be called from **top level of test file**
 - properly sets up calls to `proxyquire.require(..)`
 
-### Require module to be tested
+## Require module to be tested
 
 ***proxyquire.require(String [, String])***
 
@@ -102,7 +102,7 @@ Works the same as nodejs's `require` while preparing the to be tested module to 
 - since this happens automatically, **you don't need to change the code** of the module whose dependencies you want to override
 - optional second argument can be used to manually pass `__dirname` of test file, but ideally this would be done via `proxyquire.setup()`
 
-### Reset all overrides
+## Reset all overrides
 
 ***proxyquire.reset()***
 
@@ -112,7 +112,7 @@ Useful if you want to entirely start over in overriding dependencies.
 - flushes nodejs's require cache in order to force re-requiring the module you
   are testing, in order to cause any new overridden modules to be re-required as well
 
-### Override methods of required modules
+## Override methods of required modules
 
 ***proxyquire.add(Object)***
 
@@ -141,13 +141,13 @@ proxyquire.add({
   module2 it is configured to be `strict` see [strict vs. non-strict
   overrides](#strict-vs-non-strict-overrides)
 
-### Reset and override in one step
+## Reset and override in one step
 
 ***proxyquire(Object)***
 
 A shortcut which calls `proxyquire.reset()` and then `proxyquire.add(Object)`
 
-### Removing overrides
+## Removing overrides
 
 ***proxyquire.del(String | Object)***
 
@@ -178,7 +178,7 @@ this has the same effect as overriding entire `path` module):
     proxyquire.del({ path: [ 'extname', 'basename' ] });
 ```
 
-### Chain API Calls
+## Chain API Calls
 
 **proxyquire**'s API supports chaining of method calls during setup.
 
@@ -200,7 +200,7 @@ proxyquire
 are perfectly legal. 
 Yes I know this example is totally contrived, but it shows lots of possibilities in one shot ;) .
 
-### strict vs. non-strict overrides
+## strict vs. non-strict overrides
 
 Controls what happens when a function that wasn't overridden (added) via **proxyquire** is called.
 
@@ -210,7 +210,7 @@ In **strict** mode **proxyquire** will fail with `has no method ...` exception
 
 **Examples:**
 
-#### Non-strict
+### Non-strict
 
 ```javascript
 proxyquire.add({
@@ -219,7 +219,7 @@ proxyquire.add({
 require('path').basename('/a/b/c.txt') // returns 'c.txt'
 ```
 
-#### Strict
+### Strict
 
 ```javascript
 proxyquire.add({
@@ -229,7 +229,7 @@ proxyquire.add({
 require('path').basename('/a/b/c.txt') // will throw an error
 ```
 
-## More Examples
+# More Examples
 
 For more examples look inside the [examples folder](./proxyquire/tree/master/examples/) or
 look through the [tests](./proxyquire/blob/master/test/proxyquire.js)
