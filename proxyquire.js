@@ -174,7 +174,7 @@ function proxyquireApi () {
         if (!this.__testdirname && !caller__dirname) {
           throw new ProxyquireError(
             'Please call proxyquire.setup() from TOP LEVEL of your test file before using proxyquire.require!\n' +
-            'Alternatively pass __dirname of test file as second argument proxyquire.require.'
+            'Alternatively pass __dirname of test file as second argument to proxyquire.require.'
           );
         }
 
