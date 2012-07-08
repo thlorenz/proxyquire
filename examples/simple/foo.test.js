@@ -1,5 +1,8 @@
+require('../example-utils').listModuleAndTests(__dirname + '/foo.js', __filename);
+
 var proxyquire = require('../../proxyquire').setup()
-  , assert = require('assert');
+  , assert = require('assert')
+  ;
 
 // Needed since we use proxyquire locally instead of an imported module inside 'node_modules'
 proxyquire._proxyquire = '../../proxyquire';
@@ -20,4 +23,4 @@ assert.equal(foo.extnameAllCaps('file.txt'), 'EXTERMINATE, EXTERMINATE THE FILE.
 // path.basename on the other hand still functions as before
 assert.equal(foo.basenameAllCaps('/a/b/file.txt'), 'FILE.TXT');
 
-console.log('all asserts passed');
+console.log('*** All asserts passed ***');
