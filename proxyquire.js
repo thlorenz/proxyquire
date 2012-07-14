@@ -217,7 +217,6 @@ function proxyquireApi () {
           fs.writeFileSync(proxyquiredFile, proxyquiredCode);
 
           try {
-            console.log('requiring', proxyquiredFile);
             dependency = require(proxyquiredFile);
           } catch (err) {
             console.trace();
