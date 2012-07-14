@@ -1,5 +1,9 @@
 /*jshint asi:true */
 
+var path = require('path')
+  , should = require('should')
+  ;
+
 var proxyquire = require('../proxyquire').setup();
 
 proxyquire._proxyquire = '../../proxyquire';
@@ -288,7 +292,7 @@ describe('proxyquire.require automatically overrides require', function () {
     });
   })
 
-  describe('when bar was stubbed and "foo-without-require-override.js" is proxyquire.required ', function () {
+  describe('when bar was stubbed and "./samples/foo-without-require-override.js" is proxyquire.required ', function () {
 
     beforeEach(function init() {
       foo = proxyquire.require('./samples/foo-without-require-override.js');
@@ -303,10 +307,10 @@ describe('proxyquire.require automatically overrides require', function () {
     })
   })
 
-  describe('when bar was stubbed and "foo-without-require-override" is proxyquire.required ', function () {
+  describe('when bar was stubbed and "../test/samples/foo-without-require-override" is proxyquire.required ', function () {
 
     beforeEach(function init() {
-      foo = proxyquire.require('./samples/foo-without-require-override');
+      foo = proxyquire.require('../test/samples/foo-without-require-override');
     });
 
     it('drinkUp returns stub', function () {
@@ -327,8 +331,26 @@ describe('proxyquire.require automatically overrides require', function () {
   })
 })
 
+describe('proxyquire.require for absolute paths', function () {
+  describe('when I require ./samples/foo-without-require-override.js with absolute path', function () {
+    it('finds it', function () {
+      should.exist(proxyquire.require(path.join(__dirname, './samples/foo-without-require-override.js')));
+    })  
+  })
+
+  describe('when I require ./file-that-doesnt-exist.js with absolute path', function () {
+    it('finds it', function () {
+      (function () { 
+        proxyquire.require(path.join(__dirname, './file-that-doesnt-exist.js'))
+      }).should.throw(/cannot find file/i);
+    })  
+  })
+  
+})
 describe('when proxyquire.setup is called from anywhere else but the top level of the test file', function () {
   it('throws an error explaining how to correct the problem', function () {
     (function () { proxyquire.setup(); }).should.throw(/top level/i);
   })
 })
+
+
