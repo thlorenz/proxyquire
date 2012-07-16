@@ -231,8 +231,13 @@ function proxyquireApi () {
       }
 
     // Don't touch below props as they are only here for diagnostics and testing
-    , _config: config
+    , _getConfig: function () { return config; }
     , _proxyquire: 'proxyquire'
+    , print: function () { 
+        console.log('config:');
+        console.dir(this._getConfig());
+        console.log('__testdirname: ', this.__testdirname);
+      }
   };
 }
 
@@ -276,7 +281,7 @@ function proxyquire(arg) {
     } else if (typeof arg === 'object') {
       
       // b) shortcut to reset and add overrides in one call
-      return api
+      return proxyquire
         .reset()
         .add(arg);
 
