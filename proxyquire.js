@@ -34,11 +34,11 @@ function resolve (mdl, caller__dirname) {
   }
 }
 
-function addMissingProperties(mdl) {
+function addMissingProperties(mdl, forceStrict) {
   var orig = mdl.__proxyquire.original;
   
   // In strict mode we 'require' all properties to be used in tests to be overridden beforehand
-  if (mdl.__proxyquire && mdl.__proxyquire.strict) return;
+  if (mdl.__proxyquire && (forceStrict || mdl.__proxyquire.strict)) return;
   
   // In non strict mode (default), we fill in all missing properties from the original module
   Object.keys(orig).forEach(function (key) {
@@ -108,7 +108,7 @@ function proxyquireApi () {
         active = true;
         return this;
       }
-    , setup: function () { 
+    , setup: function (forceStrict) { 
         // Needs to be called at root of test file, so we can resolve its __dirname
         // Ideally this is done like so: var proxyquire = require('proxyquire').setup();
       
@@ -121,6 +121,10 @@ function proxyquireApi () {
 
         this.__testdirname = caller__dirname;
         return this;
+      }
+    , forceStrict: function (forceStrict) { 
+        this.__forceStrict = forceStrict === undefined || forceStrict;
+        return this; 
       }
     , add: function (arg) {
         Object.keys(arg).forEach(function (key) {
@@ -233,6 +237,8 @@ function proxyquireApi () {
     // Don't touch below props as they are only here for diagnostics and testing
     , _getConfig: function () { return config; }
     , _proxyquire: 'proxyquire'
+    , __testdirname: undefined
+    , __forceStrict: undefined
     , print: function () { 
         console.log('config:');
         console.dir(this._getConfig());
@@ -268,7 +274,7 @@ function proxyquire(arg) {
         // If non-strict and we didn't fill missing properties before ...
         if (!config[arg].__proxyquire.strict && !config[arg].__proxyquire.original) {
           config[arg].__proxyquire.original = require(resolvedPath);
-          addMissingProperties(config[arg]);
+          addMissingProperties(config[arg], proxyquire.__forceStrict);
         }
 
         return config[arg];

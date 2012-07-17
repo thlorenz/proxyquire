@@ -59,6 +59,7 @@ assert.equal(foo.basenameAllCaps('/a/b/file.txt'), 'FILE.TXT');
     - [Override methods of required modules](#override-methods-of-required-modules)
     - [Reset and override in one step](#reset-and-override-in-one-step)
     - [Removing overrides](#removing-overrides)
+      [Forcing strict for all overrides](#forcing-strict-for-all-overrides)
     - [Chain API Calls](#chain-api-calls)
     - [strict vs. non-strict overrides](#strict-vs-non-strict-overrides)
         - [Non-strict](#non-strict)
@@ -153,6 +154,20 @@ A shortcut which calls `proxyquire.reset()` and then `proxyquire.add(Object)`
 
 Removes overrides and replaces them with method of the real module unless it was overridden using **strict** mode.
 
+## Forcing strict for all overrides
+
+***proxyquire.forceStrict([force])***
+
+Allows to enforce [strict mode](#strict-vs-non-strict-overrides) for all overrides, even if they aren't explicitly declared as strict.
+
+```javascript
+proxyquire.forceStrict();
+```
+
+- force parameter is optional and if not present `true` is assumed, thus `forceStrict()` has the same effect as `forceStrict(true)`.
+- if force parameter is false, strict mode is no longer enforced e.g., things are back to normal.
+- note that once the strict mode is changed, it will stay so for the entire lifetime of proxyquire (even if [reset](#reset-all-overrides) is called. Change it back to normal via `forceStrict(false)`.
+
 **Examples:** 
 
 Assume `path.extname` and `path.basename` were overridden previously.
@@ -160,14 +175,14 @@ Assume `path.extname` and `path.basename` were overridden previously.
 Remove all `path` module overrides:
 
 ```javascript
-    proxyquire.del('path');
+proxyquire.del('path');
 ```
 
 
 Remove only `path.extname` override:
 
 ```javascript
-    proxyquire.del({ path: 'extname' });
+proxyquire.del({ path: 'extname' });
 ```
 
 
@@ -175,7 +190,7 @@ Explicitly remove `path.extname` and `path.basename` overrides. (In this case
 this has the same effect as overriding entire `path` module):
 
 ```javascript
-    proxyquire.del({ path: [ 'extname', 'basename' ] });
+proxyquire.del({ path: [ 'extname', 'basename' ] });
 ```
 
 ## Chain API Calls
@@ -186,6 +201,7 @@ Things like:
 
 ```javascript
 proxyquire
+  .enforceStrict()
   .reset()
   .add({
     path: { extname: function (x) { return 'what?'; } 
@@ -193,12 +209,10 @@ proxyquire
   .add({
     fs: { realpath: function (x, y) { return 'no really, what?'; } 
   })
-  .del('path')
   ;
 ```
 
 are perfectly legal. 
-Yes I know this example is totally contrived, but it shows lots of possibilities in one shot ;) .
 
 ## strict vs. non-strict overrides
 
@@ -207,6 +221,8 @@ Controls what happens when a function that wasn't overridden (added) via **proxy
 In **non-strict** mode **proxyquire** will call the method with the same name on the 'real' module.
 
 In **strict** mode **proxyquire** will fail with `has no method ...` exception
+
+The default strict mode can be changed by [forcing strict-for-all-overrides](#forcing-strict-for-all-overrides).
 
 **Examples:**
 

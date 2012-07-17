@@ -26,16 +26,15 @@ describe('when no module was overridden', function () {
 describe('module overrides', function () {
 
   describe('override extname to return ".xtx"', function () {
-    var path 
+    var path;
 
     beforeEach(function () {
-      proxyquire({ 
+        proxyquire({
           path: { 
-            extname: function () { return '.xtx'; }
+              extname: function () { return '.xtx'; }
           }
         });
-
-      path = proxyquire('path');
+        path = proxyquire('path');
     });
 
     it('path.extname("a.txt") returns ".xtx"', function () {
@@ -45,11 +44,43 @@ describe('module overrides', function () {
     it('path.basename("/path/a.txt" returns "a.txt"', function () {
       path.basename('/path/a.txt').should.eql('a.txt');
     })
-    
+  })
+
+  describe('proxyquire setup to enforce strict globally', function () {
+    before(function () {
+      proxyquire.forceStrict();
+    })
+
+    after(function () {
+      proxyquire.forceStrict(false);
+    })
+
+    describe('non-strict override extname to return ".xtx"', function () {
+      var path;
+
+      beforeEach(function () {
+        proxyquire({
+          path: { 
+              extname: function () { return '.xtx'; }
+          }
+        });
+        path = proxyquire('path');;
+      });
+
+      it('path.extname("a.txt") returns ".xtx"', function () {
+        path.extname('a.txt').should.eql('.xtx');
+      })
+
+      it('path.basename("/path/a.txt" throws "has no method basename"', function () {
+        (function () {
+          path.basename('/path/a.txt')
+        }).should.throw(/has no method.*basename/);
+      })
+    })
   })
 
   describe('strict override extname to return ".xtx"', function () {
-    var path 
+    var path;
 
     beforeEach(function () {
       proxyquire
