@@ -3,6 +3,9 @@ var path   =  require('path')
   , util   =  require('util')
   , existsSync = fs.existsSync || path.existsSync // support node 0.6 
   , active =  false
+  , config = { }
+  , testdirname
+  , forceStrict
   ;
 
 function ProxyquireError(msg) {
@@ -10,9 +13,6 @@ function ProxyquireError(msg) {
   this.message = msg || 'An error occurred inside proxyquire.';
 }
 
-var config = { }
-  , api = proxyquireApi()
-  ;
 
 function resolve (mdl, caller__dirname) {
   
@@ -34,7 +34,7 @@ function resolve (mdl, caller__dirname) {
   }
 }
 
-function addMissingProperties(mdl, forceStrict) {
+function addMissingProperties(mdl) {
   var orig = mdl.__proxyquire.original;
   
   // In strict mode we 'require' all properties to be used in tests to be overridden beforehand
@@ -48,7 +48,67 @@ function addMissingProperties(mdl, forceStrict) {
   });
 }
 
-function proxyquireApi () {
+//
+// Main proxyquire function
+// Replaces 'require' in to be tested files and serves as shortcut 'reset().add(..)' in tests
+// 
+function proxyquire(arg) {
+  
+  var callerArgs = arguments.callee.caller.arguments
+    , caller__dirname = callerArgs[4]
+    ;
+    
+  // Two options:
+  //   a) arg is string - used by module that we are testing when it requires its dependencies
+  //   b) arg is object - used as a shortcut to invoke reset and then add in one step
+
+  if (arg) {
+    
+    if (typeof arg === 'string') {
+
+      var resolvedPath = resolve(arg, caller__dirname);
+
+      // Shortcut the process if we are not testing
+      if (!active) return require(resolvedPath);
+
+      // a) get overridden module or resolve it through original require
+      if (config[arg]) {
+        config[arg].__proxyquire = config[arg].__proxyquire || { };
+
+        // Here is the only sure way to resolve the original require, so we attach it to the overridden module for later use
+        // If non-strict and we didn't fill missing properties before ...
+        if (!config[arg].__proxyquire.strict && !config[arg].__proxyquire.original) {
+          config[arg].__proxyquire.original = require(resolvedPath);
+          addMissingProperties(config[arg]);
+        }
+
+        return config[arg];
+      } else {
+        
+        var original = require(resolvedPath);
+        return original;
+      }
+
+    } else if (typeof arg === 'object') {
+      
+      // b) shortcut to reset and add overrides in one call
+      return proxyquire
+        .reset()
+        .add(arg);
+
+    } else {
+      throw new ProxyquireError('arg needs to be string or object');
+    }
+  } else {
+      throw new ProxyquireError('need to pass string or object argument');
+  }
+}
+
+//
+// proxyquire function also functions (npi) as an object that exposes proxyquire api.
+// The proxyquire API contains all methods to be used in tests to configure proxyquire and require the to be tested module
+//
+(function attachApi () {
 
   function clearRequireCache() {
     Object.keys(require.cache).forEach(function (key) {
@@ -101,208 +161,157 @@ function proxyquireApi () {
     }
   }
 
-  return {
-      reset: function () { 
-        config = { };
-        clearRequireCache();
-        active = true;
-        return this;
-      }
-    , setup: function (forceStrict) { 
-        // Needs to be called at root of test file, so we can resolve its __dirname
-        // Ideally this is done like so: var proxyquire = require('proxyquire').setup();
-      
-        var callerArgs = arguments.callee.caller.arguments
-        ,  caller__dirname = callerArgs[4];
-        
-        if (!caller__dirname) {
-          throw new ProxyquireError('Please call proxyquire.setup only from the TOP LEVEL of your test file!');
-        }
-
-        this.__testdirname = caller__dirname;
-        return this;
-      }
-    , forceStrict: function (forceStrict) { 
-        this.__forceStrict = forceStrict === undefined || forceStrict;
-        return this; 
-      }
-    , add: function (arg) {
-        Object.keys(arg).forEach(function (key) {
-          addOverrides(arg[key], key); 
-        });
-
-        active = true;
-        return this;
-      }
-    , del: function (arg) {
-
-        // Remove entire module
-        if (typeof arg === 'string') {
-          // Cannot delete module property here, since dependant holds reference to it and thus wouldn't be affected
-          // Instead we need to remove all props to get them to point at the real required module
-
-          Object.keys(config[arg]).forEach( function (p) {
-            if (p !== '__proxyquire') removeProperty(arg, p);
-          });
-
-          return this;
-        }
-
-        // Remove only specified properties of the given module
-        Object.keys(arg).forEach( function (mdl) {
-
-          if (config[mdl]) {
-            var prop = arg[mdl];
-
-            if (typeof prop === 'string') {
-
-              removeProperty(mdl, prop);
-
-            } else if (Array.isArray(prop)) {
-
-              prop.forEach(function (p) {
-                removeProperty(mdl, p);
-              });
-
-            } else {
-              throw new ProxyquireError('argument to delete needs to be key: String, or key: Array[String] object');
-            }
-          }
-          
-        });
-
-        return this;
-      }
-    , require: function (arg, caller__dirname) {
-
-        if (!this.__testdirname && !caller__dirname) {
-          throw new ProxyquireError(
-            'Please call proxyquire.setup() from TOP LEVEL of your test file before using proxyquire.require!\n' +
-            'Alternatively pass __dirname of test file as second argument to proxyquire.require.'
-          );
-        }
-
-        // Automatically injects require override into code of the file to be required.
-        // Saves result as new file and requires that file instead of the original one.
-        // That way no change to original code is necessary in order to hook into proxyquire.
-      
-        function find(file) {
-          var jsfile;
-
-          // finds foo.js even if it is required as foo
-          if (existsSync(file)) 
-            return file;
-          else {
-            jsfile = file + '.js';
-            if (existsSync(jsfile))
-              return jsfile;
-          }
-
-          // Cannot find file
-          throw new ProxyquireError(
-            util.format('Cannot find file you required.\nTried [%s] and [%s]', file, jsfile) +
-            '\nIf you are running tests from different files asynchronously, pass in scripts __dirname instead of using ' +
-            'proxyquire.setup().'
-          );
-        }
-
-        var originalFile    =  find(resolve(arg, caller__dirname || this.__testdirname))
-          , originalCode    =  fs.readFileSync(originalFile)
-          , proxyquiredFile =  originalFile + '.proxyquirefied'
-          , proxyquiredCode =  
-              // all on first line (don't introduce new line in order to keep original and proxified line numbers matching)
-              '/* START proxyquirefying (This file should have been removed after testing, please remove!) */'  +
-              'var require = require("' + this._proxyquire + '"); '                                             +
-              '/* END proxyquirefying Original code on this line: */ '                                          +
-              originalCode
-          , dependency
-          ;
-          
-          fs.writeFileSync(proxyquiredFile, proxyquiredCode);
-
-          try {
-            dependency = require(proxyquiredFile);
-          } catch (err) {
-            console.trace();
-            console.error(err);
-            throw (err);
-          } finally {
-            // Make sure we remove the generated file even if require fails
-            fs.unlinkSync(proxyquiredFile); 
-          }
-
-        return dependency;
-      }
-
-    // Don't touch below props as they are only here for diagnostics and testing
-    , _getConfig: function () { return config; }
-    , _proxyquire: 'proxyquire'
-    , __testdirname: undefined
-    , __forceStrict: undefined
-    , print: function () { 
-        console.log('config:');
-        console.dir(this._getConfig());
-        console.log('__testdirname: ', this.__testdirname);
-      }
+  proxyquire.reset = function () { 
+      config = { };
+      clearRequireCache();
+      active = true;
+      return this;
   };
-}
 
-function proxyquire(arg) {
-  
-  var callerArgs = arguments.callee.caller.arguments
-    , caller__dirname = callerArgs[4]
-    ;
+  proxyquire.setup = function (forceStrict) { 
+      // Needs to be called at root of test file, so we can resolve its __dirname
+      // Ideally this is done like so: var proxyquire = require('proxyquire').setup();
     
-  // Two options:
-  //   a) arg is string - used by module that we are testing when it requires its dependencies
-  //   b) arg is object - used as a shortcut to invoke reset and then add in one step
-
-  if (arg) {
-    
-    if (typeof arg === 'string') {
-
-      var resolvedPath = resolve(arg, caller__dirname);
-
-      // Shortcut the process if we are not testing
-      if (!active) return require(resolvedPath);
-
-      // a) get overridden module or resolve it through original require
-      if (config[arg]) {
-        config[arg].__proxyquire = config[arg].__proxyquire || { };
-
-        // Here is the only sure way to resolve the original require, so we attach it to the overridden module for later use
-        // If non-strict and we didn't fill missing properties before ...
-        if (!config[arg].__proxyquire.strict && !config[arg].__proxyquire.original) {
-          config[arg].__proxyquire.original = require(resolvedPath);
-          addMissingProperties(config[arg], proxyquire.__forceStrict);
-        }
-
-        return config[arg];
-      } else {
-        
-        var original = require(resolvedPath);
-        return original;
+      var callerArgs = arguments.callee.caller.arguments
+      ,  caller__dirname = callerArgs[4];
+      
+      if (!caller__dirname) {
+        throw new ProxyquireError('Please call proxyquire.setup only from the TOP LEVEL of your test file!');
       }
 
-    } else if (typeof arg === 'object') {
-      
-      // b) shortcut to reset and add overrides in one call
-      return proxyquire
-        .reset()
-        .add(arg);
+      testdirname = caller__dirname;
+      return this;
+  };
 
-    } else {
-      throw new ProxyquireError('arg needs to be string or object');
-    }
-  } else {
-      throw new ProxyquireError('need to pass string or object argument');
-  }
-}
+  proxyquire.forceStrict = function (force) { 
+      forceStrict = force === undefined || force;
+      return this; 
+  };
 
-// Attach api to exported function to allow things like
-// proxyquire.reset() 
-Object.keys(api).forEach(function (key) {
-  proxyquire[key] = api[key];
-});
+  proxyquire.add = function (arg) {
+      Object.keys(arg).forEach(function (key) {
+        addOverrides(arg[key], key); 
+      });
+
+      active = true;
+      return this;
+  };
+
+  proxyquire.del = function (arg) {
+
+      // Remove entire module
+      if (typeof arg === 'string') {
+        // Cannot delete module property here, since dependant holds reference to it and thus wouldn't be affected
+        // Instead we need to remove all props to get them to point at the real required module
+
+        Object.keys(config[arg]).forEach( function (p) {
+          if (p !== '__proxyquire') removeProperty(arg, p);
+        });
+
+        return this;
+      }
+
+      // Remove only specified properties of the given module
+      Object.keys(arg).forEach( function (mdl) {
+
+        if (config[mdl]) {
+          var prop = arg[mdl];
+
+          if (typeof prop === 'string') {
+
+            removeProperty(mdl, prop);
+
+          } else if (Array.isArray(prop)) {
+
+            prop.forEach(function (p) {
+              removeProperty(mdl, p);
+            });
+
+          } else {
+            throw new ProxyquireError('argument to delete needs to be key: String, or key: Array[String] object');
+          }
+        }
+        
+      });
+
+      return this;
+  };
+
+  proxyquire.require = function (arg, caller__dirname) {
+
+      if (!testdirname && !caller__dirname) {
+        throw new ProxyquireError(
+          'Please call proxyquire.setup() from TOP LEVEL of your test file before using proxyquire.require!\n' +
+          'Alternatively pass __dirname of test file as second argument to proxyquire.require.'
+        );
+      }
+
+      // Automatically injects require override into code of the file to be required.
+      // Saves result as new file and requires that file instead of the original one.
+      // That way no change to original code is necessary in order to hook into proxyquire.
+    
+      function find(file) {
+        var jsfile;
+
+        // finds foo.js even if it is required as foo
+        if (existsSync(file)) 
+          return file;
+        else {
+          jsfile = file + '.js';
+          if (existsSync(jsfile))
+            return jsfile;
+        }
+
+        // Cannot find file
+        throw new ProxyquireError(
+          util.format('Cannot find file you required.\nTried [%s] and [%s]', file, jsfile) +
+          '\nIf you are running tests from different files asynchronously, pass in scripts __dirname instead of using ' +
+          'proxyquire.setup().'
+        );
+      }
+
+      var originalFile    =  find(resolve(arg, caller__dirname || testdirname))
+        , originalCode    =  fs.readFileSync(originalFile)
+        , proxyquiredFile =  originalFile + '.proxyquirefied'
+        , proxyquiredCode =  
+            // all on first line (don't introduce new line in order to keep original and proxified line numbers matching)
+            '/* START proxyquirefying (This file should have been removed after testing, please remove!) */'  +
+            'var require = require("' + this._proxyquire + '"); '                                             +
+            '/* END proxyquirefying Original code on this line: */ '                                          +
+            originalCode
+        , dependency
+        ;
+        
+        fs.writeFileSync(proxyquiredFile, proxyquiredCode);
+
+        try {
+          dependency = require(proxyquiredFile);
+        } catch (err) {
+          console.trace();
+          console.error(err);
+          throw (err);
+        } finally {
+          // Make sure we remove the generated file even if require fails
+          fs.unlinkSync(proxyquiredFile); 
+        }
+
+      return dependency;
+  };
+
+  proxyquire.print = function () { 
+      console.log('config:');
+      console.dir(this._getConfig());
+      console.log('testdirname: ', testdirname);
+      console.log('forceStrict: ', forceStrict);
+  };
+
+  // Diagnostics
+  proxyquire._getConfig      =  function () { return config; };
+  proxyquire._getForceStrict =  function () { return forceStrict; };
+  proxyquire._getTestdirname =  function () { return testdirname; };
+  
+  // Don't touch below prop. Only here for testing purposes.
+  proxyquire._proxyquire     =  'proxyquire';
+}) ();
 
 module.exports = proxyquire;
