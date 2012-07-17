@@ -168,7 +168,7 @@ function proxyquire(arg) {
       return this;
   };
 
-  proxyquire.setup = function (forceStrict) { 
+  proxyquire.setup = function () { 
       // Needs to be called at root of test file, so we can resolve its __dirname
       // Ideally this is done like so: var proxyquire = require('proxyquire').setup();
     
