@@ -59,7 +59,7 @@ assert.equal(foo.basenameAllCaps('/a/b/file.txt'), 'FILE.TXT');
     - [Override methods of required modules](#override-methods-of-required-modules)
     - [Reset and override in one step](#reset-and-override-in-one-step)
     - [Removing overrides](#removing-overrides)
-      [Forcing strict for all overrides](#forcing-strict-for-all-overrides)
+    - [Forcing strict for all overrides](#forcing-strict-for-all-overrides)
     - [Chain API Calls](#chain-api-calls)
     - [strict vs. non-strict overrides](#strict-vs-non-strict-overrides)
         - [Non-strict](#non-strict)
@@ -160,13 +160,13 @@ Removes overrides and replaces them with method of the real module unless it was
 
 Allows to enforce [strict mode](#strict-vs-non-strict-overrides) for all overrides, even if they aren't explicitly declared as strict.
 
-```javascript
-proxyquire.forceStrict();
-```
-
-- force parameter is optional and if not present `true` is assumed, thus `forceStrict()` has the same effect as `forceStrict(true)`.
-- if force parameter is false, strict mode is no longer enforced e.g., things are back to normal.
-- note that once the strict mode is changed, it will stay so for the entire lifetime of proxyquire (even if [reset](#reset-all-overrides) is called. Change it back to normal via `forceStrict(false)`.
+- force parameter is optional and if not present `true` is assumed, thus
+  `forceStrict()` has the same effect as `forceStrict(true)`
+- if force parameter is false, strict mode is no longer enforced e.g., things
+  are back to normal
+- note that once the strict mode is changed, it will stay so for the entire
+  lifetime of proxyquire even if [reset](#reset-all-overrides) is called.
+- once strict mode is enforced, you may change it back to non-strict mode via `forceStrict(false)`
 
 **Examples:** 
 
@@ -222,7 +222,7 @@ In **non-strict** mode **proxyquire** will call the method with the same name on
 
 In **strict** mode **proxyquire** will fail with `has no method ...` exception
 
-The default strict mode can be changed by [forcing strict-for-all-overrides](#forcing-strict-for-all-overrides).
+The default strict mode can be changed by [forcing strict for all overrides](#forcing-strict-for-all-overrides).
 
 **Examples:**
 
