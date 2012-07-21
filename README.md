@@ -154,20 +154,6 @@ A shortcut which calls `proxyquire.reset()` and then `proxyquire.add(Object)`
 
 Removes overrides and replaces them with method of the real module unless it was overridden using **strict** mode.
 
-## Forcing strict for all overrides
-
-***proxyquire.forceStrict([force])***
-
-Allows to enforce [strict mode](#strict-vs-non-strict-overrides) for all overrides, even if they aren't explicitly declared as strict.
-
-- force parameter is optional and if not present `true` is assumed, thus
-  `forceStrict()` has the same effect as `forceStrict(true)`
-- if force parameter is false, strict mode is no longer enforced e.g., things
-  are back to normal
-- note that once the strict mode is changed, it will stay so for the entire
-  lifetime of proxyquire even if [reset](#reset-all-overrides) is called.
-- once strict mode is enforced, you may change it back to non-strict mode via `forceStrict(false)`
-
 **Examples:** 
 
 Assume `path.extname` and `path.basename` were overridden previously.
@@ -192,6 +178,20 @@ this has the same effect as overriding entire `path` module):
 ```javascript
 proxyquire.del({ path: [ 'extname', 'basename' ] });
 ```
+
+## Forcing strict for all overrides
+
+***proxyquire.forceStrict([force])***
+
+Allows to enforce [strict mode](#strict-vs-non-strict-overrides) for all overrides, even if they aren't explicitly declared as strict.
+
+- force parameter is optional and if not present `true` is assumed, thus
+  `forceStrict()` has the same effect as `forceStrict(true)`
+- if force parameter is false, strict mode is no longer enforced e.g., things
+  are back to normal
+- note that once the strict mode is changed, it will stay so for the entire
+  lifetime of proxyquire even if [reset](#reset-all-overrides) is called.
+- once strict mode is enforced, you may change it back to non-strict mode via `forceStrict(false)`
 
 ## Chain API Calls
 
