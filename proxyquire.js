@@ -4,7 +4,22 @@ var path            =  require('path')
   , existsSync      =  fs.existsSync || path.existsSync // support node <=0.6
   , registeredStubs =  { }
   , stubkey         =  0
+  , tmpDirPath      = getTmpDirPath()
   ;
+
+
+function getTmpDirPath () {
+  var defaultTmp = '/tmp'
+    , envVars = ['TMPDIR', 'TMP', 'TEMP']
+    ;
+
+  for (var i = 0; i < envVars.length; i++) {
+    var key = envVars[i];
+    if(process.env[key]) return fs.realpathSync(process.env[key]);
+  }
+
+  return fs.realpathSync(defaultTmp);
+}
 
 function ProxyquireError(msg) {
   this.name = 'ProxyquireError';
@@ -38,25 +53,29 @@ function normalizeExtension (file) {
   return file + '.js';
 }
 
-function proxyquire (mdl, caller__filename) {
-  var mdlResolve = isRelativePath(mdl) ? path.join(path.dirname(caller__filename), mdl) : mdl;  
+function proxyquire (mdl, proxy__filename, original__dirname) {
+  var mdlResolve = isRelativePath(mdl) ? path.join(original__dirname, mdl) : mdl;  
 
-  if (registeredStubs[caller__filename] && registeredStubs[caller__filename][mdl]) {
-    console.log('found', registeredStubs[caller__filename]);
-    return registeredStubs[caller__filename][mdl];
+  if (registeredStubs[proxy__filename] && registeredStubs[proxy__filename][mdl]) {
+    console.log('found', registeredStubs[proxy__filename]);
+    return registeredStubs[proxy__filename][mdl];
   }
   else return require(mdlResolve);
 }
 
-function resolve (mdl, dirname, stubs) {
-  var mdlPath        =  isRelativePath(mdl) ? path.join(dirname, mdl) : mdl
+function resolve (mdl, test__dirname, stubs) {
+  var mdlPath        =  isRelativePath(mdl) ? path.join(test__dirname, mdl) : mdl
     , resolvedMdl    =  require.resolve(mdlPath)
     , resolvedFile   =  findFile(resolvedMdl)
     , originalCode   =  fs.readFileSync(resolvedFile)
-    , mdlProxyFile   =  mdlPath + '@' + (stubkey++).toString()
+    , mdlProxyFile   =  tmpDirPath + '@' + (stubkey++).toString()
     , resolvedProxy  =  normalizeExtension(mdlProxyFile) 
     , mdlProxyCode = 
-        ['function require(mdl) { return module.require("' , __filename, '").require(mdl, __filename); }'
+        ['function require(mdl) { '
+        , 'return module'
+        ,   '.require("' , __filename, '")'
+        ,   '.require(mdl, "' + resolvedProxy + '", "' + path.dirname(resolvedFile) + '"); '
+        , '}'
         , originalCode 
         ].join('')
     , dependency
