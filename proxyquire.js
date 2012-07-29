@@ -4,7 +4,7 @@ var path            =  require('path')
   , existsSync      =  fs.existsSync || path.existsSync // support node <=0.6
   , registeredStubs =  { }
   , stubkey         =  0
-  , tmpDirPath      = getTmpDirPath()
+  , tmpDir          = getTmpDirPath()
   ;
 
 
@@ -68,14 +68,15 @@ function resolve (mdl, test__dirname, stubs) {
     , resolvedMdl    =  require.resolve(mdlPath)
     , resolvedFile   =  findFile(resolvedMdl)
     , originalCode   =  fs.readFileSync(resolvedFile)
-    , mdlProxyFile   =  tmpDirPath + '@' + (stubkey++).toString()
-    , resolvedProxy  =  normalizeExtension(mdlProxyFile) 
+    , mdlProxyFile   =  path.basename(resolvedFile) + '@' + (stubkey++).toString()
+    , resolvedProxy  =  path.join(tmpDir, normalizeExtension(mdlProxyFile))
+    // all code will be written on one line, prepended to whatever was on first line to maintain linenos
     , mdlProxyCode = 
         ['function require(mdl) { '
         , 'return module'
         ,   '.require("' , __filename, '")'
         ,   '.require(mdl, "' + resolvedProxy + '", "' + path.dirname(resolvedFile) + '"); '
-        , '}'
+        , '} '
         , originalCode 
         ].join('')
     , dependency
