@@ -53,31 +53,40 @@ function normalizeExtension (file) {
   return file + '.js';
 }
 
-function addMissingProperties(mdl, original) {
+function fillMissingKeys(mdl, original) {
   
   // TODO: In nocallthru mode we enforce all properties to be used in tests to be overridden beforehand
   
   Object.keys(original).forEach(function (key) {
-    if (!mdl[key]) { 
-      mdl[key] = original[key];   
-    } 
+    if (!mdl[key])  mdl[key] = original[key];   
   });
+
   return mdl;
 }
 
 function setTmpDir(tmpdir) {
-  if (!existsSync(tmpdir)) throw new ProxyquireError('%s doesn\'t exist, so it cannot be used as a tmp dir', tmpdir);
-  else tmpDir = tmpdir;
+  if (!existsSync(tmpdir)) {
+    console.trace();
+    throw new ProxyquireError('%s doesn\'t exist, so it cannot be used as a tmp dir.', tmpdir);
+  }
+  tmpDir = tmpdir;
 }
 
 function proxyquire (mdl, proxy__filename, original__dirname) {
   var mdlResolve = isRelativePath(mdl) ? path.join(original__dirname, mdl) : mdl
-    , original = require(mdlResolve);
+    , original = require(mdlResolve)
+    , registeredMdl;
 
-  if (registeredStubs[proxy__filename] && registeredStubs[proxy__filename][mdl])
-    return addMissingProperties(registeredStubs[proxy__filename][mdl], original);
-  else 
-    return original;
+  if (registeredStubs[proxy__filename]) {
+    registeredMdl =  registeredStubs[proxy__filename][mdl];
+
+    if (registeredMdl)
+      return registeredMdl['@noCallThru'] ?
+        registeredMdl                     :  
+        fillMissingKeys(registeredMdl, original);
+  }
+
+  return original;
 }
 
 function resolve (mdl, test__dirname, stubs) {
