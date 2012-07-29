@@ -4,11 +4,11 @@ var path            =  require('path')
   , existsSync      =  fs.existsSync || path.existsSync // support node <=0.6
   , registeredStubs =  { }
   , stubkey         =  0
-  , tmpDir          = getTmpDirPath()
+  , tmpDir          =  getTmpDir()
   ;
 
 
-function getTmpDirPath () {
+function getTmpDir () {
   var defaultTmp = '/tmp'
     , envVars = ['TMPDIR', 'TMP', 'TEMP']
     ;
@@ -53,14 +53,31 @@ function normalizeExtension (file) {
   return file + '.js';
 }
 
-function proxyquire (mdl, proxy__filename, original__dirname) {
-  var mdlResolve = isRelativePath(mdl) ? path.join(original__dirname, mdl) : mdl;  
+function addMissingProperties(mdl, original) {
+  
+  // TODO: In nocallthru mode we enforce all properties to be used in tests to be overridden beforehand
+  
+  Object.keys(original).forEach(function (key) {
+    if (!mdl[key]) { 
+      mdl[key] = original[key];   
+    } 
+  });
+  return mdl;
+}
 
-  if (registeredStubs[proxy__filename] && registeredStubs[proxy__filename][mdl]) {
-    console.log('found', registeredStubs[proxy__filename]);
-    return registeredStubs[proxy__filename][mdl];
-  }
-  else return require(mdlResolve);
+function setTmpDir(tmpdir) {
+  if (!existsSync(tmpdir)) throw new ProxyquireError('%s doesn\'t exist, so it cannot be used as a tmp dir', tmpdir);
+  else tmpDir = tmpdir;
+}
+
+function proxyquire (mdl, proxy__filename, original__dirname) {
+  var mdlResolve = isRelativePath(mdl) ? path.join(original__dirname, mdl) : mdl
+    , original = require(mdlResolve);
+
+  if (registeredStubs[proxy__filename] && registeredStubs[proxy__filename][mdl])
+    return addMissingProperties(registeredStubs[proxy__filename][mdl], original);
+  else 
+    return original;
 }
 
 function resolve (mdl, test__dirname, stubs) {
