@@ -5,6 +5,7 @@ var path            =  require('path')
   , registeredStubs =  { }
   , stubkey         =  0
   , tmpDir          =  getTmpDir()
+  , callThru        =  true
   ;
 
 
@@ -72,6 +73,12 @@ function setTmpDir(tmpdir) {
   tmpDir = tmpdir;
 }
 
+function noCallThru(no) {
+  // default to true when 'no' is not supplied
+  callThru = no === false;
+  return module.exports;
+}
+
 function proxyquire (mdl, proxy__filename, original__dirname) {
   var mdlResolve = isRelativePath(mdl) ? path.join(original__dirname, mdl) : mdl
     , original = require(mdlResolve)
@@ -108,7 +115,17 @@ function resolve (mdl, test__dirname, stubs) {
     , dependency
     ;
 
-  if (stubs) registeredStubs[resolvedProxy] = stubs;
+  if (stubs) { 
+    // Adjust no call thru settings for each stubbed module if it was overridden globally
+    if (!callThru) {
+      Object.keys(stubs).forEach(function (key) {
+        // allow turning call thru back on per module by setting it to false
+        if (stubs[key]['@noCallThru'] !== false) stubs[key]['@noCallThru'] = true;
+      });
+    }
+      
+    registeredStubs[resolvedProxy] = stubs;
+  }
 
   fs.writeFileSync(resolvedProxy, mdlProxyCode);
 
@@ -127,6 +144,8 @@ function resolve (mdl, test__dirname, stubs) {
 }
 
 module.exports = {
-    resolve: resolve
-  , require: proxyquire
+    resolve    :  resolve
+  , require    :  proxyquire
+  , tmpDir     :  setTmpDir
+  , noCallThru :  noCallThru
 };
