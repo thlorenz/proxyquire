@@ -1,8 +1,10 @@
+function bar () {
+  return 'bar';
+}
 
-module.exports.drinkUp = function () {
-  return 'you are a drunk';
-};
+function rab () {
+  return 'rab';
+}
 
-module.exports.drinksOnMe = function () {
-  return 'you are rich';
-};
+module.exports = { bar : bar, rab: rab };
+
