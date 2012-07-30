@@ -1,3 +1,6 @@
+/*jshint laxbreak:true*/
+"use strict";
+
 var path            =  require('path')
   , fs              =  require('fs')
   , util            =  require('util')
@@ -7,7 +10,14 @@ var path            =  require('path')
   , tmpDir          =  getTmpDir()
   , callThru        =  true
   ;
-
+  
+(function enhanceUtil () {
+  ['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp'].forEach(function(name) {
+    util['is' + name] = function(obj) {
+      return Object.prototype.toString.call(obj) == '[object ' + name + ']';
+    };
+  });
+}) ();
 
 function getTmpDir () {
   var defaultTmp = '/tmp'
@@ -43,7 +53,7 @@ function findFile(file) {
       return jsfile;
   }
 
-  log.trace();
+  console.trace();
   throw new ProxyquireError(
     util.format('Cannot find file you required.\nTried [%s] and [%s]', file, jsfile)
   );
@@ -63,6 +73,33 @@ function fillMissingKeys(mdl, original) {
   });
 
   return mdl;
+}
+
+function validateArguments(mdl, test__dirname, stubs) {
+  if (!mdl) 
+    throw new ProxyquireError(
+      'Missing argument: "module". Need it know which module to require.'
+    );
+
+  if (!test__dirname) 
+    throw new ProxyquireError(
+      'Missing argument: "test__dirname". Need it to resolve module relative to test directory.'
+    );
+
+  if (!stubs) 
+    throw new ProxyquireError(
+      'Missing argument: "stubs". If no stubbing is needed for [' + mdl + '], use regular require instead.'
+    );
+
+
+  Object.keys(stubs).forEach(function (key) {
+    if (util.isFunction(stubs[key]))
+      throw new ProxyquireError(
+          '\n\tFound "' + key + '" to be an orphan stub. Please specify what module the stub is for.'
+        + '\n\tFor example: { "./foo": ' + key + ' }'
+      );
+    
+  });
 }
 
 function setTmpDir(tmpdir) {
@@ -97,6 +134,9 @@ function proxyquire (mdl, proxy__filename, original__dirname) {
 }
 
 function resolve (mdl, test__dirname, stubs) {
+
+  validateArguments(mdl, test__dirname, stubs);
+
   var mdlPath        =  isRelativePath(mdl) ? path.join(test__dirname, mdl) : mdl
     , resolvedMdl    =  require.resolve(mdlPath)
     , resolvedFile   =  findFile(resolvedMdl)
