@@ -1,4 +1,5 @@
 /*jshint laxbreak:true*/
+"use strict";
 
 var path            =  require('path')
   , fs              =  require('fs')
@@ -17,7 +18,7 @@ var path            =  require('path')
       return Object.prototype.toString.call(obj) == '[object ' + name + ']';
     };
     is.Object = function(obj) {
-      return obj === Object(obj);
+      return obj === new Object(obj);
     };
   });
 }) ();
@@ -79,7 +80,7 @@ function fillMissingKeys(mdl, original) {
 function validateArguments(mdl, test__dirname, stubs) {
   if (!mdl) 
     throw new ProxyquireError(
-      'Missing argument: "module". Need it know which module to require.'
+      'Missing argument: "mdl". Need it know to which module to require.'
     );
 
   if (!test__dirname) 
@@ -94,7 +95,7 @@ function validateArguments(mdl, test__dirname, stubs) {
 
   if (!is.String(mdl))
     throw new ProxyquireError(
-      'Invalid argument: "module". Needs to be a string that contains path to module to be resolved.'
+      'Invalid argument: "mdl". Needs to be a string that contains path to module to be resolved.'
     );
 
   if (!is.String(test__dirname))
@@ -117,6 +118,12 @@ function validateArguments(mdl, test__dirname, stubs) {
   });
 }
 
+/**
+* Overrides default tmp dir used by proxyquire to store modified modules before they are required.
+* @name setTmpDir
+* @function
+* @param {string} tmpdir The path to the tmp dir to be used
+*/
 function setTmpDir(tmpdir) {
   if (!existsSync(tmpdir)) {
     console.trace();
@@ -125,9 +132,17 @@ function setTmpDir(tmpdir) {
   tmpDir = tmpdir;
 }
 
-function noCallThru(no) {
-  // default to true when 'no' is not supplied
-  callThru = no === false;
+/**
+  * Overrides default setting for call thru, which determines if keys of original modules will be used
+  * when they weren't stubbed out.
+  * @name noCallThru
+  * @function 
+  * @param {boolean} [ flag = true ]
+  * @return {object} proxyquire exports to allow chaining
+  */
+function noCallThru(flag) {
+  // default to true when 'flag' is flagt supplied
+  callThru = flag === false;
   return module.exports;
 }
 

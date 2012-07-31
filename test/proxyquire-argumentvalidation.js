@@ -23,7 +23,7 @@ describe('Illegal parameters to resolve give meaningful errors', function () {
     }
 
     it('throws an exception explaining that module needs to be passed', function () {
-      throws(act, /missing argument: "module"/i);
+      throws(act, /missing argument: "mdl"/i);
     })
     
   })
@@ -35,7 +35,7 @@ describe('Illegal parameters to resolve give meaningful errors', function () {
     }
       
     it('throws an exception explaining that module needs to be a string', function () {
-      throws(act, /invalid argument: "module".+needs to be a string/i);
+      throws(act, /invalid argument: "mdl".+needs to be a string/i);
     })
   })
 
