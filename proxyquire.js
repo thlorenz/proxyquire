@@ -9,12 +9,16 @@ var path            =  require('path')
   , stubkey         =  0
   , tmpDir          =  getTmpDir()
   , callThru        =  true
+  , is              =  { }
   ;
   
-(function enhanceUtil () {
+(function populateIs () {
   ['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp'].forEach(function(name) {
-    util['is' + name] = function(obj) {
+    is[name] = function(obj) {
       return Object.prototype.toString.call(obj) == '[object ' + name + ']';
+    };
+    is.Object = function(obj) {
+      return obj === Object(obj);
     };
   });
 }) ();
@@ -83,7 +87,7 @@ function validateArguments(mdl, test__dirname, stubs) {
 
   if (!test__dirname) 
     throw new ProxyquireError(
-      'Missing argument: "test__dirname". Need it to resolve module relative to test directory.'
+      'Missing argument: "__dirname" of test file. Need it to resolve module relative to test directory.'
     );
 
   if (!stubs) 
@@ -91,9 +95,23 @@ function validateArguments(mdl, test__dirname, stubs) {
       'Missing argument: "stubs". If no stubbing is needed for [' + mdl + '], use regular require instead.'
     );
 
+  if (!is.String(mdl))
+    throw new ProxyquireError(
+      'Invalid argument: "module". Needs to be a string that contains path to module to be resolved.'
+    );
+
+  if (!is.String(test__dirname))
+    throw new ProxyquireError(
+      'Invalid argument: "__dirname" of test file. Needs to be a string that contains path to test file resolving the module.'
+    );
+
+  if (!is.Object(stubs))
+    throw new ProxyquireError(
+      'Invalid argument: "stubs". Needs to be an object containing overrides e.g., {"path": { extname: function () { ... } } }.'
+    );
 
   Object.keys(stubs).forEach(function (key) {
-    if (util.isFunction(stubs[key]))
+    if (is.Function(stubs[key]))
       throw new ProxyquireError(
           '\n\tFound "' + key + '" to be an orphan stub. Please specify what module the stub is for.'
         + '\n\tFor example: { "./foo": ' + key + ' }'

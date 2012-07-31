@@ -16,6 +16,7 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
   
   describe('When I resolve foo with no overrides to bar as foo and resolve foo with barber stub as foober.', function () {
     before(function () {
+      stats.reset();
       foo = proxyquire.resolve('./samples/foo', __dirname, { './bar': { /* no overrides */ } });
       foober = proxyquire.resolve('./samples/foo', __dirname, { './bar': barber });
     })
@@ -192,89 +193,5 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
   })
 })
 
-describe('Multiple requires of same module don\'t affect each other', function () {
-  describe('Given I require foo stubbed with bar1 as foo1 and foo stubbed with bar2 as foo2', function () {
-    var foo1
-      , foo2
-      , bar1 = { bar: function () { return 'bar1'; } }
-      , bar2 = { bar: function () { return 'bar2'; } }
-      ;
-
-    before(function () {
-      foo1 = proxyquire.resolve('./samples/foo', __dirname, { './bar': bar1 });
-      foo2 = proxyquire.resolve('./samples/foo', __dirname, { './bar': bar2 });
-    })
-    
-    it('foo1.bigBar() == "BAR1"', function () {
-      assert.equal(foo1.bigBar(), 'BAR1');  
-    })
-
-    it('foo2.bigBar() == "BAR2"', function () {
-      assert.equal(foo2.bigBar(), 'BAR2');  
-    })
-
-    describe('and I change bar1.bar() to return barone', function () {
-      before(function () {
-        bar1.bar = function () { return 'barone'; };
-      })
-      
-      it('foo1.bigBar() == "BARONE"', function () {
-        assert.equal(foo1.bigBar(), 'BARONE');  
-      })
-
-      it('foo2.bigBar() == "BAR2"', function () {
-        assert.equal(foo2.bigBar(), 'BAR2');  
-      })
-
-    })
-  })
-})
 
 
-describe('Illegal parameters to resolve give meaningful errors', function () {
-  var bar = { bar: function () { return 'bar'; } }
-    , exception
-    ;
-
-  describe('when I pass no module', function () {
-    function act () {
-      proxyquire.resolve(undefined, __dirname); 
-    }
-
-    it('throws an exception explaining that resolve without stubs makes no sense', function () {
-      assert.throws(act, 'ProxyquireError', /missing argument: "module"/i);
-    })
-    
-  })
-
-  describe('when I pass no test__dirname', function () {
-    function act () {
-      proxyquire.resolve('module'); 
-    }
-
-    it('throws an exception explaining that resolve without stubs makes no sense', function () {
-      assert.throws(act, 'ProxyquireError', /missing argument: "__dirname" of test file/i);
-    })
-    
-  })
-  describe('when I pass no stubs', function () {
-    function act () {
-      proxyquire.resolve('./samples/foo', __dirname); 
-    }
-
-    it('throws an exception explaining that resolve without stubs makes no sense', function () {
-      assert.throws(act, 'ProxyquireError', /missing argument: "stubs".+use regular require instead/i);
-    })
-    
-  })
-
-  describe('when I pass { bar: function () { .. } } as stubs (e.g., fail to assign it to "./bar")', function () {
-    function act () {
-      proxyquire.resolve('./samples/foo', __dirname, bar); 
-    }
-
-    it('throws an exception explaining that stub needs to be assigned to a module', function () {
-      assert.throws(act,  'ProxyquireError',  /specify what module the stub is for/i);
-    })
-  })  
-})
