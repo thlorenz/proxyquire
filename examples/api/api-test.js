@@ -11,7 +11,7 @@ var assert = require('assert')
   , wildBarStub = { bar: function () { return 'barbar'; } }
   ;
   
-foo = proxyquire.resolve('./samples/foo', __dirname);
+foo = proxyquire.resolve('./samples/foo', __dirname, { });
 fooCut = proxyquire.resolve('./samples/foo', __dirname, { './bar': cutBarStub });
 fooWild = proxyquire.resolve('./samples/foo', __dirname, { './bar': wildBarStub });
 
@@ -122,3 +122,5 @@ foo = proxyquire
   });
 
 assert.throws(foo.bigBas);
+
+console.log('*** All Asserts passed ***');
