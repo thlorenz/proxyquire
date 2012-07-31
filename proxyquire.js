@@ -1,5 +1,4 @@
 /*jshint laxbreak:true*/
-"use strict";
 
 var path            =  require('path')
   , fs              =  require('fs')
@@ -137,6 +136,7 @@ function setTmpDir(tmpdir) {
   * when they weren't stubbed out.
   * @name noCallThru
   * @function 
+  * @private
   * @param {boolean} [ flag = true ]
   * @return {object} proxyquire exports to allow chaining
   */
@@ -146,7 +146,16 @@ function noCallThru(flag) {
   return module.exports;
 }
 
-function proxyquire (mdl, proxy__filename, original__dirname) {
+/**
+* Called from tested modules. Not part of the public api and therefore not to be used directly.
+* @name _proxyquire
+* @function
+* @param {string} mdl Module to require.
+* @param {string} proxy__filename __filename of the generated module proxy which calls this method.
+* @param {string} original__dirname __dirname of the module from which the calling proxy was generated.
+* @return {object} Required module.
+*/
+function _proxyquire (mdl, proxy__filename, original__dirname) {
   var mdlResolve = isRelativePath(mdl) ? path.join(original__dirname, mdl) : mdl
     , original = require(mdlResolve)
     , registeredMdl;
@@ -163,6 +172,19 @@ function proxyquire (mdl, proxy__filename, original__dirname) {
   return original;
 }
 
+
+
+/**
+ * Resolves specified module and overrides dependencies with specified stubs.
+ * @name resolve
+ * @function
+ * @param {string} mdl Path to the module to be resolved.
+ * @param {string} test__dirname __dirname of the test file calling this method.
+ * @param {object} stubs Key/value pairs of modules to be stubbed out.
+ *                       Keys are paths to modules relative to the tested file NOT the test file, e.g., exactly 
+ *                       as it is required in the tested file.
+ *                       Values themselves are key/value pairs of functions/properties and the appropriate override.
+ */
 function resolve (mdl, test__dirname, stubs) {
 
   validateArguments(mdl, test__dirname, stubs);
@@ -178,7 +200,7 @@ function resolve (mdl, test__dirname, stubs) {
         ['function require(mdl) { '
         , 'return module'
         ,   '.require("' , __filename, '")'
-        ,   '.require(mdl, "' + resolvedProxy + '", "' + path.dirname(resolvedFile) + '"); '
+        ,   '._require(mdl, "' + resolvedProxy + '", "' + path.dirname(resolvedFile) + '"); '
         , '} '
         , originalCode 
         ].join('')
@@ -215,7 +237,7 @@ function resolve (mdl, test__dirname, stubs) {
 
 module.exports = {
     resolve    :  resolve
-  , require    :  proxyquire
+  , _require   :  _proxyquire
   , tmpDir     :  setTmpDir
   , noCallThru :  noCallThru
 };
