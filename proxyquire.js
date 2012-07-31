@@ -1,5 +1,4 @@
 /*jshint laxbreak:true*/
-"use strict";
 
 var path            =  require('path')
   , fs              =  require('fs')
@@ -69,9 +68,7 @@ function normalizeExtension (file) {
 }
 
 function fillMissingKeys(mdl, original) {
-  
-  // TODO: In nocallthru mode we enforce all properties to be used in tests to be overridden beforehand
-  
+
   Object.keys(original).forEach(function (key) {
     if (!mdl[key])  mdl[key] = original[key];   
   });
