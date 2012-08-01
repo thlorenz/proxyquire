@@ -3,7 +3,7 @@
 require('../example-utils').listModuleAndTests(__dirname + '/foo.js', __filename);
 
 // Overriding callbacks that would normally be async will cause them to call back immediately
-// Thus allowing you to run synchronous tests against originally async code.
+// Thus allowing you to run synchronous tests against async APIs.
 
 var proxyquire   =  require('../../proxyquire')
   , assert       =  require('assert')
