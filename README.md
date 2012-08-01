@@ -50,8 +50,8 @@ assert.equal(foo.basenameAllCaps('/a/b/file.txt'), 'FILE.TXT');
 - [Usage](#usage)
 - [API](#api)
 	- [Resolve module to be tested and configure stubs](#resolve-module-to-be-tested-and-configure-stubs)
-		- [Examples](#examples)
-		- [Prevent call thru to original dependency](#prevent-call-thru-to-original-dependency)
+    - [Examples](#examples)
+    - [Preventing call thru to original dependency](#preventing-call-thru-to-original-dependency)
 	- [Changing the TmpDir](#changing-the-tmpdir)
 - [More Examples](#more-examples)
 
@@ -76,7 +76,62 @@ Two simple steps to override require in your tests:
     - therefore specify it exactly as in the require statement inside the tested file
     - values themselves are key/value pairs of functions/properties and the appropriate override
 
-### Examples
+## Preventing call thru to original dependency
+
+By default proxyquire calls the function defined on the *original* dependency whenever it is not found on the stub.
+
+If you prefer a more strict behavior you can prevent *callThru* on a per module or global basis.
+
+**Prevent call thru on path stub:**
+
+```javascript
+var foo = proxyquire.resolve('./foo', __dirname, {
+  path: { 
+      extname: function (file) { ... } 
+    , '@noCallThru': true
+  }
+});
+```
+
+**Prevent call thru for all future stubs:**
+
+```javascript
+proxyquire.noCallThru();
+```
+
+**Re-enable call thru for all future stubs:**
+
+```javascript
+proxyquire.noCallThru(false);
+```
+
+**Call thru config per module wins:**
+
+```javascript
+var foo = proxyquire
+    .noCallThru()
+    .resolve('./foo', __dirname, {
+
+        // no calls to original './bar' methods will be made
+        './bar' : { toAtm: function (val) { ... } }
+
+        // for 'path' module they will be made
+      , path: { 
+          extname: function (file) { ... } 
+        , '@noCallThru': false
+        }
+    });
+```
+
+## Changing the TmpDir
+
+***proxyquire.tmpDir({string} tmpdir)***
+
+In order to hook into your code, proxyquire writes some intermediate files into the tmp directory.
+
+By default it will use the *TMPDIR* of your environment, but this method allows you to override it.
+
+## Examples
 
 **We are testing foo which depends on bar:**
 
@@ -134,62 +189,6 @@ var foo = proxyquire.resolve('./foo', __dirname, {
     }
 });
 ```
-
-### Prevent call thru to original dependency
-
-By default proxyquire calls the function defined on the *original* dependency whenever it is not found on the stub.
-
-If you prefer a more strict behavior you can prevent *callThru* on a per module or global basis.
-
-**Prevent call thru on path stub:**
-
-```javascript
-var foo = proxyquire.resolve('./foo', __dirname, {
-  path: { 
-      extname: function (file) { ... } 
-    , '@noCallThru': true
-  }
-});
-```
-
-**Prevent call thru for all future stubs:**
-
-```javascript
-proxyquire.noCallThru();
-```
-
-**Re-enable call thru for all future stubs:**
-
-```javascript
-proxyquire.noCallThru(false);
-```
-
-**Call thru config per module wins:**
-
-```javascript
-var foo = proxyquire
-    .noCallThru()
-    .resolve('./foo', __dirname, {
-
-        // no calls to original './bar' methods will be made
-        './bar' : { toAtm: function (val) { ... } }
-
-        // for 'path' module they will be made
-      , path: { 
-          extname: function (file) { ... } 
-        , '@noCallThru': false
-        }
-    });
-```
-
-## Changing the TmpDir
-
-***proxyquire.tmpDir({string} tmpdir)***
-
-In order to hook into your code, proxyquire writes some intermediate files into the tmp directory.
-
-By default it will use the *TMPDIR* of your environment, but this method allows you to override it.
-
 
 # More Examples
 
