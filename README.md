@@ -56,7 +56,7 @@ Two simple steps to override require in your tests:
 
 # API
 
-## Resolve module to be tested
+## Resolve module to be tested and configure stubs
 
 ***proxyquire.resolve({string} mdl, {string} test__dirname, {Object} stubs)***
 
@@ -74,7 +74,7 @@ Two simple steps to override require in your tests:
 ```javascript
 // bar.js module
 module.exports = { 
-    toAtm: function toAtm(val) { return  0.986923267 * val; }
+    toAtm: function (val) { return  0.986923267 * val; }
 };
 
 // foo.js module 
@@ -108,12 +108,12 @@ var foo =  proxyquire.resolve('../foo', __dirname, { './bar': barStub });
 // Add override
 bar.toAtm = function (val) { return 0; /* wonder what happens now */ };
 
-// [ .. run some tests .. ]
+[ .. run some tests .. ]
 
 // Change override
 bar.toAtm = function (val) { return -1 * val; /* or now */ };
 
-// [ .. run some tests .. ]
+[ .. run some tests .. ]
 
 // Resolve and override multiple modules in one step - oh my!
 var foo = proxyquire.resolve('./foo', __dirname, {
@@ -122,11 +122,11 @@ var foo = proxyquire.resolve('./foo', __dirname, {
 });
 ```
 
-### Prevent call thru to real dependency
+### Prevent call thru to original dependency
 
-Proxyquire calls the function defined on the *real* dependency whenever it is not found on the stub.
+Proxyquire calls the function defined on the *original* dependency whenever it is not found on the stub.
 
-If you prefer a more strict behavior you can prevent *callThru* per module or globally.
+If you prefer a more strict behavior you can prevent *callThru* on a per module or global basis.
 
 **Prevent call thru on path stub:**
 
@@ -145,7 +145,7 @@ var foo = proxyquire.resolve('./foo', __dirname, {
 proxyquire.noCallThru();
 ```
 
-**Reenable call thru for all future stubs:**
+**Re-enable call thru for all future stubs:**
 
 ```javascript
 proxyquire.noCallThru(false);
@@ -154,11 +154,14 @@ proxyquire.noCallThru(false);
 **Call thru config per module wins:**
 
 ```javascript
-// no calls to real './bar' methods will be made, but for 'path' module they will
 var foo = proxyquire
     .noCallThru()
     .resolve('./foo', __dirname, {
+
+        // no calls to original './bar' methods will be made,
         './bar' : { toAtm: function (val) { ... } }
+
+        // for 'path' module they will be made
       , path: { 
           extname: function (file) { ... } 
         , '@noCallThru': false
@@ -166,3 +169,16 @@ var foo = proxyquire
     });
 ```
 
+## Changing the TmpDir
+
+**proxyquire.tmpDir({string} tmpdir)**
+
+In order to hook into your code, proxyquire writes some intermediate files into the tmp directory.
+
+By default it will use the *TMPDIR* of your environment, but this method allows you to override it.
+
+
+# More Examples
+
+For more examples look inside the [examples folder](./proxyquire/tree/master/examples/) or
+look through the [tests](./proxyquire/blob/master/test/proxyquire.js)
