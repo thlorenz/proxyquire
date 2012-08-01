@@ -1,23 +1,22 @@
+"use strict";
+
 require('../example-utils').listModuleAndTests(__dirname + '/foo.js', __filename);
 
-var proxyquire = require('../../proxyquire')
-  , assert = require('assert')
-  , foo
-  ;
+var proxyquire =  require('../../proxyquire')
+  , assert     =  require('assert')
+  , pathStub   =  { };
 
-// no overrides yet, so path.extname behaves normally
-foo = proxyquire.resolve('./foo', __dirname, {});
+// when not overridden, path.extname behaves normally
+var foo = proxyquire.resolve('./foo', __dirname, { 'path': pathStub });
 assert.equal(foo.extnameAllCaps('file.txt'), '.TXT');
 
 // override path.extname
-foo = proxyquire.resolve('./foo', __dirname, {
-  path: { extname: function (file) { return 'Exterminate, exterminate the ' + file; } }
-});
+pathStub.extname = function (file) { return 'Exterminate, exterminate the ' + file; };
 
 // path.extname now behaves as we told it to
 assert.equal(foo.extnameAllCaps('file.txt'), 'EXTERMINATE, EXTERMINATE THE FILE.TXT');
 
-// path.basename on the other hand still functions as before
+// path.basename and all other path module methods still function as before
 assert.equal(foo.basenameAllCaps('/a/b/file.txt'), 'FILE.TXT');
 
 console.log('*** All asserts passed ***');
