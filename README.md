@@ -8,7 +8,6 @@ Proxies nodejs's require in order to make overriding dependencies during testing
 - non overriden methods of a module behave like the original
 - "use strict" compliant
 
-
 # Example
 
 **foo.js:**
@@ -32,7 +31,7 @@ var proxyquire =  require('proxyquire')
   , assert     =  require('assert')
   , pathStub   =  { };
 
-// when not overridden, path.extname behaves normally
+// when no overrides are specified, path.extname behaves normally
 var foo = proxyquire.resolve('./foo', __dirname, { 'path': pathStub });
 assert.equal(foo.extnameAllCaps('file.txt'), '.TXT');
 
@@ -46,12 +45,22 @@ assert.equal(foo.extnameAllCaps('file.txt'), 'EXTERMINATE, EXTERMINATE THE FILE.
 assert.equal(foo.basenameAllCaps('/a/b/file.txt'), 'FILE.TXT');
 ```
 
+**Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
+
+- [Usage](#usage)
+- [API](#api)
+	- [Resolve module to be tested and configure stubs](#resolve-module-to-be-tested-and-configure-stubs)
+		- [Examples](#examples)
+		- [Prevent call thru to original dependency](#prevent-call-thru-to-original-dependency)
+	- [Changing the TmpDir](#changing-the-tmpdir)
+- [More Examples](#more-examples)
+
 
 # Usage
 
 Two simple steps to override require in your tests:
 
-- `var proxyquire = require('proxyquire');` on top level of your test file
+- add `var proxyquire = require('proxyquire');` to top level of your test file
 - `proxyquire.resolve(...)` the module you want to test and pass along stubs for modules you want to override
 
 # API
@@ -90,7 +99,7 @@ var bar = require('./bar');
 // foo-test.js module which is one folder below foo (e.g., in ./tests/)
 
 /*
- * a) Resolve and override in one step:
+ *   Option a) Resolve and override in one step:
  */
 var foo = proxyquire.resolve('../foo', __dirname, {
   './bar': { toAtm: function (val) { return 0; /* wonder what happens now */ } }
@@ -99,7 +108,7 @@ var foo = proxyquire.resolve('../foo', __dirname, {
 // [ .. run some tests .. ]
 
 /*
- * b) Resolve with empty stub and add overrides later
+ *   Option b) Resolve with empty stub and add overrides later
  */
 var barStub = { };
 
@@ -115,16 +124,20 @@ bar.toAtm = function (val) { return -1 * val; /* or now */ };
 
 [ .. run some tests .. ]
 
-// Resolve and override multiple modules in one step - oh my!
+// Resolve foo and override multiple of its dependencies in one step - oh my!
 var foo = proxyquire.resolve('./foo', __dirname, {
-    './bar' : { toAtm: function (val) { return 0; /* wonder what happens now */ } }
-  , path    : { extname: function (file) { return 'exterminate the name of ' + file; } }
+    './bar' : { 
+      toAtm: function (val) { return 0; /* wonder what happens now */ } 
+    }
+  , path    : { 
+      extname: function (file) { return 'exterminate the name of ' + file; } 
+    }
 });
 ```
 
 ### Prevent call thru to original dependency
 
-Proxyquire calls the function defined on the *original* dependency whenever it is not found on the stub.
+By default proxyquire calls the function defined on the *original* dependency whenever it is not found on the stub.
 
 If you prefer a more strict behavior you can prevent *callThru* on a per module or global basis.
 
@@ -158,7 +171,7 @@ var foo = proxyquire
     .noCallThru()
     .resolve('./foo', __dirname, {
 
-        // no calls to original './bar' methods will be made,
+        // no calls to original './bar' methods will be made
         './bar' : { toAtm: function (val) { ... } }
 
         // for 'path' module they will be made
@@ -171,7 +184,7 @@ var foo = proxyquire
 
 ## Changing the TmpDir
 
-**proxyquire.tmpDir({string} tmpdir)**
+***proxyquire.tmpDir({string} tmpdir)***
 
 In order to hook into your code, proxyquire writes some intermediate files into the tmp directory.
 
