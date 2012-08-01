@@ -69,40 +69,41 @@ Two simple steps to override require in your tests:
 
 ### Examples
 
-**Assume:**
-```javascript
+**We are testing foo which depends on bar:**
 
-// bar module
+```javascript
+// bar.js module
 module.exports = { 
     toAtm: function toAtm(val) { return  0.986923267 * val; }
 };
 
-
-// foo module 
-// requires bar which we need to stub out in tests
+// foo.js module 
+// requires bar which we will stub out in tests
 var bar = require('./bar');
 [ ... ]
 
 ```
 
-```javascript
-// foo-test module which is one folder below foo (e.g., in ./tests/)
+**Tests:**
 
-/**
-* a) Resolve and override in one step:
-*/
-var foo = proxyquire.resolve('./foo', __dirname, {
+```javascript
+// foo-test.js module which is one folder below foo (e.g., in ./tests/)
+
+/*
+ * a) Resolve and override in one step:
+ */
+var foo = proxyquire.resolve('../foo', __dirname, {
   './bar': { toAtm: function (val) { return 0; /* wonder what happens now */ } }
 });
 
 // [ .. run some tests .. ]
 
-/**
-* b) Resolve with empty stub and add overrides later
-*/
+/*
+ * b) Resolve with empty stub and add overrides later
+ */
 var barStub = { };
 
-var foo =  proxyquire.resolve('./foo', __dirname, { './bar': barStub }); 
+var foo =  proxyquire.resolve('../foo', __dirname, { './bar': barStub }); 
 
 // Add override
 bar.toAtm = function (val) { return 0; /* wonder what happens now */ };
@@ -117,8 +118,51 @@ bar.toAtm = function (val) { return -1 * val; /* or now */ };
 // Resolve and override multiple modules in one step - oh my!
 var foo = proxyquire.resolve('./foo', __dirname, {
     './bar' : { toAtm: function (val) { return 0; /* wonder what happens now */ } }
-  , path    : { extname: function (file) { return 'exterminate the name of ' + file } }
+  , path    : { extname: function (file) { return 'exterminate the name of ' + file; } }
 });
 ```
 
+### Prevent call thru to real dependency
+
+Proxyquire calls the function defined on the *real* dependency whenever it is not found on the stub.
+
+If you prefer a more strict behavior you can prevent *callThru* per module or globally.
+
+**Prevent call thru on path stub:**
+
+```javascript
+var foo = proxyquire.resolve('./foo', __dirname, {
+  path: { 
+      extname: function (file) { ... } 
+    , '@noCallThru': true
+  }
+});
+```
+
+**Prevent call thru for all future stubs:**
+
+```javascript
+proxyquire.noCallThru();
+```
+
+**Reenable call thru for all future stubs:**
+
+```javascript
+proxyquire.noCallThru(false);
+```
+
+**Call thru config per module wins:**
+
+```javascript
+// no calls to real './bar' methods will be made, but for 'path' module they will
+var foo = proxyquire
+    .noCallThru()
+    .resolve('./foo', __dirname, {
+        './bar' : { toAtm: function (val) { ... } }
+      , path: { 
+          extname: function (file) { ... } 
+        , '@noCallThru': false
+        }
+    });
+```
 
