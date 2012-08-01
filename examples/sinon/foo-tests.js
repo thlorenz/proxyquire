@@ -87,9 +87,9 @@ describe('when fs.readdir returns an error', function () {
   })
 })
 
+// Spying
 describe('when calling filesAllCaps with "../simple"', function () {
   
-  // Spying
   var readdirSpy;
 
   before(function () {
@@ -108,7 +108,4 @@ describe('when calling filesAllCaps with "../simple"', function () {
       done();
     });
   })
-  
 })
-
-

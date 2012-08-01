@@ -194,3 +194,5 @@ var foo = proxyquire.resolve('./foo', __dirname, {
 
 For more examples look inside the [examples folder](./proxyquire/tree/master/examples/) or
 look through the [tests](./proxyquire/blob/master/test/proxyquire.js)
+
+For an example on how to use proxyquire with [Sinon.JS](http://sinonjs.org/), look [in here](./proxyquire/tree/master/examples/sinon).
