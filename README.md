@@ -50,9 +50,9 @@ assert.equal(foo.basenameAllCaps('/a/b/file.txt'), 'FILE.TXT');
 - [Usage](#usage)
 - [API](#api)
 	- [Resolve module to be tested and configure stubs](#resolve-module-to-be-tested-and-configure-stubs)
-    - [Examples](#examples)
     - [Preventing call thru to original dependency](#preventing-call-thru-to-original-dependency)
 	- [Changing the TmpDir](#changing-the-tmpdir)
+    - [Examples](#examples)
 - [More Examples](#more-examples)
 
 
@@ -151,7 +151,7 @@ var bar = require('./bar');
 **Tests:**
 
 ```javascript
-// foo-test.js module which is one folder below foo (e.g., in ./tests/)
+// foo-test.js module which is one folder below foo.js (e.g., in ./tests/)
 
 /*
  *   Option a) Resolve and override in one step:
