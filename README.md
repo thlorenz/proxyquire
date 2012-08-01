@@ -6,6 +6,7 @@ Proxies nodejs's require in order to make overriding dependencies during testing
 
 - **no changes to your code** are necessary 
 - non overriden methods of a module behave like the original
+- mocking framework agnostic, if it can stub a function then it works with proxyquire
 - "use strict" compliant
 
 # Example
