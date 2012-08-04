@@ -107,6 +107,8 @@ function validateArguments(mdl, test__dirname, stubs) {
       'Invalid argument: "stubs". Needs to be an object containing overrides e.g., {"path": { extname: function () { ... } } }.'
     );
 
+  /* TODO: orphan stub detection breaks modules that export a function directly
+   *       in order for this to work directly, we'd have to make an exception for those
   Object.keys(stubs).forEach(function (key) {
     if (is.Function(stubs[key]))
       throw new ProxyquireError(
@@ -115,6 +117,7 @@ function validateArguments(mdl, test__dirname, stubs) {
       );
     
   });
+  */
 }
 
 /**

@@ -81,6 +81,8 @@ describe('Illegal parameters to resolve give meaningful errors', function () {
     })
   })
 
+  /* TODO: orphan stub detection breaks modules that export a function directly
+   *       in order for this to work directly, we'd have to make an exception for those
   describe('when I pass { bar: function () { .. } } as stubs (e.g., fail to assign it to "./bar")', function () {
     function act () {
       proxyquire.resolve('./samples/foo', __dirname, bar); 
@@ -90,4 +92,5 @@ describe('Illegal parameters to resolve give meaningful errors', function () {
       throws(act,  /specify what module the stub is for/i);
     })
   })  
+  */
 })
