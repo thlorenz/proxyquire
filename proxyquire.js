@@ -121,6 +121,19 @@ function validateArguments(mdl, test__dirname, stubs) {
 }
 
 /**
+ * Takes a string and returns a string literal that if eval'ed
+ * would be the same as the original string. To do this it
+ * just wraps it in double quotes and doubles up any backslashes.
+ * @name stringify
+ * @function
+ * @param {string} The string to stringify
+ * @return {string} The stringified string
+ */
+function stringify(stringValue) {
+  return '"' + stringValue.replace(/\\/g, '\\\\') + '"';
+}
+
+/**
 * Overrides default tmp dir used by proxyquire to store modified modules before they are required.
 * @name setTmpDir
 * @function
@@ -175,8 +188,6 @@ function _proxyquire (mdl, proxy__filename, original__dirname) {
   return original;
 }
 
-
-
 /**
  * Resolves specified module and overrides dependencies with specified stubs.
  * @name resolve
@@ -200,12 +211,12 @@ function resolve (mdl, test__dirname, stubs) {
     , resolvedProxy  =  path.join(tmpDir, normalizeExtension(mdlProxyFile))
     // all code will be written on one line, prepended to whatever was on first line to maintain linenos
     , mdlProxyCode = 
-        [ 'var __dirname = "' + path.dirname(resolvedFile) + '"; '
-        , 'var __filename = "' + resolvedFile + '"; '
+        [ 'var __dirname = ' + stringify(path.dirname(resolvedFile)) + '; '
+        , 'var __filename = ' + stringify(resolvedFile) + '; '
         , 'function require(mdl) { '
         , 'return module'
-        ,   '.require("' , __filename, '")'
-        ,   '._require(mdl, "' + resolvedProxy + '", __dirname); '
+        ,   '.require(' , stringify(__filename), ')'
+        ,   '._require(mdl, ' + stringify(resolvedProxy) + ', __dirname); '
         , '} '
         , originalCode 
         ].join('')
