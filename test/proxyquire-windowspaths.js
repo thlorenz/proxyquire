@@ -8,31 +8,24 @@ var assert = require('assert')
   ;
 
 // NB. These tests would (should?) only ever fail on windows
-describe('Constructed file path strings in generated temporary module should handle backslahes correctly for Windows support', function () {
-  var windowspaths;
+describe('Windows should be supported so that', function () {
+  var windowspaths
+    , barMock = { bar: function () { return 'mock'; } }
+    ;
 
   before(function() {
-    windowspaths = proxyquire.resolve('./samples/windowspaths', __dirname, {});
+    windowspaths = proxyquire.resolve('./samples/windowspaths', __dirname, {'./bar': barMock});
   })
 
-  it('for instance the generated __dirname variable should be valid', function() {
+  it('the module\'s __dirname variable is the original parent directory', function() {
     assert.equal(windowspaths.__dirname, path.join(__dirname, 'samples'));
   })
 
-  it('for instance the generated __filename variable should be valid', function() {
+  it('the module\'s __filename variable is the original file name', function() {
     assert.equal(windowspaths.__filename, path.join(__dirname, 'samples', 'windowspaths.js'));
   })
 
-  it('for instance the generated require function should not contain unescaped string literals', function() {
-    var requireFunctionText = windowspaths.require.toString();
-    var backslashCount = 0;
-    requireFunctionText.split('').forEach(function(character) {
-      if (character === '\\') {
-        backslashCount++;
-      } else {
-        assert((backslashCount % 2 === 0), 'backslashes should always come in pairs, ie. be escaped: ' + requireFunctionText);
-        backslashCount = 0;
-      }
-    });
+  it('the module\'s require function returns the registered mock bar object', function() {
+    assert.equal(windowspaths.testRequire(), 'mock', 'testRequire should call the mock bar function');
   })
 })

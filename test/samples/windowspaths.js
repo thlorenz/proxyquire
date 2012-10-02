@@ -1,3 +1,6 @@
 module.exports.__dirname = __dirname;
 module.exports.__filename = __filename;
-module.exports.require = require;
+module.exports.testRequire = function() {
+  var bar = require('./bar');
+  return bar.bar();
+};
