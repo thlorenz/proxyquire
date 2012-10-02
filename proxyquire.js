@@ -200,12 +200,12 @@ function resolve (mdl, test__dirname, stubs) {
     , resolvedProxy  =  path.join(tmpDir, normalizeExtension(mdlProxyFile))
     // all code will be written on one line, prepended to whatever was on first line to maintain linenos
     , mdlProxyCode = 
-        [ 'var __dirname = "' + path.dirname(resolvedFile) + '"; '
-        , 'var __filename = "' + resolvedFile + '"; '
+        [ 'var __dirname = "' + path.dirname(resolvedFile).replace(/\\/g, '\\\\') + '"; '
+        , 'var __filename = "' + resolvedFile.replace(/\\/g, '\\\\') + '"; '
         , 'function require(mdl) { '
         , 'return module'
-        ,   '.require("' , __filename, '")'
-        ,   '._require(mdl, "' + resolvedProxy + '", __dirname); '
+        ,   '.require("' , __filename.replace(/\\/g, '\\\\'), '")'
+        ,   '._require(mdl, "' + resolvedProxy.replace(/\\/g, '\\\\') + '", __dirname); '
         , '} '
         , originalCode 
         ].join('')
