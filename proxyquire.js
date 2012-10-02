@@ -120,6 +120,15 @@ function validateArguments(mdl, test__dirname, stubs) {
   */
 }
 
+/**
+ * Takes a string and returns a string literal that if eval'ed
+ * would be the same as the original string. To do this it
+ * just wraps it in double quotes and doubles up any backslashes.
+ * @name stringify
+ * @function
+ * @param {string} The string to stringify
+ * @return {string} The stringified string
+ */
 function stringify(stringValue) {
   return '"' + stringValue.replace(/\\/g, '\\\\') + '"';
 }
@@ -178,17 +187,6 @@ function _proxyquire (mdl, proxy__filename, original__dirname) {
 
   return original;
 }
-
-/**
- * Takes a string and returns a string literal that if eval'ed
- * would be the same as the original string. To do this it
- * just wraps it in double quotes and doubles up any backslashes.
- * @name stringify
- * @function
- * @param {string} The string to stringify.
- * @return {string} 
- */
-
 
 /**
  * Resolves specified module and overrides dependencies with specified stubs.
