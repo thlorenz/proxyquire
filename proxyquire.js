@@ -164,20 +164,34 @@ function noCallThru(flag) {
 * @return {object} Required module.
 */
 function _proxyquire (mdl, proxy__filename, original__dirname) {
-  var mdlResolve = isRelativePath(mdl) ? path.join(original__dirname, mdl) : mdl
-    , original = require(mdlResolve)
+  var original
     , registeredMdl;
 
-  if (registeredStubs[proxy__filename]) {
-    registeredMdl =  registeredStubs[proxy__filename][mdl];
-
-    if (registeredMdl)
-      return registeredMdl['@noCallThru'] ?
-        registeredMdl                     :  
-        fillMissingKeys(registeredMdl, original);
+  function requireOriginal () {
+    var mdlResolve = isRelativePath(mdl) ? path.join(original__dirname, mdl) : mdl;
+    return require(mdlResolve);
   }
 
-  return original;
+  if (registeredStubs[proxy__filename]) {
+    registeredMdl = registeredStubs[proxy__filename][mdl];
+
+    if (registeredMdl) {
+      if(!registeredMdl['@noCallThru']) {
+        // Only if callThru is turned on do we need to resolve the original
+        // and fill in missing methods for the registered module.
+        // Attempting to require lazily allows stubbing out modules that don't even 
+        // really exist on the current machine (important for global machine specific files like configs).
+
+        original = requireOriginal();
+
+        fillMissingKeys(registeredMdl, original);
+      }
+
+      return registeredMdl;
+    }
+  }
+
+  return requireOriginal();
 }
 
 /**
