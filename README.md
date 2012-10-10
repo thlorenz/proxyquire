@@ -83,6 +83,10 @@ By default proxyquire calls the function defined on the *original* dependency wh
 
 If you prefer a more strict behavior you can prevent *callThru* on a per module or global basis.
 
+If *callThru* is disabled, you can stub out modules that don't even exist on the machine that your tests are running on.
+While I wouldn't recommend this in general, I have seen cases where it is legitimately useful (e.g., when requiring
+global environment configs in json format that may not be available on all machines).
+
 **Prevent call thru on path stub:**
 
 ```javascript
