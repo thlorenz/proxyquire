@@ -77,7 +77,7 @@ Two simple steps to override require in your tests:
     - therefore specify it exactly as in the require statement inside the tested file
     - values themselves are key/value pairs of functions/properties and the appropriate override
 
-**Alternative:** 
+### Alternative:
 
 ***proxyquire.resolve({string} mdl, {string} test__dirname, {Object} stubs)***
 
