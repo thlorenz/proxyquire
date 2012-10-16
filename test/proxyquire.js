@@ -17,8 +17,8 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
   describe('When I resolve foo with no overrides to bar as foo and resolve foo with barber stub as foober.', function () {
     before(function () {
       stats.reset();
-      foo = proxyquire.resolve('./samples/foo', __dirname, { './bar': { /* no overrides */ } });
-      foober = proxyquire.resolve('./samples/foo', __dirname, { './bar': barber });
+      foo = proxyquire('./samples/foo', __dirname, { './bar': { /* no overrides */ } });
+      foober = proxyquire('./samples/foo', __dirname, { './bar': barber });
     })
 
     it('foo is required 2 times', function () {
@@ -87,8 +87,7 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
 
       describe('and callThru was not changed globally or for path module', function () {
         before(function () {
-          foo = proxyquire
-            .resolve('./samples/foo', __dirname, { 
+          foo = proxyquire('./samples/foo', __dirname, { 
               path: { 
                   extname: function (file) { return 'override ' + file; }
                 } 
@@ -106,8 +105,7 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
 
       describe('and callThru is turned off for path module', function () {
         before(function () {
-          foo = proxyquire
-            .resolve('./samples/foo', __dirname, { 
+          foo = proxyquire('./samples/foo', __dirname, { 
               path: { 
                   extname: function (file) { return 'override ' + file; }
                 , '@noCallThru': true
@@ -132,8 +130,7 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
 
         describe('and not changed for path module', function () {
           before(function () {
-            foo = proxyquire
-              .resolve('./samples/foo', __dirname, { 
+            foo = proxyquire('./samples/foo', __dirname, { 
                 path: { 
                     extname: function (file) { return 'override ' + file; }
                   } 
@@ -151,8 +148,7 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
 
         describe('and turned back on for path module', function () {
           before(function () {
-            foo = proxyquire
-              .resolve('./samples/foo', __dirname, { 
+            foo = proxyquire('./samples/foo', __dirname, { 
                 path: { 
                     extname: function (file) { return 'override ' + file; }
                   , '@noCallThru': false

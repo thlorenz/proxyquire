@@ -14,7 +14,7 @@ describe('Windows should be supported so that', function () {
     ;
 
   before(function() {
-    windowspaths = proxyquire.resolve('./samples/windowspaths', __dirname, {'./bar': barMock});
+    windowspaths = proxyquire('./samples/windowspaths', __dirname, {'./bar': barMock});
   })
 
   it('the module\'s __dirname variable is the original parent directory', function() {

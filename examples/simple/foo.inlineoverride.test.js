@@ -6,11 +6,11 @@ var proxyquire = require('../../proxyquire')
   ;
 
 // no overrides yet, so path.extname behaves normally
-foo = proxyquire.resolve('./foo', __dirname, {});
+foo = proxyquire('./foo', __dirname, {});
 assert.equal(foo.extnameAllCaps('file.txt'), '.TXT');
 
 // override path.extname
-foo = proxyquire.resolve('./foo', __dirname, {
+foo = proxyquire('./foo', __dirname, {
   path: { extname: function (file) { return 'Exterminate, exterminate the ' + file; } }
 });
 

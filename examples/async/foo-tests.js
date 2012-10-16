@@ -12,7 +12,7 @@ var proxyquire   =  require('../../proxyquire')
   , calledBack
   ;
 
-var foo = proxyquire.resolve('./foo', __dirname, { fs: fsStub });
+var foo = proxyquire('./foo', __dirname, { fs: fsStub });
 
 /*
 * Test caps locking of returned files

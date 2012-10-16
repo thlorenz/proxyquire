@@ -19,7 +19,7 @@ describe('Illegal parameters to resolve give meaningful errors', function () {
 
   describe('when I pass no module', function () {
     function act () {
-      proxyquire.resolve(undefined, __dirname); 
+      proxyquire(undefined, __dirname); 
     }
 
     it('throws an exception explaining that module needs to be passed', function () {
@@ -31,7 +31,7 @@ describe('Illegal parameters to resolve give meaningful errors', function () {
   describe('when I pass an object as module', function () {
 
     function act () {
-      proxyquire.resolve({ }, __dirname, { './bar': bar }); 
+      proxyquire({ }, __dirname, { './bar': bar }); 
     }
       
     it('throws an exception explaining that module needs to be a string', function () {
@@ -41,7 +41,7 @@ describe('Illegal parameters to resolve give meaningful errors', function () {
 
   describe('when I pass no test__dirname', function () {
     function act () {
-      proxyquire.resolve('module'); 
+      proxyquire('module'); 
     }
 
     it('throws an exception explaining that resolve without stubs makes no sense', function () {
@@ -52,7 +52,7 @@ describe('Illegal parameters to resolve give meaningful errors', function () {
   describe('when I pass an object as test__dirname', function () {
 
     function act () {
-      proxyquire.resolve('./samples/foo', { }, { './bar': bar }); 
+      proxyquire('./samples/foo', { }, { './bar': bar }); 
     }
       
     it('throws an exception explaining that test__dirname needs to be a string', function () {
@@ -62,7 +62,7 @@ describe('Illegal parameters to resolve give meaningful errors', function () {
 
   describe('when I pass no stubs', function () {
     function act () {
-      proxyquire.resolve('./samples/foo', __dirname); 
+      proxyquire('./samples/foo', __dirname); 
     }
 
     it('throws an exception explaining that resolve without stubs makes no sense', function () {
@@ -73,24 +73,11 @@ describe('Illegal parameters to resolve give meaningful errors', function () {
 
   describe('when I pass a string as stubs', function () {
     function act () {
-      proxyquire.resolve('./samples/foo', __dirname, 'stubs'); 
+      proxyquire('./samples/foo', __dirname, 'stubs'); 
     }
 
     it('throws an exception explaining that stubs need to be an object', function () {
       throws(act,  /invalid argument: "stubs".+needs to be an object/i);
     })
   })
-
-  /* TODO: orphan stub detection breaks modules that export a function directly
-   *       in order for this to work directly, we'd have to make an exception for those
-  describe('when I pass { bar: function () { .. } } as stubs (e.g., fail to assign it to "./bar")', function () {
-    function act () {
-      proxyquire.resolve('./samples/foo', __dirname, bar); 
-    }
-
-    it('throws an exception explaining that stub needs to be assigned to a module', function () {
-      throws(act,  /specify what module the stub is for/i);
-    })
-  })  
-  */
 })

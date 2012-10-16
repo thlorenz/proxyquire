@@ -33,7 +33,7 @@ var proxyquire =  require('proxyquire')
   , pathStub   =  { };
 
 // when no overrides are specified, path.extname behaves normally
-var foo = proxyquire.resolve('./foo', __dirname, { 'path': pathStub });
+var foo = proxyquire('./foo', __dirname, { 'path': pathStub });
 assert.equal(foo.extnameAllCaps('file.txt'), '.TXT');
 
 // override path.extname
@@ -62,13 +62,13 @@ assert.equal(foo.basenameAllCaps('/a/b/file.txt'), 'FILE.TXT');
 Two simple steps to override require in your tests:
 
 - add `var proxyquire = require('proxyquire');` to top level of your test file
-- `proxyquire.resolve(...)` the module you want to test and pass along stubs for modules you want to override
+- `proxyquire(...)` the module you want to test and pass along stubs for modules you want to override
 
 # API
 
 ## Resolve module to be tested and configure stubs
 
-***proxyquire.resolve({string} mdl, {string} test__dirname, {Object} stubs)***
+***proxyquire({string} mdl, {string} test__dirname, {Object} stubs)***
 
 - **mdl**: path to the module to be tested e.g., `../lib/foo`
 - **test__dirname**: the `__dirname` of the module containing the tests
@@ -76,6 +76,11 @@ Two simple steps to override require in your tests:
     - module paths are relative to the tested module **not** the test file 
     - therefore specify it exactly as in the require statement inside the tested file
     - values themselves are key/value pairs of functions/properties and the appropriate override
+
+**Alternative:** (useful when using fluent api - see third example [below](#preventing-call-thru-to-original-dependency)
+
+***proxyquire.resolve({string} mdl, {string} test__dirname, {Object} stubs)***
+
 
 ## Preventing call thru to original dependency
 
@@ -90,7 +95,7 @@ global environment configs in json format that may not be available on all machi
 **Prevent call thru on path stub:**
 
 ```javascript
-var foo = proxyquire.resolve('./foo', __dirname, {
+var foo = proxyquire('./foo', __dirname, {
   path: { 
       extname: function (file) { ... } 
     , '@noCallThru': true
@@ -161,7 +166,7 @@ var bar = require('./bar');
 /*
  *   Option a) Resolve and override in one step:
  */
-var foo = proxyquire.resolve('../foo', __dirname, {
+var foo = proxyquire('../foo', __dirname, {
   './bar': { toAtm: function (val) { return 0; /* wonder what happens now */ } }
 });
 
@@ -172,7 +177,7 @@ var foo = proxyquire.resolve('../foo', __dirname, {
  */
 var barStub = { };
 
-var foo =  proxyquire.resolve('../foo', __dirname, { './bar': barStub }); 
+var foo =  proxyquire('../foo', __dirname, { './bar': barStub }); 
 
 // Add override
 bar.toAtm = function (val) { return 0; /* wonder what happens now */ };
@@ -185,7 +190,7 @@ bar.toAtm = function (val) { return -1 * val; /* or now */ };
 [ .. run some tests .. ]
 
 // Resolve foo and override multiple of its dependencies in one step - oh my!
-var foo = proxyquire.resolve('./foo', __dirname, {
+var foo = proxyquire('./foo', __dirname, {
     './bar' : { 
       toAtm: function (val) { return 0; /* wonder what happens now */ } 
     }

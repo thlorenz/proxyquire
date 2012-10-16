@@ -15,8 +15,8 @@ describe('Multiple requires of same module don\'t affect each other', function (
       ;
 
     before(function () {
-      foo1 = proxyquire.resolve('./samples/foo', __dirname, { './bar': bar1 });
-      foo2 = proxyquire.resolve('./samples/foo', __dirname, { './bar': bar2 });
+      foo1 = proxyquire('./samples/foo', __dirname, { './bar': bar1 });
+      foo2 = proxyquire('./samples/foo', __dirname, { './bar': bar2 });
     })
     
     it('foo1.bigBar() == "BAR1"', function () {

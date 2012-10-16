@@ -11,9 +11,9 @@ var assert = require('assert')
   , wildBarStub = { bar: function () { return 'barbar'; } }
   ;
   
-foo = proxyquire.resolve('./samples/foo', __dirname, { });
-fooCut = proxyquire.resolve('./samples/foo', __dirname, { './bar': cutBarStub });
-fooWild = proxyquire.resolve('./samples/foo', __dirname, { './bar': wildBarStub });
+foo = proxyquire('./samples/foo', __dirname, { });
+fooCut = proxyquire('./samples/foo', __dirname, { './bar': cutBarStub });
+fooWild = proxyquire('./samples/foo', __dirname, { './bar': wildBarStub });
 
 assert.equal(stats.fooRequires(), 3);
 

@@ -257,9 +257,10 @@ function resolve (mdl, test__dirname, stubs) {
   return dependency;
 }
 
-module.exports = {
-    resolve    :  resolve
-  , _require   :  _proxyquire
-  , tmpDir     :  setTmpDir
-  , noCallThru :  noCallThru
-};
+// allow proxyquire(..) and proxyquire.resolve(..) - useful for fluent api
+resolve.resolve   =  resolve;
+resolve._require  =  _proxyquire;
+resolve.tmpDir    =  setTmpDir;
+resolve.noCallThru =  noCallThru;
+
+module.exports = resolve;

@@ -23,7 +23,7 @@ describe('when path.extname(file) returns ".markdown"', function () {
 
   before(function () {
     extnameStub = sinon.stub(path, 'extname');
-    foo = proxyquire.resolve('./foo', __dirname, { path: { extname: extnameStub } } );
+    foo = proxyquire('./foo', __dirname, { path: { extname: extnameStub } } );
 
     extnameStub.withArgs(file).returns('.markdown');
   })
@@ -43,7 +43,7 @@ describe('when fs.readdir calls back with ["file1", "file2"]', function () {
 
   before(function () {
     readdirStub = sinon.stub(fs, 'readdir');
-    foo = proxyquire.resolve('./foo', __dirname, { fs: { readdir: readdirStub } } );
+    foo = proxyquire('./foo', __dirname, { fs: { readdir: readdirStub } } );
 
     readdirStub.withArgs('../simple').yields(null, [ 'file1', 'file2' ]);
   })  
@@ -68,7 +68,7 @@ describe('when fs.readdir returns an error', function () {
 
   before(function () {
     readdirStub = sinon.stub(fs, 'readdir');
-    foo = proxyquire.resolve('./foo', __dirname, { fs: { readdir: readdirStub } } );
+    foo = proxyquire('./foo', __dirname, { fs: { readdir: readdirStub } } );
 
     readdirError = new Error('some error');
     readdirStub.withArgs('../simple').yields(readdirError, null);
@@ -94,7 +94,7 @@ describe('when calling filesAllCaps with "../simple"', function () {
 
   before(function () {
     readdirSpy = sinon.spy(fs, 'readdir');
-    foo = proxyquire.resolve('./foo', __dirname, { fs: { readdir: readdirSpy } } );
+    foo = proxyquire('./foo', __dirname, { fs: { readdir: readdirSpy } } );
   })
 
   after(function () {
