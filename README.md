@@ -77,9 +77,12 @@ Two simple steps to override require in your tests:
     - therefore specify it exactly as in the require statement inside the tested file
     - values themselves are key/value pairs of functions/properties and the appropriate override
 
-**Alternative:** (useful when using fluent api - see third example [below](#preventing-call-thru-to-original-dependency)
+**Alternative:** 
 
 ***proxyquire.resolve({string} mdl, {string} test__dirname, {Object} stubs)***
+
+You should only use ***resolve*** to enable a fluent api, like in the last example
+[below](#preventing-call-thru-to-original-dependency).
 
 
 ## Preventing call thru to original dependency
