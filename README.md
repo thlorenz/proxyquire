@@ -33,7 +33,7 @@ var proxyquire =  require('proxyquire')
   , pathStub   =  { };
 
 // when no overrides are specified, path.extname behaves normally
-var foo = proxyquire('./foo', __dirname, { 'path': pathStub });
+var foo = proxyquire(module, './foo', { 'path': pathStub });
 assert.equal(foo.extnameAllCaps('file.txt'), '.TXT');
 
 // override path.extname
@@ -50,12 +50,14 @@ assert.equal(foo.basenameAllCaps('/a/b/file.txt'), 'FILE.TXT');
 
 - [Usage](#usage)
 - [API](#api)
-	- [Resolve module to be tested and configure stubs](#resolve-module-to-be-tested-and-configure-stubs)
-    - [Preventing call thru to original dependency](#preventing-call-thru-to-original-dependency)
-	- [Changing the TmpDir](#changing-the-tmpdir)
-    - [Examples](#examples)
+	- [Preventing call thru to original dependency](#preventing-call-thru-to-original-dependency)
+	- [Creating a context](#creating-a-context)
+	- [Setting a contextual module](#setting-a-contextual-module)
+	- [Prevent call thru for all stubs in a context](#prevent-call-thru-for-all-stubs-in-a-context)
+		- [Re-enable call thru for all stubs in a context](#re-enable-call-thru-for-all-stubs-in-a-context)
+	- [All together, now](#all-together-now)
+	- [Examples](#examples)
 - [More Examples](#more-examples)
-
 
 # Usage
 
@@ -66,30 +68,20 @@ Two simple steps to override require in your tests:
 
 # API
 
-## Resolve module to be tested and configure stubs
+***proxyquire({Module} parent, {string} request, {Object} stubs)***
 
-***proxyquire({string} mdl, {string} test__dirname, {Object} stubs)***
-
-- **mdl**: path to the module to be tested e.g., `../lib/foo`
-- **test__dirname**: the `__dirname` of the module containing the tests
+- **parent**: the module running the test. i.e., `module`
+- **request**: path to the module to be tested e.g., `../lib/foo`
 - **stubs**: key/value pairs of the form `{ modulePath: stub, ... }`
     - module paths are relative to the tested module **not** the test file 
     - therefore specify it exactly as in the require statement inside the tested file
     - values themselves are key/value pairs of functions/properties and the appropriate override
 
-### Alternative:
-
-***proxyquire.resolve({string} mdl, {string} test__dirname, {Object} stubs)***
-
-You should only use ***resolve*** to enable a fluent api, like in the last example
-[below](#preventing-call-thru-to-original-dependency).
-
-
 ## Preventing call thru to original dependency
 
 By default proxyquire calls the function defined on the *original* dependency whenever it is not found on the stub.
 
-If you prefer a more strict behavior you can prevent *callThru* on a per module or global basis.
+If you prefer a more strict behavior you can prevent *callThru* on a per module or contextual basis.
 
 If *callThru* is disabled, you can stub out modules that don't even exist on the machine that your tests are running on.
 While I wouldn't recommend this in general, I have seen cases where it is legitimately useful (e.g., when requiring
@@ -98,24 +90,39 @@ global environment configs in json format that may not be available on all machi
 **Prevent call thru on path stub:**
 
 ```javascript
-var foo = proxyquire('./foo', __dirname, {
-  path: { 
-      extname: function (file) { ... } 
+var foo = proxyquire(module, './foo', {
+  path: {
+      extname: function (file) { ... }
     , '@noCallThru': true
   }
 });
 ```
 
-**Prevent call thru for all future stubs:**
+## Creating a context
+
+For more advanced configuration, you can create a context by calling `proxyquire.create`. This enables a fluent API that
+lets you do a few things.
+
+## Setting a contextual module
+
+If you plan on calling `proxyquire` several times in a test, you can default the module like so:
 
 ```javascript
-proxyquire.noCallThru();
+var proxyquire = require('proxyquire').create().fromModule(module);
+
+var foo = proxyquire('./foo', stubs);
 ```
 
-**Re-enable call thru for all future stubs:**
+## Prevent call thru for all stubs in a context
 
 ```javascript
-proxyquire.noCallThru(false);
+var proxyquire = require('proxyquire').create().noCallThru();
+```
+
+### Re-enable call thru for all stubs in a context
+
+```javascript
+proxyquire.callThru();
 ```
 
 **Call thru config per module wins:**
@@ -123,7 +130,7 @@ proxyquire.noCallThru(false);
 ```javascript
 var foo = proxyquire
     .noCallThru()
-    .resolve('./foo', __dirname, {
+    .load(module, './foo', {
 
         // no calls to original './bar' methods will be made
         './bar' : { toAtm: function (val) { ... } }
@@ -136,13 +143,16 @@ var foo = proxyquire
     });
 ```
 
-## Changing the TmpDir
+## All together, now
 
-***proxyquire.tmpDir({string} tmpdir)***
+```javascript
+var proxyquire = require('proxyquire').create().fromModule(module).noCallThru();
+var foo = require('./foo', stubs);
 
-In order to hook into your code, proxyquire writes some intermediate files into the tmp directory.
+proxyquire.callThru();
 
-By default it will use the *TMPDIR* of your environment, but this method allows you to override it.
+var foo2 = require('./foo', stubs);
+```
 
 ## Examples
 
@@ -169,7 +179,7 @@ var bar = require('./bar');
 /*
  *   Option a) Resolve and override in one step:
  */
-var foo = proxyquire('../foo', __dirname, {
+var foo = proxyquire(module, '../foo', {
   './bar': { toAtm: function (val) { return 0; /* wonder what happens now */ } }
 });
 
@@ -180,7 +190,7 @@ var foo = proxyquire('../foo', __dirname, {
  */
 var barStub = { };
 
-var foo =  proxyquire('../foo', __dirname, { './bar': barStub }); 
+var foo =  proxyquire(module, '../foo', { './bar': barStub });
 
 // Add override
 bar.toAtm = function (val) { return 0; /* wonder what happens now */ };
@@ -193,7 +203,7 @@ bar.toAtm = function (val) { return -1 * val; /* or now */ };
 [ .. run some tests .. ]
 
 // Resolve foo and override multiple of its dependencies in one step - oh my!
-var foo = proxyquire('./foo', __dirname, {
+var foo = proxyquire(module, './foo', {
     './bar' : { 
       toAtm: function (val) { return 0; /* wonder what happens now */ } 
     }
