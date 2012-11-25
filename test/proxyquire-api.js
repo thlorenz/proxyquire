@@ -3,10 +3,43 @@
 'use strict';
 
 var assert = require('assert')
-  , proxyquire = require('./../proxyquire');
+  , realFoo = require('./samples/foo');
+
+var stubs = {
+  path:{
+    extname:function () {},
+    basename:function () {}
+  }
+};
 
 describe('api', function () {
-  it('proxyquire function is the same as proxyquire.resolve function', function () {
-    assert.equal(proxyquire, proxyquire.resolve)
+  describe('default export', function () {
+    var proxyquire = require('./../proxyquire')
+
+    function canLoad(fn) {
+      var proxiedFoo = fn(module, './samples/foo', stubs);
+
+      assert.equal(typeof proxiedFoo, 'object');
+      assert.notStrictEqual(realFoo, proxiedFoo);
+    }
+
+    it('proxyquire can load', function () {
+      canLoad(proxyquire);
+    });
+
+    it('proxyquire.load is a function', function () {
+      canLoad(proxyquire.load);
+    });
+  });
+
+  describe('contextual proxyquires', function () {
+   var proxyquire = require('./../proxyquire').create().fromModule(module);
+
+    it('can load without specifying the module', function(){
+      var proxiedFoo = proxyquire('./samples/foo', stubs);
+
+      assert.equal(typeof proxiedFoo, 'object');
+      assert.notStrictEqual(realFoo, proxiedFoo);
+    })
   })
-})
+});
