@@ -1,5 +1,5 @@
 'use strict';
-/*jshint laxbreak:true*/
+/*jshint laxbreak:true, loopfunc:true*/
 
 var path = require('path')
   , Module = require('module')
@@ -55,7 +55,9 @@ function validateArguments(parent, request, stubs) {
   if (msg) throw new ProxyquireError(msg);
 }
 
-function bind(fn, self) { return function () { return fn.apply(self, arguments); }; }
+function bind(fn, self) { 
+  return function () { return fn.apply(self, arguments); }; 
+}
 
 function Proxyquire() {
   var fn = bind(this.load, this);
@@ -84,7 +86,7 @@ Proxyquire.prototype.fromModule = function (module) {
  * @name noCallThru
  * @function
  * @private
- * @return {object} proxyquire exports to allow chaining
+ * @return {object} The proxyquire function to allow chaining
  */
 Proxyquire.prototype.noCallThru = function () {
   this._noCallThru = true;
@@ -94,10 +96,10 @@ Proxyquire.prototype.noCallThru = function () {
 /**
  * Enables call thru, which determines if keys of original modules will be used
  * when they weren't stubbed out.
- * @name noCallThru
+ * @name callThru
  * @function
  * @private
- * @return {object} proxyquire exports to allow chaining
+ * @return {object} The proxyquire function to allow chaining
  */
 Proxyquire.prototype.callThru = function () {
   this._noCallThru = false;
@@ -107,7 +109,7 @@ Proxyquire.prototype.callThru = function () {
 /**
  * Loads a module using the given stubs instead of their normally resolved required modules.
  * @param parent The calling module.
- * @param request The requirable module name to load.
+ * @param request The requirable module path to load.
  * @param stubs The stubs to use. e.g., { "path": { extname: function () { ... } } }
  * @return {*} A newly resolved module with the given stubs.
  */
