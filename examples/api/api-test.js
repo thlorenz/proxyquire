@@ -11,9 +11,9 @@ var assert = require('assert')
   , wildBarStub = { bar: function () { return 'barbar'; } }
   ;
   
-foo = proxyquire('./samples/foo', __dirname, { });
-fooCut = proxyquire('./samples/foo', __dirname, { './bar': cutBarStub });
-fooWild = proxyquire('./samples/foo', __dirname, { './bar': wildBarStub });
+foo = proxyquire('./samples/foo', { });
+fooCut = proxyquire('./samples/foo', { './bar': cutBarStub });
+fooWild = proxyquire('./samples/foo', { './bar': wildBarStub });
 
 assert.equal(stats.fooRequires(), 3);
 
@@ -50,8 +50,7 @@ assert.throws(fooCut.bigRab);
 
 // turn off callThru feature via noCallThru
 // not turned off
-foo = proxyquire
-  .resolve('./samples/foo', __dirname, { 
+foo = proxyquire('./samples/foo', { 
     path: { 
         extname: function (file) { return 'Exterminate, exterminate the ' + file; }
       } 
@@ -61,8 +60,7 @@ assert.equal(foo.bigExt(file),  'EXTERMINATE, EXTERMINATE THE /SOME/PATH/TEST.EX
 assert.equal(foo.bigBas(file),  'TEST.EXT');
 
 // turned off
-foo = proxyquire
-  .resolve('./samples/foo', __dirname, { 
+foo = proxyquire('./samples/foo', { 
     path: { 
         extname: function (file) { return 'Exterminate, exterminate the ' + file; }
       , '@noCallThru': true
@@ -76,8 +74,9 @@ assert.throws(foo.bigBas);
 // not turned back on per module
 
 foo = proxyquire
+  .create()
   .noCallThru()
-  .resolve('./samples/foo', __dirname, { 
+  .load('./samples/foo', { 
     path: { 
         extname: function (file) { return 'Exterminate, exterminate the ' + file; }
       } 
@@ -88,8 +87,9 @@ assert.throws(foo.bigBas);
 // turned back on per module
 
 foo = proxyquire
+  .create()
   .noCallThru()
-  .resolve('./samples/foo', __dirname, { 
+  .load('./samples/foo', { 
     path: { 
         extname: function (file) { return 'Exterminate, exterminate the ' + file; }
       , '@noCallThru': false
@@ -101,8 +101,9 @@ assert.equal(foo.bigBas(file),  'TEST.EXT');
 // turned back on globally
 
 foo = proxyquire
-  .noCallThru(false)
-  .resolve('./samples/foo', __dirname, { 
+  .create()
+  .callThru()
+  .load('./samples/foo', { 
     path: { 
         extname: function (file) { return 'Exterminate, exterminate the ' + file; }
       } 
@@ -113,8 +114,9 @@ assert.equal(foo.bigBas(file),  'TEST.EXT');
 // turned back off per module
 
 foo = proxyquire
-  .noCallThru(false)
-  .resolve('./samples/foo', __dirname, { 
+  .create()
+  .callThru()
+  .load('./samples/foo', { 
     path: { 
         extname: function (file) { return 'Exterminate, exterminate the ' + file; }
       , '@noCallThru': true
