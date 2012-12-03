@@ -17,6 +17,22 @@ var path = require('path')
   });
 })();
 
+function resolveCallingModule () {
+  var err = new Error();
+  var lines = err.stack.split('\n');
+  var callerLine;
+
+  // skip 'Error:' and find first file in stack trace that isn't this one
+  for (var i = 1; i < lines.length; i++) {
+    callerLine = lines[i];
+    if (!~callerLine.indexOf(__filename)) break;
+  }
+
+  var match = callerLine.match(/^.+\((\/.+)+:\d+:\d+\)/);
+  var fullPath = match[1];
+
+  return require.cache[fullPath];
+}
 
 function ProxyquireError(msg) {
   this.name = 'ProxyquireError';
