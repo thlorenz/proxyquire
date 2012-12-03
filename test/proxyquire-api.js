@@ -17,13 +17,14 @@ describe('api', function () {
     var proxyquire = require('./../proxyquire')
 
     it('proxyquire can load', function () {
-      var proxiedFoo = proxyquire(module, './samples/foo', stubs);
+      var proxiedFoo = proxyquire('./samples/foo', stubs);
 
       assert.equal(typeof proxiedFoo, 'object');
       assert.notStrictEqual(realFoo, proxiedFoo);
     });
   });
 
+  // TODO: no longer needed since we will always autoresolve parent module
   describe('contextual proxyquires', function () {
    var proxyquire = require('./../proxyquire').create().fromModule(module);
 

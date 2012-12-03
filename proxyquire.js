@@ -131,7 +131,8 @@ Proxyquire.prototype.callThru = function () {
  */
 Proxyquire.prototype.load = function (parent, request, stubs) {
   if (arguments.length === 2 && !(parent instanceof Module)) {
-    parent = this._parentModule;
+    //this._parentModule = this._parentModule || resolveCallingModule();
+    parent = resolveCallingModule(); //this._parentModule;
     request = arguments[0];
     stubs = arguments[1];
   }

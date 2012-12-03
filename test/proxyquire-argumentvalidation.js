@@ -17,16 +17,6 @@ describe('Illegal parameters to resolve give meaningful errors', function () {
     });
   }
 
-  describe('when I pass no parent', function () {
-    function act () {
-      proxyquire(undefined, './samples/foo');
-    }
-
-    it('throws an exception explaining that module needs to be passed', function () {
-      throws(act, /missing argument: "parent"/i);
-    })
-  })
-
   describe('when I pass an object as module', function () {
 
     function act () {
@@ -51,7 +41,7 @@ describe('Illegal parameters to resolve give meaningful errors', function () {
   describe('when I pass an object as a request', function () {
 
     function act () {
-      proxyquire(module, { }, { './bar': bar });
+      proxyquire({ }, { './bar': bar });
     }
 
     it('throws an exception explaining that request needs to be a requirable string', function () {
@@ -59,6 +49,7 @@ describe('Illegal parameters to resolve give meaningful errors', function () {
     })
   })
 
+  // TODO: remove module arg from here and still get correct error
   describe('when I pass no stubs', function () {
     function act () {
       proxyquire(module, './samples/foo');
@@ -72,7 +63,7 @@ describe('Illegal parameters to resolve give meaningful errors', function () {
 
   describe('when I pass a string as stubs', function () {
     function act () {
-      proxyquire(module, './samples/foo', 'stubs');
+      proxyquire('./samples/foo', 'stubs');
     }
 
     it('throws an exception explaining that stubs need to be an object', function () {

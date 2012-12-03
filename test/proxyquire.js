@@ -17,8 +17,8 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
   describe('When I resolve foo with no overrides to bar as foo and resolve foo with barber stub as foober.', function () {
     before(function () {
       stats.reset();
-      foo = proxyquire(module, './samples/foo', { './bar':{ /* no overrides */ } });
-      foober = proxyquire(module, './samples/foo', { './bar':barber });
+      foo = proxyquire('./samples/foo', { './bar':{ /* no overrides */ } });
+      foober = proxyquire('./samples/foo', { './bar':barber });
     })
 
     it('foo is required 2 times', function () {
@@ -87,7 +87,7 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
 
       describe('and callThru was not changed globally or for path module', function () {
         before(function () {
-          foo = proxyquire(module, './samples/foo', {
+          foo = proxyquire('./samples/foo', {
             path:{
               extname:function (file) { return 'override ' + file; }
             }
@@ -105,7 +105,7 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
 
       describe('and callThru is turned off for path module', function () {
         before(function () {
-          foo = proxyquire(module, './samples/foo', {
+          foo = proxyquire('./samples/foo', {
             path:{
               extname:function (file) { return 'override ' + file; }, '@noCallThru':true
             }
@@ -130,7 +130,7 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
 
         describe('and not changed for path module', function () {
           before(function () {
-            foo = $proxyquire(module, './samples/foo', {
+            foo = $proxyquire('./samples/foo', {
               path:{
                 extname:function (file) { return 'override ' + file; }
               }
@@ -148,7 +148,7 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
 
         describe('and turned back on for path module', function () {
           before(function () {
-            foo = $proxyquire(module, './samples/foo', {
+            foo = $proxyquire('./samples/foo', {
               path:{
                 extname:function (file) { return 'override ' + file; }, '@noCallThru':false
               }
