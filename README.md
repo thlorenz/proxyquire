@@ -57,6 +57,7 @@ assert.equal(foo.basenameAllCaps('/a/b/file.txt'), 'FILE.TXT');
 		- [Re-enable call thru for all stubs in a context](#re-enable-call-thru-for-all-stubs-in-a-context)
 	- [All together, now](#all-together-now)
 	- [Examples](#examples)
+- [Backwards Compatibility for proxyquire v0.3.x](#backwards-compatibility-for-proxyquire-v03x)
 - [More Examples](#more-examples)
 
 # Usage
@@ -212,6 +213,16 @@ var foo = proxyquire(module, './foo', {
     }
 });
 ```
+
+# Backwards Compatibility for proxyquire v0.3.x
+
+To upgrade your project from v0.3.x to v0.4.x, a nifty compat function has been included. Simply do a
+global find and replace for `require('proxyquire')` and change them to `require('proxyquire').compat(module)`. This
+returns an object that wraps the result of `proxyquire.create().fromModule(...)` that provides exactly
+the same API as v0.3.x.
+
+If your test scripts relied on the fact that v0.3.x stored `noCallThru` in the module scope, you can use
+`require('proxyquire').compat(module, true)` to use a global compat object, instead.
 
 # More Examples
 
