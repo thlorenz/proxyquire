@@ -1,266 +1,242 @@
 'use strict';
-/*jshint laxbreak:true*/
+/*jshint laxbreak:true, loopfunc:true*/
 
-var path            =  require('path')
-  , fs              =  require('fs')
-  , util            =  require('util')
-  , existsSync      =  fs.existsSync || path.existsSync // support node <=0.6
-  , registeredStubs =  { }
-  , stubkey         =  0
-  , tmpDir          =  getTmpDir()
-  , callThru        =  true
-  , is              =  { }
+var path = require('path')
+  , Module = require('module')
+  , is = { }
   ;
-  
-(function populateIs () {
-  ['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp'].forEach(function(name) {
-    is[name] = function(obj) {
+
+(function populateIs() {
+  ['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp'].forEach(function (name) {
+    is[name] = function (obj) {
       return Object.prototype.toString.call(obj) == '[object ' + name + ']';
     };
-    is.Object = function(obj) {
+    is.Object = function (obj) {
       return obj === new Object(obj);
     };
   });
-}) ();
+})();
 
-function escapeBackslashes(value) {
-  return value.replace(/\\/g, '\\\\');
-}
-
-function getTmpDir () {
-  var defaultTmp = '/tmp'
-    , envVars = ['TMPDIR', 'TMP', 'TEMP']
-    ;
-
-  for (var i = 0; i < envVars.length; i++) {
-    var key = envVars[i];
-    if(process.env[key]) return fs.realpathSync(process.env[key]);
-  }
-
-  return fs.realpathSync(defaultTmp);
-}
 
 function ProxyquireError(msg) {
   this.name = 'ProxyquireError';
   this.message = msg || 'An error occurred inside proxyquire.';
 }
 
-function isRelativePath(p) {
-  return p.match(/^(\.{1,2}\/)/);
-}
-
-function findFile(file) {
-  var jsfile;
-
-  // finds foo.js even if it is required as foo
-  if (existsSync(file)) 
-    return file;
-  else {
-    jsfile = file + '.js';
-    if (existsSync(jsfile))
-      return jsfile;
-  }
-
-  console.trace();
-  throw new ProxyquireError(
-    util.format('Cannot find file you required.\nTried [%s] and [%s]', file, jsfile)
-  );
-}
-
-function normalizeExtension (file) {
-  if (path.extname(file) !== '') return file;
-  return file + '.js';
-}
-
 function fillMissingKeys(mdl, original) {
-
   Object.keys(original).forEach(function (key) {
-    if (!mdl[key])  mdl[key] = original[key];   
+    if (!mdl[key])  mdl[key] = original[key];
   });
 
   return mdl;
 }
 
-function validateArguments(mdl, test__dirname, stubs) {
-  if (!mdl) 
-    throw new ProxyquireError(
-      'Missing argument: "mdl". Need it know to which module to require.'
-    );
+function validateArguments(parent, request, stubs) {
+  var msg = (function getMessage() {
+    if (!parent)
+      return 'Missing argument: "parent". Need it for test require context.';
 
-  if (!test__dirname) 
-    throw new ProxyquireError(
-      'Missing argument: "__dirname" of test file. Need it to resolve module relative to test directory.'
-    );
+    if (!request)
+      return 'Missing argument: "request". Need it to resolve desired module.';
 
-  if (!stubs) 
-    throw new ProxyquireError(
-      'Missing argument: "stubs". If no stubbing is needed for [' + mdl + '], use regular require instead.'
-    );
+    if (!stubs)
+      return 'Missing argument: "stubs". If no stubbing is needed, use regular require instead.';
 
-  if (!is.String(mdl))
-    throw new ProxyquireError(
-      'Invalid argument: "mdl". Needs to be a string that contains path to module to be resolved.'
-    );
+    if (!(parent instanceof Module))
+      return 'Invalid argument: "parent". Needs to be the module loading the test module.';
 
-  if (!is.String(test__dirname))
-    throw new ProxyquireError(
-      'Invalid argument: "__dirname" of test file. Needs to be a string that contains path to test file resolving the module.'
-    );
+    if (!is.String(request))
+      return 'Invalid argument: "request". Needs to be a requirable string that is the module to load.';
 
-  if (!is.Object(stubs))
-    throw new ProxyquireError(
-      'Invalid argument: "stubs". Needs to be an object containing overrides e.g., {"path": { extname: function () { ... } } }.'
-    );
+    if (!is.Object(stubs))
+      return 'Invalid argument: "stubs". Needs to be an object containing overrides e.g., {"path": { extname: function () { ... } } }.';
+  })();
 
-  /* TODO: orphan stub detection breaks modules that export a function directly
-   *       in order for this to work directly, we'd have to make an exception for those
-  Object.keys(stubs).forEach(function (key) {
-    if (is.Function(stubs[key]))
-      throw new ProxyquireError(
-          '\n\tFound "' + key + '" to be an orphan stub. Please specify what module the stub is for.'
-        + '\n\tFor example: { "./foo": ' + key + ' }'
-      );
-    
-  });
-  */
+  if (msg) throw new ProxyquireError(msg);
+}
+
+function bind(fn, self) {
+  return function () { return fn.apply(self, arguments); };
+}
+
+function Proxyquire() {
+  var fn = bind(this.load, this);
+
+  for (var key in Proxyquire.prototype)
+    if (Proxyquire.prototype.hasOwnProperty(key))
+      fn[key] = bind(this[key], this);
+
+  this.fn = fn;
+  return fn;
 }
 
 /**
-* Overrides default tmp dir used by proxyquire to store modified modules before they are required.
-* @name setTmpDir
-* @function
-* @param {string} tmpdir The path to the tmp dir to be used
-*/
-function setTmpDir(tmpdir) {
-  if (!existsSync(tmpdir)) {
-    console.trace();
-    throw new ProxyquireError('%s doesn\'t exist, so it cannot be used as a tmp dir.', tmpdir);
-  }
-  tmpDir = tmpdir;
-}
-
-/**
-  * Overrides default setting for call thru, which determines if keys of original modules will be used
-  * when they weren't stubbed out.
-  * @name noCallThru
-  * @function 
-  * @private
-  * @param {boolean} [ flag = true ]
-  * @return {object} proxyquire exports to allow chaining
-  */
-function noCallThru(flag) {
-  // default to true when 'flag' is flagt supplied
-  callThru = flag === false;
-  return module.exports;
-}
-
-/**
-* Called from tested modules. Not part of the public api and therefore not to be used directly.
-* @name _proxyquire
-* @function
-* @param {string} mdl Module to require.
-* @param {string} proxy__filename __filename of the generated module proxy which calls this method.
-* @param {string} original__dirname __dirname of the module from which the calling proxy was generated.
-* @return {object} Required module.
-*/
-function _proxyquire (mdl, proxy__filename, original__dirname) {
-  var original
-    , registeredMdl;
-
-  function requireOriginal () {
-    var mdlResolve = isRelativePath(mdl) ? path.join(original__dirname, mdl) : mdl;
-    return require(mdlResolve);
-  }
-
-  if (registeredStubs[proxy__filename]) {
-    registeredMdl = registeredStubs[proxy__filename][mdl];
-
-    if (registeredMdl) {
-      if(!registeredMdl['@noCallThru']) {
-        // Only if callThru is turned on do we need to resolve the original
-        // and fill in missing methods for the registered module.
-        // Attempting to require lazily allows stubbing out modules that don't even 
-        // really exist on the current machine (important for global machine specific files like configs).
-
-        original = requireOriginal();
-
-        fillMissingKeys(registeredMdl, original);
-      }
-
-      return registeredMdl;
-    }
-  }
-
-  return requireOriginal();
-}
-
-/**
- * Resolves specified module and overrides dependencies with specified stubs.
- * @name resolve
- * @function
- * @param {string} mdl Path to the module to be resolved.
- * @param {string} test__dirname __dirname of the test file calling this method.
- * @param {object} stubs Key/value pairs of modules to be stubbed out.
- *                       Keys are paths to modules relative to the tested file NOT the test file, e.g., exactly 
- *                       as it is required in the tested file.
- *                       Values themselves are key/value pairs of functions/properties and the appropriate override.
+ * Sets the module to be used for the proxyquire context.
+ * @param module The calling module.
+ * @return {*} The proxyquire function for chaining.
  */
-function resolve (mdl, test__dirname, stubs) {
+Proxyquire.prototype.fromModule = function (module) {
+  this._parentModule = module;
+  return this.fn;
+};
 
-  validateArguments(mdl, test__dirname, stubs);
+/**
+ * Disables call thru, which determines if keys of original modules will be used
+ * when they weren't stubbed out.
+ * @name noCallThru
+ * @function
+ * @private
+ * @return {object} The proxyquire function to allow chaining
+ */
+Proxyquire.prototype.noCallThru = function () {
+  this._noCallThru = true;
+  return this.fn;
+};
 
-  var mdlPath        =  isRelativePath(mdl) ? path.join(test__dirname, mdl) : mdl
-    , resolvedMdl    =  require.resolve(mdlPath)
-    , resolvedFile   =  findFile(resolvedMdl)
-    , originalCode   =  fs.readFileSync(resolvedFile)
-    , mdlProxyFile   =  path.basename(resolvedFile) + '@' + (stubkey++).toString()
-    , resolvedProxy  =  path.join(tmpDir, normalizeExtension(mdlProxyFile))
-    // all code will be written on one line, prepended to whatever was on first line to maintain linenos
-    , mdlProxyCode = 
-        [ 'var __dirname = "' + escapeBackslashes(path.dirname(resolvedFile)) + '"; '
-        , 'var __filename = "' + escapeBackslashes(resolvedFile) + '"; '
-        , 'function require(mdl) { '
-        , 'return module'
-        ,   '.require("' , escapeBackslashes(__filename), '")'
-        ,   '._require(mdl, "' + escapeBackslashes(resolvedProxy) + '", __dirname); '
-        , '} '
-        , originalCode 
-        ].join('')
-    , dependency
-    ;
+/**
+ * Enables call thru, which determines if keys of original modules will be used
+ * when they weren't stubbed out.
+ * @name callThru
+ * @function
+ * @private
+ * @return {object} The proxyquire function to allow chaining
+ */
+Proxyquire.prototype.callThru = function () {
+  this._noCallThru = false;
+  return this.fn;
+};
 
-  if (stubs) { 
-    // Adjust no call thru settings for each stubbed module if it was overridden globally
-    if (!callThru) {
-      Object.keys(stubs).forEach(function (key) {
-        // allow turning call thru back on per module by setting it to false
-        if (stubs[key]['@noCallThru'] !== false) stubs[key]['@noCallThru'] = true;
-      });
-    }
-      
-    registeredStubs[resolvedProxy] = stubs;
+/**
+ * Loads a module using the given stubs instead of their normally resolved required modules.
+ * @param parent The calling module.
+ * @param request The requirable module path to load.
+ * @param stubs The stubs to use. e.g., { "path": { extname: function () { ... } } }
+ * @return {*} A newly resolved module with the given stubs.
+ */
+Proxyquire.prototype.load = function (parent, request, stubs) {
+  if (arguments.length === 2 && !(parent instanceof Module)) {
+    parent = this._parentModule;
+    request = arguments[0];
+    stubs = arguments[1];
   }
 
-  fs.writeFileSync(resolvedProxy, mdlProxyCode);
+  validateArguments(parent, request, stubs);
+
+  var self = this, interceptedExtensions = {};
+
+  for (var key in stubs) {
+    if (!stubs.hasOwnProperty(key)) continue;
+
+    var extname = path.extname(stubs[key]) || '.js';
+
+    // Have we already setup the interceptor on this extension?
+    if (interceptedExtensions.hasOwnProperty(extname)) continue;
+
+    var ext_super = interceptedExtensions[extname] = require.extensions[extname];
+
+    require.extensions[extname] = function ext(module, filename) {
+      var require_super = bind(module.require, module);
+
+      module.require = function (request) {
+        if (stubs.hasOwnProperty(request)) {
+          var stub = stubs[request];
+
+          if (stub.hasOwnProperty('@noCallThru') ? !stub['@noCallThru'] : !self._noCallThru)
+            fillMissingKeys(stub, require_super(request));
+
+          return stub;
+        }
+
+        return require_super(request);
+      };
+
+      return ext_super(module, filename);
+    };
+  }
+
+  var id = Module._resolveFilename(request, parent);
+  var cached = Module._cache[id];
+  if (cached) delete Module._cache[id];
 
   try {
-    dependency = require(resolvedProxy);
-  } catch (err) {
-    console.trace();
-    console.error(err);
-    throw (err);
+    return parent.require(request);
   } finally {
-    // Make sure we remove the generated file even if require fails
-    fs.unlinkSync(resolvedProxy); 
+    if (cached)
+      Module._cache[id] = cached;
+    else
+      delete Module._cache[id];
+
+    if (interceptedExtensions)
+      for (key in interceptedExtensions)
+        if (interceptedExtensions.hasOwnProperty(key))
+          require.extensions[key] = interceptedExtensions[key];
+  }
+};
+
+var _proxyquire = new Proxyquire();
+
+module.exports = bind(_proxyquire.load, _proxyquire);
+module.exports.create = function () { return new Proxyquire(); };
+
+//
+// Compatibility Support
+//
+
+var globalCompatProxyquire = new Proxyquire();
+
+module.exports.compat = function (parent, useGlobal) {
+  function validateArgments(mdl, test__dirname, stubs) {
+    if (!mdl)
+      throw new ProxyquireError(
+        'Missing argument: "mdl". Need it know to which module to require.'
+      );
+
+    if (!test__dirname)
+      throw new ProxyquireError(
+        'Missing argument: "__dirname" of test file. Need it to resolve module relative to test directory.'
+      );
+
+    if (!stubs)
+      throw new ProxyquireError(
+        'Missing argument: "stubs". If no stubbing is needed for [' + mdl + '], use regular require instead.'
+      );
+
+    if (!is.String(mdl))
+      throw new ProxyquireError(
+        'Invalid argument: "mdl". Needs to be a string that contains path to module to be resolved.'
+      );
+
+    if (!is.String(test__dirname))
+      throw new ProxyquireError(
+        'Invalid argument: "__dirname" of test file. Needs to be a string that contains path to test file resolving the module.'
+      );
+
+    if (!is.Object(stubs))
+      throw new ProxyquireError(
+        'Invalid argument: "stubs". Needs to be an object containing overrides e.g., {"path": { extname: function () { ... } } }.'
+      );
   }
 
-  return dependency;
-}
+  var pq = useGlobal ? globalCompatProxyquire : new Proxyquire();
+  pq.fromModule(parent);
 
-// allow proxyquire(..) and proxyquire.resolve(..) - useful for fluent api
-resolve.resolve   =  resolve;
-resolve._require  =  _proxyquire;
-resolve.tmpDir    =  setTmpDir;
-resolve.noCallThru =  noCallThru;
+  var compat = function (mdl, test__dirname, stubs) {
+    validateArgments.apply(null, arguments);
+    return pq.load(mdl, stubs);
+  };
 
-module.exports = resolve;
+  compat.resolve = compat;
+
+  compat.tmpDir = function () {};
+
+  compat.noCallThru = function (flag) {
+    if (flag !== false)
+      pq.noCallThru();
+    else
+      pq.callThru();
+
+    return compat;
+  };
+
+  return compat;
+};

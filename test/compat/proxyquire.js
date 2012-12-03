@@ -3,27 +3,27 @@
 "use strict";
 
 var assert = require('assert')
-  , proxyquire = require('./../proxyquire')
-  , stats = require('./samples/stats')
+  , proxyquire = require('./../../proxyquire').compat(module)
+  , stats  = require('./samples/stats')
   ;
 
 describe('Given foo requires the bar and path modules and bar.bar() returns "bar"', function () {
   var file = '/folder/test.ext'
     , foo
     , foober
-    , barber = { bar:function () { return 'barber'; } }
+    , barber = { bar: function () { return 'barber'; } }
     ;
-
+  
   describe('When I resolve foo with no overrides to bar as foo and resolve foo with barber stub as foober.', function () {
     before(function () {
       stats.reset();
-      foo = proxyquire(module, './samples/foo', { './bar':{ /* no overrides */ } });
-      foober = proxyquire(module, './samples/foo', { './bar':barber });
+      foo = proxyquire('./samples/foo', __dirname, { './bar': { /* no overrides */ } });
+      foober = proxyquire('./samples/foo', __dirname, { './bar': barber });
     })
 
     it('foo is required 2 times', function () {
       assert.equal(stats.fooRequires(), 2);
-    })
+    })   
 
     describe('foo\'s bar is unchanged', function () {
       it('foo.bigBar() == "BAR"', function () {
@@ -44,7 +44,7 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
       it('foober.bigBas("/folder/test.ext") == "TEST.EXT"', function () {
         assert.equal(foober.bigBas(file), 'TEST.EXT');
       })
-
+      
     })
 
     describe('when I override keys of stubs after resolve', function () {
@@ -56,11 +56,11 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
 
       it('overrides behavior when module is required inside function call', function () {
         assert.equal(foober.bigBar(), 'FRISEUR');
-      })
+      })   
 
       it('overrides behavior when module is required on top of file', function () {
         assert.equal(foober.bigRab(), 'RABARBER');
-      })
+      })   
 
 
       describe('and then delete overrides of stubs after resolve', function () {
@@ -77,7 +77,7 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
         it('doesn\'t properly revert to original behavior when module is required on top of file ', function () {
           assert.throws(foober.bigRab);
         })
-
+        
       })
     })
   })
@@ -87,11 +87,11 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
 
       describe('and callThru was not changed globally or for path module', function () {
         before(function () {
-          foo = proxyquire(module, './samples/foo', {
-            path:{
-              extname:function (file) { return 'override ' + file; }
-            }
-          });
+          foo = proxyquire('./samples/foo', __dirname, { 
+              path: { 
+                  extname: function (file) { return 'override ' + file; }
+                } 
+            });
         })
 
         it('foo.bigExt(file) == "OVERRIDE /FOLDER/TEST.EXT"', function () {
@@ -105,11 +105,12 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
 
       describe('and callThru is turned off for path module', function () {
         before(function () {
-          foo = proxyquire(module, './samples/foo', {
-            path:{
-              extname:function (file) { return 'override ' + file; }, '@noCallThru':true
-            }
-          });
+          foo = proxyquire('./samples/foo', __dirname, { 
+              path: { 
+                  extname: function (file) { return 'override ' + file; }
+                , '@noCallThru': true
+                } 
+            });
         })
 
         it('foo.bigExt(file) == "OVERRIDE /FOLDER/TEST.EXT"', function () {
@@ -119,22 +120,21 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
         it('foo.bigBas(file) throws', function () {
           assert.throws(foo.bigBas);
         })
-
+        
       })
-
+      
       describe('and callThru was turned off globally', function () {
-        var $proxyquire;
         before(function () {
-          $proxyquire = proxyquire.create().noCallThru();
+          proxyquire.noCallThru();
         })
 
         describe('and not changed for path module', function () {
           before(function () {
-            foo = $proxyquire(module, './samples/foo', {
-              path:{
-                extname:function (file) { return 'override ' + file; }
-              }
-            });
+            foo = proxyquire('./samples/foo', __dirname, { 
+                path: { 
+                    extname: function (file) { return 'override ' + file; }
+                  } 
+              });
           })
 
           it('foo.bigExt(file) == "OVERRIDE /FOLDER/TEST.EXT"', function () {
@@ -148,11 +148,12 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
 
         describe('and turned back on for path module', function () {
           before(function () {
-            foo = $proxyquire(module, './samples/foo', {
-              path:{
-                extname:function (file) { return 'override ' + file; }, '@noCallThru':false
-              }
-            });
+            foo = proxyquire('./samples/foo', __dirname, { 
+                path: { 
+                    extname: function (file) { return 'override ' + file; }
+                  , '@noCallThru': false
+                  } 
+              });
           })
 
           it('foo.bigExt(file) == "OVERRIDE /FOLDER/TEST.EXT"', function () {
@@ -166,12 +167,12 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
 
         describe('and turned back on globally', function () {
           before(function () {
-            foo = $proxyquire
-              .callThru()
-              .load(module, './samples/foo', {
-                path:{
-                  extname:function (file) { return 'override ' + file; }
-                }
+            foo = proxyquire
+              .noCallThru(false)
+              .resolve('./samples/foo', __dirname, { 
+                path: { 
+                    extname: function (file) { return 'override ' + file; }
+                  } 
               });
           })
 

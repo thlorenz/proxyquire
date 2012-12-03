@@ -3,7 +3,7 @@
 /*global describe before beforeEach it */
 
 var assert = require('assert')
-  , proxyquire = require('..').create().fromModule(module)
+  , proxyquire = require('../..').compat(module)
   , path = require('path')
   , fooPath = path.join(__dirname, './samples/notexisting/foo.js')
 
@@ -11,7 +11,7 @@ describe('When resolving foo that requires stubbed /not/existing/bar.json', func
   
   it('throws an error', function () {
     assert.throws(function () {
-      proxyquire(fooPath, {
+      proxyquire(fooPath, __dirname, { 
         '/not/existing/bar.json': { config: 'bar\'s config' } 
       })  
     })
@@ -22,7 +22,7 @@ describe('When resolving foo that requires stubbed /not/existing/bar.json with n
   var foo;
 
   it('resolves foo with stubbed bar', function () {
-    foo = proxyquire(fooPath, {
+    foo = proxyquire(fooPath, __dirname, { 
       '/not/existing/bar.json': { config: 'bar\'s config', '@noCallThru': true } 
     })  
     assert.equal(foo.config, 'bar\'s config')
