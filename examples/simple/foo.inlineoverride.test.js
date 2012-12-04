@@ -1,3 +1,4 @@
+'use strict';
 require('../example-utils').listModuleAndTests(__dirname + '/foo.js', __filename);
 
 var proxyquire = require('../../proxyquire')
@@ -6,11 +7,11 @@ var proxyquire = require('../../proxyquire')
   ;
 
 // no overrides yet, so path.extname behaves normally
-foo = proxyquire('./foo', __dirname, {});
+foo = proxyquire('./foo', {});
 assert.equal(foo.extnameAllCaps('file.txt'), '.TXT');
 
 // override path.extname
-foo = proxyquire('./foo', __dirname, {
+foo = proxyquire('./foo', {
   path: { extname: function (file) { return 'Exterminate, exterminate the ' + file; } }
 });
 

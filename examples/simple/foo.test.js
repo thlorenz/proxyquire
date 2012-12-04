@@ -7,7 +7,7 @@ var proxyquire =  require('../../proxyquire')
   , pathStub   =  { };
 
 // when not overridden, path.extname behaves normally
-var foo = proxyquire('./foo', __dirname, { 'path': pathStub });
+var foo = proxyquire('./foo', { 'path': pathStub });
 assert.equal(foo.extnameAllCaps('file.txt'), '.TXT');
 
 // override path.extname
