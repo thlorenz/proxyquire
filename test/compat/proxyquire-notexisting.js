@@ -3,7 +3,7 @@
 /*global describe before beforeEach it */
 
 var assert = require('assert')
-  , proxyquire = require('../..').compat(module)
+  , proxyquire = require('../..').compat()
   , path = require('path')
   , fooPath = path.join(__dirname, './samples/notexisting/foo.js')
 

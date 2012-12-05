@@ -2,11 +2,12 @@
 //
 // Compatibility Support 0.3.x
 //
+var globalCompatProxyquire;
 
 module.exports.init = function (Proxyquire, ProxyquireError, is) {
-  var globalCompatProxyquire = new Proxyquire();
+  globalCompatProxyquire = globalCompatProxyquire || new Proxyquire();
 
-  return function (parent, useGlobal) {
+  return function (useGlobal) {
     function validateArgments(mdl, test__dirname, stubs) {
       if (!mdl)
         throw new ProxyquireError(
