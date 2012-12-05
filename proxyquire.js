@@ -51,16 +51,12 @@ function validateArguments(request, stubs) {
   if (msg) throw new ProxyquireError(msg);
 }
 
-function bind(fn, self) {
-  return function () { return fn.apply(self, arguments); };
-}
-
 function Proxyquire() {
-  var fn = bind(this.load, this);
+  var fn = this.load.bind(this);
 
   for (var key in Proxyquire.prototype)
-    if (Proxyquire.prototype.hasOwnProperty(key))
-      fn[key] = bind(this[key], this);
+    if (is.Function(this[key]) && Proxyquire.prototype.hasOwnProperty(key))
+      fn[key] = this[key].bind(this);
 
   this.fn = fn;
   return fn;
@@ -128,7 +124,7 @@ Proxyquire.prototype.load = function (request, stubs) {
     var ext_super = interceptedExtensions[extname] = require.extensions[extname];
 
     require.extensions[extname] = function ext(module, filename) {
-      var require_super = bind(module.require, module);
+      var require_super = module.require.bind(module);
 
       module.require = function (request) {
         if (stubs.hasOwnProperty(request)) {
