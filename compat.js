@@ -40,7 +40,6 @@ module.exports.init = function (Proxyquire, ProxyquireError, is) {
     }
 
     var pq = useGlobal ? globalCompatProxyquire : new Proxyquire();
-    pq.fromModule(parent);
 
     var compat = function (mdl, test__dirname, stubs) {
       validateArgments.apply(null, arguments);

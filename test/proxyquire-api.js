@@ -23,16 +23,4 @@ describe('api', function () {
       assert.notStrictEqual(realFoo, proxiedFoo);
     });
   });
-
-  // TODO: no longer needed since we will always autoresolve parent module
-  describe('contextual proxyquires', function () {
-   var proxyquire = require('./../proxyquire').create().fromModule(module);
-
-    it('can load without specifying the module', function(){
-      var proxiedFoo = proxyquire('./samples/foo', stubs);
-
-      assert.equal(typeof proxiedFoo, 'object');
-      assert.notStrictEqual(realFoo, proxiedFoo);
-    })
-  })
 });

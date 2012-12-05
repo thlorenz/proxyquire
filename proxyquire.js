@@ -63,16 +63,6 @@ function Proxyquire() {
 }
 
 /**
- * Sets the module to be used for the proxyquire context.
- * @param module The calling module.
- * @return {*} The proxyquire function for chaining.
- */
-Proxyquire.prototype.fromModule = function (module) {
-  this._parentModule = module;
-  return this.fn;
-};
-
-/**
  * Disables call thru, which determines if keys of original modules will be used
  * when they weren't stubbed out.
  * @name noCallThru
