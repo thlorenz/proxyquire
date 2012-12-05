@@ -6,6 +6,9 @@ var path = require('path')
   , is = { }
   ;
 
+// delete proxyquire from cache to force re-require so in order to resolve module from parent.module
+delete require.cache[require.resolve(__filename)];
+
 (function populateIs() {
   ['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp'].forEach(function (name) {
     is[name] = function (obj) {
@@ -16,23 +19,6 @@ var path = require('path')
     };
   });
 })();
-
-function resolveCallingModule () {
-  var err = new Error();
-  var lines = err.stack.split('\n');
-  var callerLine;
-
-  // skip 'Error:' and find first file in stack trace that isn't this one
-  for (var i = 1; i < lines.length; i++) {
-    callerLine = lines[i];
-    if (!~callerLine.indexOf(__filename)) break;
-  }
-
-  var match = callerLine.match(/^.+\((\/.+)+:\d+:\d+\)/);
-  var fullPath = match[1];
-
-  return require.cache[fullPath];
-}
 
 function ProxyquireError(msg) {
   this.name = 'ProxyquireError';
@@ -131,8 +117,7 @@ Proxyquire.prototype.callThru = function () {
  */
 Proxyquire.prototype.load = function (parent, request, stubs) {
   if (arguments.length === 2 && !(parent instanceof Module)) {
-    //this._parentModule = this._parentModule || resolveCallingModule();
-    parent = resolveCallingModule(); //this._parentModule;
+    parent = module.parent;
     request = arguments[0];
     stubs = arguments[1];
   }
