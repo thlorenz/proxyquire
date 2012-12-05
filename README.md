@@ -52,7 +52,6 @@ assert.equal(foo.basenameAllCaps('/a/b/file.txt'), 'FILE.TXT');
 - [API](#api)
 	- [Preventing call thru to original dependency](#preventing-call-thru-to-original-dependency)
 	- [Creating a context](#creating-a-context)
-	- [Setting a contextual module](#setting-a-contextual-module)
 	- [Prevent call thru for all stubs in a context](#prevent-call-thru-for-all-stubs-in-a-context)
 		- [Re-enable call thru for all stubs in a context](#re-enable-call-thru-for-all-stubs-in-a-context)
 	- [All together, now](#all-together-now)
@@ -215,11 +214,11 @@ If your test scripts relied on the fact that v0.3.x stored `noCallThru` in the m
 
 # More Examples
 
-For more examples look inside the [examples folder](./proxyquire/tree/master/examples/) or
-look through the [tests](./proxyquire/blob/master/test/proxyquire.js)
+For more examples look inside the [examples folder](http://github/thlorenz/proxyquire/tree/master/examples/) or
+look through the [tests](http://github/thlorenz/proxyquire/blob/master/test/proxyquire.js)
 
 **Specific Examples:**
 
-- test async APIs synchronously: [examples/async](./proxyquire/tree/master/examples/async).
-- using proxyquire with [Sinon.JS](http://sinonjs.org/): [examples/sinon](./proxyquire/tree/master/examples/sinon).
+- test async APIs synchronously: [examples/async](http://github/thlorenz/proxyquire/tree/master/examples/async).
+- using proxyquire with [Sinon.JS](http://sinonjs.org/): [examples/sinon](http://github/thlorenz/proxyquire/tree/master/examples/sinon).
 
