@@ -33,7 +33,7 @@ var proxyquire =  require('proxyquire')
   , pathStub   =  { };
 
 // when no overrides are specified, path.extname behaves normally
-var foo = proxyquire(module, './foo', { 'path': pathStub });
+var foo = proxyquire('./foo', { 'path': pathStub });
 assert.equal(foo.extnameAllCaps('file.txt'), '.TXT');
 
 // override path.extname
@@ -69,9 +69,8 @@ Two simple steps to override require in your tests:
 
 # API
 
-***proxyquire({Module} parent, {string} request, {Object} stubs)***
+***proxyquire({string} request, {Object} stubs)***
 
-- **parent**: the module running the test. i.e., `module`
 - **request**: path to the module to be tested e.g., `../lib/foo`
 - **stubs**: key/value pairs of the form `{ modulePath: stub, ... }`
     - module paths are relative to the tested module **not** the test file 
@@ -91,7 +90,7 @@ global environment configs in json format that may not be available on all machi
 **Prevent call thru on path stub:**
 
 ```javascript
-var foo = proxyquire(module, './foo', {
+var foo = proxyquire('./foo', {
   path: {
       extname: function (file) { ... }
     , '@noCallThru': true
@@ -103,16 +102,6 @@ var foo = proxyquire(module, './foo', {
 
 For more advanced configuration, you can create a context by calling `proxyquire.create`. This enables a fluent API that
 lets you do a few things.
-
-## Setting a contextual module
-
-If you plan on calling `proxyquire` several times in a test, you can default the module like so:
-
-```javascript
-var proxyquire = require('proxyquire').create().fromModule(module);
-
-var foo = proxyquire('./foo', stubs);
-```
 
 ## Prevent call thru for all stubs in a context
 
@@ -131,7 +120,7 @@ proxyquire.callThru();
 ```javascript
 var foo = proxyquire
     .noCallThru()
-    .load(module, './foo', {
+    .load('./foo', {
 
         // no calls to original './bar' methods will be made
         './bar' : { toAtm: function (val) { ... } }
@@ -180,7 +169,7 @@ var bar = require('./bar');
 /*
  *   Option a) Resolve and override in one step:
  */
-var foo = proxyquire(module, '../foo', {
+var foo = proxyquire('../foo', {
   './bar': { toAtm: function (val) { return 0; /* wonder what happens now */ } }
 });
 
@@ -191,7 +180,7 @@ var foo = proxyquire(module, '../foo', {
  */
 var barStub = { };
 
-var foo =  proxyquire(module, '../foo', { './bar': barStub });
+var foo =  proxyquire('../foo', { './bar': barStub });
 
 // Add override
 bar.toAtm = function (val) { return 0; /* wonder what happens now */ };
@@ -204,7 +193,7 @@ bar.toAtm = function (val) { return -1 * val; /* or now */ };
 [ .. run some tests .. ]
 
 // Resolve foo and override multiple of its dependencies in one step - oh my!
-var foo = proxyquire(module, './foo', {
+var foo = proxyquire('./foo', {
     './bar' : { 
       toAtm: function (val) { return 0; /* wonder what happens now */ } 
     }
