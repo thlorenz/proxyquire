@@ -216,11 +216,11 @@ If your test scripts relied on the fact that v0.3.x stored `noCallThru` in the m
 
 # More Examples
 
-For more examples look inside the [examples folder](https://github/thlorenz/proxyquire/tree/master/examples/) or
-look through the [tests](https://github/thlorenz/proxyquire/blob/master/test/proxyquire.js)
+For more examples look inside the [examples folder](https://github.com/thlorenz/proxyquire/tree/master/examples/) or
+look through the [tests](https://github.com/thlorenz/proxyquire/blob/master/test/proxyquire.js)
 
 **Specific Examples:**
 
-- test async APIs synchronously: [examples/async](https://github/thlorenz/proxyquire/tree/master/examples/async).
-- using proxyquire with [Sinon.JS](http://sinonjs.org/): [examples/sinon](https://github/thlorenz/proxyquire/tree/master/examples/sinon).
+- test async APIs synchronously: [examples/async](https://github.com/thlorenz/proxyquire/tree/master/examples/async).
+- using proxyquire with [Sinon.JS](http://sinonjs.org/): [examples/sinon](https://github.com/thlorenz/proxyquire/tree/master/examples/sinon).
 
