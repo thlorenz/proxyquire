@@ -206,13 +206,12 @@ var foo = proxyquire('./foo', {
 
 To upgrade your project from v0.3.x to v0.4.x, a nifty compat function has been included. 
 
-Simply do a global find and replace for `require('proxyquire')` and change them to `require('proxyquire').compat(module)`. 
+Simply do a global find and replace for `require('proxyquire')` and change them to `require('proxyquire').compat()`. 
 
-This returns an object that wraps the result of `proxyquire.create().fromModule(...)` that provides exactly
-the same API as v0.3.x.
+This returns an object that wraps the result of `proxyquire.create()` that provides exactly the same API as v0.3.x.
 
 If your test scripts relied on the fact that v0.3.x stored `noCallThru` in the module scope, you can use
-`require('proxyquire').compat(module, true)` to use a global compat object, instead.
+`require('proxyquire').compat(true)` to use a global compat object, instead.
 
 # More Examples
 
