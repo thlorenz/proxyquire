@@ -168,7 +168,7 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
           before(function () {
             foo = $proxyquire
               .callThru()
-              .load(module, './samples/foo', {
+              .load('./samples/foo', {
                 path:{
                   extname:function (file) { return 'override ' + file; }
                 }

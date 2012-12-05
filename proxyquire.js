@@ -110,17 +110,14 @@ Proxyquire.prototype.callThru = function () {
 
 /**
  * Loads a module using the given stubs instead of their normally resolved required modules.
- * @param parent The calling module.
  * @param request The requirable module path to load.
  * @param stubs The stubs to use. e.g., { "path": { extname: function () { ... } } }
  * @return {*} A newly resolved module with the given stubs.
  */
-Proxyquire.prototype.load = function (parent, request, stubs) {
-  if (arguments.length === 2 && !(parent instanceof Module)) {
-    parent = module.parent;
-    request = arguments[0];
-    stubs = arguments[1];
-  }
+Proxyquire.prototype.load = function (request, stubs) {
+  var parent = module.parent;
+  request = arguments[0];
+  stubs = arguments[1];
 
   validateArguments(parent, request, stubs);
 
