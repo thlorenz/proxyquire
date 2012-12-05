@@ -204,9 +204,11 @@ var foo = proxyquire('./foo', {
 
 # Backwards Compatibility for proxyquire v0.3.x
 
-To upgrade your project from v0.3.x to v0.4.x, a nifty compat function has been included. Simply do a
-global find and replace for `require('proxyquire')` and change them to `require('proxyquire').compat(module)`. This
-returns an object that wraps the result of `proxyquire.create().fromModule(...)` that provides exactly
+To upgrade your project from v0.3.x to v0.4.x, a nifty compat function has been included. 
+
+Simply do a global find and replace for `require('proxyquire')` and change them to `require('proxyquire').compat(module)`. 
+
+This returns an object that wraps the result of `proxyquire.create().fromModule(...)` that provides exactly
 the same API as v0.3.x.
 
 If your test scripts relied on the fact that v0.3.x stored `noCallThru` in the module scope, you can use
@@ -214,11 +216,11 @@ If your test scripts relied on the fact that v0.3.x stored `noCallThru` in the m
 
 # More Examples
 
-For more examples look inside the [examples folder](http://github/thlorenz/proxyquire/tree/master/examples/) or
-look through the [tests](http://github/thlorenz/proxyquire/blob/master/test/proxyquire.js)
+For more examples look inside the [examples folder](https://github/thlorenz/proxyquire/tree/master/examples/) or
+look through the [tests](https://github/thlorenz/proxyquire/blob/master/test/proxyquire.js)
 
 **Specific Examples:**
 
-- test async APIs synchronously: [examples/async](http://github/thlorenz/proxyquire/tree/master/examples/async).
-- using proxyquire with [Sinon.JS](http://sinonjs.org/): [examples/sinon](http://github/thlorenz/proxyquire/tree/master/examples/sinon).
+- test async APIs synchronously: [examples/async](https://github/thlorenz/proxyquire/tree/master/examples/async).
+- using proxyquire with [Sinon.JS](http://sinonjs.org/): [examples/sinon](https://github/thlorenz/proxyquire/tree/master/examples/sinon).
 
