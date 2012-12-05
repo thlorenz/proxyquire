@@ -6,7 +6,7 @@ var path = require('path')
   , is = { }
   ;
 
-// delete proxyquire from cache to force re-require so in order to resolve module from parent.module
+// delete proxyquire from cache to force re-require in order to allow resolving test module via parent.module
 delete require.cache[require.resolve(__filename)];
 
 (function populateIs() {
@@ -172,9 +172,6 @@ Proxyquire.prototype.load = function (request, stubs) {
   }
 };
 
-var _proxyquire = new Proxyquire();
-
-module.exports = bind(_proxyquire.load, _proxyquire);
-module.exports.create = function () { return new Proxyquire(); };
-module.exports.compat = require('./compat').init(Proxyquire, ProxyquireError, is);
-
+module.exports        =  new Proxyquire().load;
+module.exports.create =  function () { return new Proxyquire(); };
+module.exports.compat =  require('./compat').init(Proxyquire, ProxyquireError, is);
