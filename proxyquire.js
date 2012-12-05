@@ -33,19 +33,13 @@ function fillMissingKeys(mdl, original) {
   return mdl;
 }
 
-function validateArguments(parent, request, stubs) {
+function validateArguments(request, stubs) {
   var msg = (function getMessage() {
-    if (!parent)
-      return 'Missing argument: "parent". Need it for test require context.';
-
     if (!request)
       return 'Missing argument: "request". Need it to resolve desired module.';
 
     if (!stubs)
       return 'Missing argument: "stubs". If no stubbing is needed, use regular require instead.';
-
-    if (!(parent instanceof Module))
-      return 'Invalid argument: "parent". Needs to be the module loading the test module.';
 
     if (!is.String(request))
       return 'Invalid argument: "request". Needs to be a requirable string that is the module to load.';
@@ -119,7 +113,7 @@ Proxyquire.prototype.load = function (request, stubs) {
   request = arguments[0];
   stubs = arguments[1];
 
-  validateArguments(parent, request, stubs);
+  validateArguments(request, stubs);
 
   var self = this, interceptedExtensions = {};
 
