@@ -74,7 +74,6 @@ assert.throws(foo.bigBas);
 // not turned back on per module
 
 foo = proxyquire
-  .create()
   .noCallThru()
   .load('./samples/foo', { 
     path: { 
@@ -87,7 +86,6 @@ assert.throws(foo.bigBas);
 // turned back on per module
 
 foo = proxyquire
-  .create()
   .noCallThru()
   .load('./samples/foo', { 
     path: { 
@@ -101,7 +99,6 @@ assert.equal(foo.bigBas(file),  'TEST.EXT');
 // turned back on globally
 
 foo = proxyquire
-  .create()
   .callThru()
   .load('./samples/foo', { 
     path: { 
@@ -114,7 +111,6 @@ assert.equal(foo.bigBas(file),  'TEST.EXT');
 // turned back off per module
 
 foo = proxyquire
-  .create()
   .callThru()
   .load('./samples/foo', { 
     path: { 
