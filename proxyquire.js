@@ -83,13 +83,15 @@ function interceptExtensions (self, stubs) {
 }
 
 function Proxyquire() {
-  var fn = this.load.bind(this);
+  var self = this
+    , fn = self.load.bind(self);
 
-  for (var key in Proxyquire.prototype)
-    if (is.Function(this[key]) && Proxyquire.prototype.hasOwnProperty(key))
-      fn[key] = this[key].bind(this);
+  Object.keys(Proxyquire.prototype)
+    .forEach(function (key) {
+      if(is.Function(self[key])) fn[key] = self[key].bind(self);
+    });
 
-  this.fn = fn;
+  self.fn = fn;
   return fn;
 }
 
@@ -144,10 +146,11 @@ Proxyquire.prototype.load = function (request, stubs) {
     else
       delete Module._cache[id];
 
-    if (interceptedExtensions)
-      for (var ext in interceptedExtensions)
-        if (interceptedExtensions.hasOwnProperty(ext))
+    if (interceptedExtensions) {
+      Object.keys(interceptedExtensions).forEach(function (ext) {
           require.extensions[ext] = interceptedExtensions[ext];
+      });
+    }
   }
 };
 
