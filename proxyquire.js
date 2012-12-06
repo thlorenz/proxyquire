@@ -51,6 +51,37 @@ function validateArguments(request, stubs) {
   if (msg) throw new ProxyquireError(msg);
 }
 
+function interceptExtensions (self, stubs) {
+  var interceptedExtensions = {};
+
+  [ '.js', '.json', '.node' ].forEach(function (extname) {
+
+    var ext_super = interceptedExtensions[extname] = require.extensions[extname];
+
+    require.extensions[extname] = function ext(module, filename) {
+      var require_super = module.require.bind(module);
+
+      module.require = function (request) {
+        if (stubs.hasOwnProperty(request)) {
+          var stub = stubs[request]
+            , callThru = stub.hasOwnProperty('@noCallThru') ? !stub['@noCallThru'] : !self._noCallThru;
+
+          if (callThru)
+            fillMissingKeys(stub, require_super(request));
+
+          return stub;
+        }
+
+        return require_super(request);
+      };
+
+      return ext_super(module, filename);
+    };
+  });
+
+  return interceptedExtensions;
+}
+
 function Proxyquire() {
   var fn = this.load.bind(this);
 
@@ -87,46 +118,6 @@ Proxyquire.prototype.callThru = function () {
   this._noCallThru = false;
   return this.fn;
 };
-
-function interceptExtensions (self, stubs) {
-  var interceptedExtensions = {};
-  for (var key in stubs) {
-    if (!stubs.hasOwnProperty(key)) continue;
-
-    // An odd bug requires us to try two ways to get valid require.extension for each stub
-    // a) this works in most cases and except some edge cases (see test/proxyquire-edgecases.js)
-    var extname = path.extname(stubs[key]) || '.js';
-
-    // b) this works for everything but '.json' files (see test/proxyquire-notexisting.js)
-    if (!require.extensions[extname])
-      extname = path.extname(key) || '.js';
-
-    // Have we already setup the interceptor on this extension?
-    if (interceptedExtensions.hasOwnProperty(extname)) continue;
-
-    var ext_super = interceptedExtensions[extname] = require.extensions[extname];
-
-    require.extensions[extname] = function ext(module, filename) {
-      var require_super = module.require.bind(module);
-
-      module.require = function (request) {
-        if (stubs.hasOwnProperty(request)) {
-          var stub = stubs[request];
-
-          if (stub.hasOwnProperty('@noCallThru') ? !stub['@noCallThru'] : !self._noCallThru)
-            fillMissingKeys(stub, require_super(request));
-
-          return stub;
-        }
-
-        return require_super(request);
-      };
-
-      return ext_super(module, filename);
-    };
-  }
-  return interceptedExtensions;
-}
 
 /**
  * Loads a module using the given stubs instead of their normally resolved required modules.
