@@ -88,20 +88,8 @@ Proxyquire.prototype.callThru = function () {
   return this.fn;
 };
 
-/**
- * Loads a module using the given stubs instead of their normally resolved required modules.
- * @param request The requirable module path to load.
- * @param stubs The stubs to use. e.g., { "path": { extname: function () { ... } } }
- * @return {*} A newly resolved module with the given stubs.
- */
-Proxyquire.prototype.load = function (request, stubs) {
-  var parent = module.parent;
-
-  validateArguments(request, stubs);
-
-  var self = this
-    , interceptedExtensions = {};
-
+function interceptExtensions (self, stubs) {
+  var interceptedExtensions = {};
   for (var key in stubs) {
     if (!stubs.hasOwnProperty(key)) continue;
 
@@ -137,6 +125,21 @@ Proxyquire.prototype.load = function (request, stubs) {
       return ext_super(module, filename);
     };
   }
+  return interceptedExtensions;
+}
+
+/**
+ * Loads a module using the given stubs instead of their normally resolved required modules.
+ * @param request The requirable module path to load.
+ * @param stubs The stubs to use. e.g., { "path": { extname: function () { ... } } }
+ * @return {*} A newly resolved module with the given stubs.
+ */
+Proxyquire.prototype.load = function (request, stubs) {
+  var parent = module.parent;
+
+  validateArguments(request, stubs);
+
+  var interceptedExtensions = interceptExtensions(this, stubs);
 
   var id = Module._resolveFilename(request, parent);
   var cached = Module._cache[id];
