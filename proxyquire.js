@@ -51,7 +51,7 @@ function validateArguments(request, stubs) {
   if (msg) throw new ProxyquireError(msg);
 }
 
-function interceptExtensions (self, stubs) {
+function interceptExtensions(self, stubs) {
   var interceptedExtensions = {};
 
   [ '.js', '.json', '.node' ].forEach(function (extname) {
