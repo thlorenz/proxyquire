@@ -105,7 +105,13 @@ Proxyquire.prototype.load = function (request, stubs) {
   for (var key in stubs) {
     if (!stubs.hasOwnProperty(key)) continue;
 
+    // An odd bug requires us to try two ways to get valid require.extension for each stub
+    // a) this works in most cases and except some edge cases (see test/proxyquire-edgecases.js)
     var extname = path.extname(stubs[key]) || '.js';
+
+    // b) this works for everything but '.json' files (see test/proxyquire-notexisting.js)
+    if (!require.extensions[extname])
+      extname = path.extname(key) || '.js';
 
     // Have we already setup the interceptor on this extension?
     if (interceptedExtensions.hasOwnProperty(extname)) continue;
@@ -145,9 +151,9 @@ Proxyquire.prototype.load = function (request, stubs) {
       delete Module._cache[id];
 
     if (interceptedExtensions)
-      for (key in interceptedExtensions)
-        if (interceptedExtensions.hasOwnProperty(key))
-          require.extensions[key] = interceptedExtensions[key];
+      for (var ext in interceptedExtensions)
+        if (interceptedExtensions.hasOwnProperty(ext))
+          require.extensions[ext] = interceptedExtensions[ext];
   }
 };
 
