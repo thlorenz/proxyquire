@@ -1,7 +1,7 @@
 'use strict';
 /*jshint asi:true */
 /*global describe before beforeEach it */
-var proxyquire = require('..').create().noCallThru()
+var proxyquire = require('..').noCallThru()
 
 describe('when I require stubs with different extensions', function () {
   var res;

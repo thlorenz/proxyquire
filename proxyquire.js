@@ -85,11 +85,13 @@ function interceptExtensions(self, stubs) {
 
 function Proxyquire() {
   var self = this
-    , fn = self.load.bind(self);
+    , fn = self.load.bind(self)
+    , proto = Proxyquire.prototype
+    ;
 
-  Object.keys(Proxyquire.prototype)
+  Object.keys(proto)
     .forEach(function (key) {
-      if(is.Function(self[key])) fn[key] = self[key].bind(self);
+      if(is.Function(proto[key])) fn[key] = proto[key].bind(self);
     });
 
   self.fn = fn;
@@ -155,6 +157,6 @@ Proxyquire.prototype.load = function (request, stubs) {
   }
 };
 
-module.exports        =  new Proxyquire().load;
+module.exports        =  new Proxyquire();
 module.exports.create =  function () { return new Proxyquire(); };
 module.exports.compat =  require('./compat').init(Proxyquire, ProxyquireError, is);
