@@ -52,37 +52,6 @@ function validateArguments(request, stubs) {
   if (msg) throw new ProxyquireError(msg);
 }
 
-function interceptExtensions(self, stubs) {
-  var interceptedExtensions = {};
-
-  [ '.js', '.json', '.node' ].forEach(function (extname) {
-
-    var ext_super = interceptedExtensions[extname] = require.extensions[extname];
-
-    require.extensions[extname] = function ext(module, filename) {
-      var require_super = module.require.bind(module);
-
-      module.require = function (request) {
-        if (stubs.hasOwnProperty(request)) {
-          var stub = stubs[request]
-            , callThru = stub.hasOwnProperty('@noCallThru') ? !stub['@noCallThru'] : !self._noCallThru;
-
-          if (callThru)
-            fillMissingKeys(stub, require_super(request));
-
-          return stub;
-        }
-
-        return require_super(request);
-      };
-
-      return ext_super(module, filename);
-    };
-  });
-
-  return interceptedExtensions;
-}
-
 function Proxyquire() {
   var self = this
     , fn = self.load.bind(self)
@@ -91,7 +60,7 @@ function Proxyquire() {
 
   Object.keys(proto)
     .forEach(function (key) {
-      if(is.Function(proto[key])) fn[key] = proto[key].bind(self);
+      if (is.Function(proto[key])) fn[key] = proto[key].bind(self);
     });
 
   self.fn = fn;
@@ -135,11 +104,41 @@ Proxyquire.prototype.load = function (request, stubs) {
 
   validateArguments(request, stubs);
 
-  var interceptedExtensions = interceptExtensions(this, stubs);
-
+  // Find the ID (location) of the SUT, relative to the parent
   var id = Module._resolveFilename(request, parent);
+
+  // Temporarily delete the SUT from the require cache, if it exists.
   var cached = Module._cache[id];
   if (cached) delete Module._cache[id];
+
+  // Override the core require function for the SUT's file extension.
+  var extname = path.extname(id);
+  var ext_super = require.extensions[extname];
+
+  var self = this;
+  require.extensions[extname] = function ext(module, filename) {
+    // NOTE: This function is for requiring the SUT
+
+    // require_super is the normal require for the SUT.
+    var require_super = module.require.bind(module);
+
+    module.require = function (request) {
+      // NOTE: This function is for requiring dependencies for the SUT
+
+      // If the request string isn't stubbed, just do the usual thing.
+      if (!stubs.hasOwnProperty(request)) return require_super(request);
+
+      var stub = stubs[request];
+
+      if (stub.hasOwnProperty('@noCallThru') ? !stub['@noCallThru'] : !self._noCallThru)
+        fillMissingKeys(stub, require_super(request));
+
+      return stub;
+    };
+
+    // Now that we've overridden the SUT's require, we can proceed as usual.
+    return ext_super(module, filename);
+  };
 
   try {
     return parent.require(request);
@@ -149,14 +148,11 @@ Proxyquire.prototype.load = function (request, stubs) {
     else
       delete Module._cache[id];
 
-    if (interceptedExtensions) {
-      Object.keys(interceptedExtensions).forEach(function (ext) {
-          require.extensions[ext] = interceptedExtensions[ext];
-      });
-    }
+    if (ext_super)
+      require.extensions[extname] = ext_super;
   }
 };
 
-module.exports        =  new Proxyquire();
-module.exports.create =  function () { return new Proxyquire(); };
-module.exports.compat =  require('./compat').init(Proxyquire, ProxyquireError, is);
+module.exports = new Proxyquire();
+module.exports.create = function () { return new Proxyquire(); };
+module.exports.compat = require('./compat').init(Proxyquire, ProxyquireError, is);
