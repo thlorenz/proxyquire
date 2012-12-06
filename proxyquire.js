@@ -22,6 +22,7 @@ delete require.cache[require.resolve(__filename)];
 
 function ProxyquireError(msg) {
   this.name = 'ProxyquireError';
+  Error.captureStackTrace(this, ProxyquireError);
   this.message = msg || 'An error occurred inside proxyquire.';
 }
 
