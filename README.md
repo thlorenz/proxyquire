@@ -135,7 +135,7 @@ var foo = proxyquire
 ## All together, now
 
 ```javascript
-var proxyquire = require('proxyquire').create().fromModule(module).noCallThru();
+var proxyquire = require('proxyquire').create().noCallThru();
 var foo = require('./foo', stubs);
 
 proxyquire.callThru();
