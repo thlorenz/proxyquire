@@ -96,12 +96,11 @@ Proxyquire.prototype.callThru = function () {
  */
 Proxyquire.prototype.load = function (request, stubs) {
   var parent = module.parent;
-  request = arguments[0];
-  stubs = arguments[1];
 
   validateArguments(request, stubs);
 
-  var self = this, interceptedExtensions = {};
+  var self = this
+    , interceptedExtensions = {};
 
   for (var key in stubs) {
     if (!stubs.hasOwnProperty(key)) continue;
