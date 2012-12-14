@@ -4,6 +4,7 @@
 var path            =  require('path')
   , fs              =  require('fs')
   , util            =  require('util')
+  , coffee          =  require('coffee-script')
   , existsSync      =  fs.existsSync || path.existsSync // support node <=0.6
   , registeredStubs =  { }
   , stubkey         =  0
@@ -213,6 +214,7 @@ function resolve (mdl, test__dirname, stubs) {
     , resolvedMdl    =  require.resolve(mdlPath)
     , resolvedFile   =  findFile(resolvedMdl)
     , originalCode   =  fs.readFileSync(resolvedFile)
+    , compiledCode   =  coffee.compile(originalCode.toString())
     , mdlProxyFile   =  path.basename(resolvedFile) + '@' + (stubkey++).toString()
     , resolvedProxy  =  path.join(tmpDir, normalizeExtension(mdlProxyFile))
     // all code will be written on one line, prepended to whatever was on first line to maintain linenos
@@ -224,7 +226,7 @@ function resolve (mdl, test__dirname, stubs) {
         ,   '.require("' , escapeBackslashes(__filename), '")'
         ,   '._require(mdl, "' + escapeBackslashes(resolvedProxy) + '", __dirname); '
         , '} '
-        , originalCode 
+        , compiledCode 
         ].join('')
     , dependency
     ;
