@@ -3,7 +3,7 @@
 "use strict";
 
 var assert = require('assert')
-  , proxyquire = require('./../proxyquire')
+  , proxyquire = require('..')
   ;
 
 describe('Multiple requires of same module don\'t affect each other', function () {

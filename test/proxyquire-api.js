@@ -14,7 +14,7 @@ var stubs = {
 
 describe('api', function () {
   describe('default export', function () {
-    var proxyquire = require('./../proxyquire')
+    var proxyquire = require('..')
 
     it('proxyquire can load', function () {
       var proxiedFoo = proxyquire.load('./samples/foo', stubs);

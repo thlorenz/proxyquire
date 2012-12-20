@@ -1,3 +1,5 @@
+*.user.js
+
 lib-cov
 *.seed
 *.log
@@ -15,3 +17,6 @@ node_modules
 npm-debug.log
 
 spikes
+
+*.idea
+*.iml

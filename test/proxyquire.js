@@ -3,7 +3,7 @@
 "use strict";
 
 var assert = require('assert')
-  , proxyquire = require('./../proxyquire')
+  , proxyquire = require('..')
   , stats = require('./samples/stats')
   ;
 
@@ -125,7 +125,7 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
       describe('and callThru was turned off globally', function () {
         var $proxyquire;
         before(function () {
-          $proxyquire = proxyquire.create().noCallThru();
+          $proxyquire = proxyquire.noCallThru();
         })
 
         describe('and not changed for path module', function () {

@@ -3,7 +3,7 @@
 "use strict";
 
 var assert = require('assert')
-  , proxyquire = require('./../../proxyquire').compat()
+  , proxyquire = require('../..').compat()
   , stats  = require('./samples/stats')
   ;
 

@@ -3,7 +3,7 @@
 "use strict";
 
 var assert = require('assert')
-  , proxyquire = require('./../../proxyquire').compat()
+  , proxyquire = require('../..').compat()
   ;
 
 describe('Illegal parameters to resolve give meaningful errors', function () {
