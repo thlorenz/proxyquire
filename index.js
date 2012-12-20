@@ -1,4 +1,4 @@
-var Proxyquire = require('./lib/proxyquire')
+var Proxyquire = require('./lib/Proxyquire')
   , compat = require('./lib/compat');
 
 // delete this module from the cache to force re-require in order to allow resolving test module via parent.module
