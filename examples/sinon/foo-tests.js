@@ -8,7 +8,7 @@
  * e.g., mocha foo-tests.js
  */
 
-var proxyquire =  require('../../proxyquire')
+var proxyquire =  require('../..')
   , sinon      =  require('sinon')
   , assert     =  require('assert')
   , fs         =  require('fs')

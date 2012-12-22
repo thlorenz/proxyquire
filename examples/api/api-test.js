@@ -2,7 +2,7 @@
 
 var assert = require('assert')
   , stats  = require('./samples/stats')
-  , proxyquire = require('../../proxyquire')
+  , proxyquire = require('../..')
   , file = '/some/path/test.ext'
   , foo
   , fooCut

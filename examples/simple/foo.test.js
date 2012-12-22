@@ -2,7 +2,7 @@
 
 require('../example-utils').listModuleAndTests(__dirname + '/foo.js', __filename);
 
-var proxyquire =  require('../../proxyquire')
+var proxyquire =  require('../..')
   , assert     =  require('assert')
   , pathStub   =  { };
 
