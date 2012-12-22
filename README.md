@@ -51,13 +51,13 @@ assert.equal(foo.basenameAllCaps('/a/b/file.txt'), 'FILE.TXT');
 - [Usage](#usage)
 - [API](#api)
 	- [Preventing call thru to original dependency](#preventing-call-thru-to-original-dependency)
-	- [Creating a context](#creating-a-context)
-	- [Prevent call thru for all stubs in a context](#prevent-call-thru-for-all-stubs-in-a-context)
-		- [Re-enable call thru for all stubs in a context](#re-enable-call-thru-for-all-stubs-in-a-context)
+		- [Prevent call thru for all future stubs resolved by a proxyquire instance](#prevent-call-thru-for-all-future-stubs-resolved-by-a-proxyquire-instance)
+		- [Re-enable call thru for all future stubs resolved by a proxyquire instance](#re-enable-call-thru-for-all-future-stubs-resolved-by-a-proxyquire-instance)
 	- [All together, now](#all-together-now)
 	- [Examples](#examples)
 - [Backwards Compatibility for proxyquire v0.3.x](#backwards-compatibility-for-proxyquire-v03x)
 - [More Examples](#more-examples)
+
 
 # Usage
 
@@ -97,18 +97,17 @@ var foo = proxyquire('./foo', {
 });
 ```
 
-## Creating a context
-
-For more advanced configuration, you can create a context by calling `proxyquire.create`. This enables a fluent API that
-lets you do a few things.
-
-## Prevent call thru for all stubs in a context
+### Prevent call thru for all future stubs resolved by a proxyquire instance
 
 ```javascript
-var proxyquire = require('proxyquire').create().noCallThru();
+// all stubs resolved by proxyquireStrict will not call through by default
+var proxyquireStrict = require('proxyquire').noCallThru();
+
+// all stubs resolved by proxyquireNonStrict will call through by default
+var proxyquireNonStrict = require('proxyquire');
 ```
 
-### Re-enable call thru for all stubs in a context
+### Re-enable call thru for all future stubs resolved by a proxyquire instance
 
 ```javascript
 proxyquire.callThru();
@@ -135,7 +134,7 @@ var foo = proxyquire
 ## All together, now
 
 ```javascript
-var proxyquire = require('proxyquire').create().noCallThru();
+var proxyquire = require('proxyquire').noCallThru();
 var foo = require('./foo', stubs);
 
 proxyquire.callThru();
@@ -208,7 +207,7 @@ To upgrade your project from v0.3.x to v0.4.x, a nifty compat function has been 
 
 Simply do a global find and replace for `require('proxyquire')` and change them to `require('proxyquire').compat()`. 
 
-This returns an object that wraps the result of `proxyquire.create()` that provides exactly the same API as v0.3.x.
+This returns an object that wraps the result of `proxyquire()` that provides exactly the same API as v0.3.x.
 
 If your test scripts relied on the fact that v0.3.x stored `noCallThru` in the module scope, you can use
 `require('proxyquire').compat(true)` to use a global compat object, instead.
