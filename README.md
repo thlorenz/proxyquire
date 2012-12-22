@@ -53,11 +53,10 @@ assert.equal(foo.basenameAllCaps('/a/b/file.txt'), 'FILE.TXT');
 	- [Preventing call thru to original dependency](#preventing-call-thru-to-original-dependency)
 		- [Prevent call thru for all future stubs resolved by a proxyquire instance](#prevent-call-thru-for-all-future-stubs-resolved-by-a-proxyquire-instance)
 		- [Re-enable call thru for all future stubs resolved by a proxyquire instance](#re-enable-call-thru-for-all-future-stubs-resolved-by-a-proxyquire-instance)
-    - [All together, now](#all-together-now)
+		- [All together, now](#all-together-now)
 	- [Examples](#examples)
 - [Backwards Compatibility for proxyquire v0.3.x](#backwards-compatibility-for-proxyquire-v03x)
 - [More Examples](#more-examples)
-
 
 # Usage
 
