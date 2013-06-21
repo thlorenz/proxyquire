@@ -17,7 +17,9 @@ describe('undefined dependency', function() {
 
     assert.equal(typeof proxiedUndefinedDependency, 'object');
     assert.notStrictEqual(realUndefinedDependency, proxiedUndefinedDependency);
-    assert.equal(proxiedUndefinedDependency.bar, realBar);
+
+    var result = realUndefinedDependency.nullNonSideEffectDependency('9');
+    assert.equal(result, true);
   });
 
   it('proxyquire can noCallThru and then load', function() {
@@ -26,8 +28,14 @@ describe('undefined dependency', function() {
     });
 
     assert.equal(typeof proxiedUndefinedDependency, 'object');
-    assert.notStrictEqual(realUndefinedDependency, proxiedUndefinedDependency);
 
-    assert.equal(proxiedUndefinedDependency.bar, null);
+    var threwException = false;
+    try {
+      proxiedUndefinedDependency('9');
+    } catch (e) {
+      threwException = true;
+    }
+
+    assert(threwException);
   });
 })
