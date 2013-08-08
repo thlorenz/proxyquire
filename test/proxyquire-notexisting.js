@@ -1,6 +1,6 @@
 'use strict';
 /*jshint asi:true*/
-/*global describe before beforeEach it */
+/*global describe, before, beforeEach, it */
 
 var assert = require('assert')
   , proxyquire = require('..')

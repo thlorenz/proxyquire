@@ -1,6 +1,6 @@
 'use strict';
 /*jshint asi:true*/
-/*global describe before beforeEach it */
+/*global describe, before, beforeEach, it */
 
 var assert = require('assert')
   , proxyquire = require('..')
@@ -24,15 +24,15 @@ describe('When resolving foo that requires bar and stubbed baz where bar require
 
     baz = require('./samples/sub-dependencies/baz');
 
-  });
+  })
 
   it('does not stub baz in bar', function () {
-    assert.notEqual(foo.bar.baz, bazStub);
-  });
+    assert.equal(foo.bar.baz.testexport, 'test');
+  })
 
   it('does not affect a normal baz import', function () {
-    assert.notEqual(baz, bazStub);
-  });
+    assert.equal(baz.testexport, 'test');
+  })
 
 });
 
