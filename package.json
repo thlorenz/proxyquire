@@ -21,7 +21,7 @@
   "licenses": [
     {
       "type": "MIT",
-      "url": "http://www.opensource.org/licenses/mit-license.php"
+      "url": "https://github.com/thlorenz/proxyquire/blob/master/LICENSE"
     }
   ],
   "devDependencies": {
