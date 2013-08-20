@@ -13,6 +13,10 @@
   "keywords": [
     "require",
     "dependency",
+    "injection",
+    "di",
+    "inject",
+    "swap",
     "test",
     "mock",
     "stub"
