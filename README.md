@@ -79,6 +79,40 @@ Two simple steps to override require in your tests:
     - therefore specify it exactly as in the require statement inside the tested file
     - values themselves are key/value pairs of functions/properties and the appropriate override
 
+## Explicitly preventing the load of dependencies
+
+During testing it can provide stability to your tests, and code, by explicitly preventing dependencies from being loaded.
+This can be done by passing null, or undefined, as your dependency:
+
+```javascript
+var foo = proxyquire('./foo', {
+  path: null
+});
+```
+
+An example of the sort of functionality we're trying to avoid might be:
+
+```javascript
+var path = require('path');
+module.exports = function () {
+  // Mis-typed parameter check.
+  if (/[0-8]/.test(input)) {
+    return false;
+  }
+
+  // Call another function that does a different verification step,
+  // returning the same result as the original function call. 
+  // We could manually stub this out to function () { throw "Whatever."; }
+  // however, this would be much more code over time, and to do this for 
+  // every function on every dependency would take a long time.
+  if (fs.readFileSync('./some-test-file') === 'Some data.') {
+    return false;
+  }
+
+  // other stuff.
+};
+```
+
 ## Preventing call thru to original dependency
 
 By default proxyquire calls the function defined on the *original* dependency whenever it is not found on the stub.
