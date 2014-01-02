@@ -28,4 +28,5 @@ module.exports = {
   , bigRab: bigRab
   , bigExt: bigExt
   , bigBas: bigBas
+  , booleanValue: bar.booleanValue
 };

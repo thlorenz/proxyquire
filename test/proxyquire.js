@@ -80,6 +80,16 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
 
       })
     })
+
+    describe("when I use a falsey stub value", function () {
+      before(function () {
+        foo = proxyquire("./samples/foo", {"./bar": { booleanValue: false}});
+      })
+
+      it("should remain a falsey value", function () {
+        assert.equal(foo.booleanValue, false);
+      });
+    })
   })
 
   describe('When foo.bigExt() returns capitalized path.extname and foo.bigBas() returns capitalized path.basename', function () {
