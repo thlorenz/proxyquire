@@ -189,12 +189,12 @@ var barStub = { };
 var foo =  proxyquire('../foo', { './bar': barStub });
 
 // Add override
-bar.toAtm = function (val) { return 0; /* wonder what happens now */ };
+barStub.toAtm = function (val) { return 0; /* wonder what happens now */ };
 
 [ .. run some tests .. ]
 
 // Change override
-bar.toAtm = function (val) { return -1 * val; /* or now */ };
+barStub.toAtm = function (val) { return -1 * val; /* or now */ };
 
 [ .. run some tests .. ]
 
