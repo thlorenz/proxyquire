@@ -80,6 +80,21 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
 
       })
     })
+
+    describe("when I use a boolean stub value", function () {
+
+      it("should remain a falsey value", function () {
+        foo = proxyquire("./samples/foo", {"./bar": { booleanValue: false}});
+        assert.equal(foo.booleanValue, false);
+        foo = proxyquire("./samples/foo", {"./bar": { booleanValue: null}});
+        assert.equal(foo.booleanValue, null);
+      })
+
+      it("should still set the missing value with the default boolean values", function () {
+        foo = proxyquire("./samples/foo", {});
+        assert.equal(foo.booleanValue, true);
+      })
+    })
   })
 
   describe('When foo.bigExt() returns capitalized path.extname and foo.bigBas() returns capitalized path.basename', function () {

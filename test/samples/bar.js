@@ -6,5 +6,9 @@ function rab () {
   return 'rab';
 }
 
-module.exports = { bar : bar, rab: rab };
+module.exports = {
+    bar : bar
+  , rab: rab
+  , booleanValue: true
+};
 
