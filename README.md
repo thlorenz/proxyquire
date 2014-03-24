@@ -150,6 +150,81 @@ proxyquire.callThru();
 var foo2 = proxyquire('./foo', stubs);
 ```
 
+## Singletons and preserving the require.cache
+
+By default proxyquire will delete the require.cache for the module being stubbed.  This forces it to be reloaded the next time `require` is called.  In most cases, this will produce the behavior you want.  However, sometimes you will want to preserve the cache, such as when you are working with Singletons.
+
+**To do this, simply call preserveCache() on proxyquire**
+```
+// Correct way
+var proxyquire = require('proxyquire').preserveCache();
+proxyquire.load(request, stubs);
+
+// Incorrect way
+var proxyquire = require(request, stubs).preserveCache();
+
+```
+
+**To return to the default setting, call noCache()**
+```
+var proxyquire = require('proxyquire').preserveCache();
+
+// Do some stuff
+
+proxyquire.noCache();
+```
+
+### Why not always preserve the cache?
+
+It seems to make sense to simply restore the cache after every proxyquire call.  However, doing so would prevent any object definitions from being reloaded.  This creates a scenario where the module's cache will be restored, yet the object definition will still be referring to a stubbed module.
+
+#### For example
+
+**foo-object.js**
+```
+var path = require('path');
+
+Foo = function() {};
+
+Foo.prototype.bigExt = function(file) {
+    return path.extname(file).toUpperCase();
+};
+```
+**foo-test.js**
+
+```
+    it('will demonstrate that caching breaks object definitions', function() {
+
+      // This module is cached and the object definition is read for the first time
+      require('./foo-object');
+
+      var proxyquire = require('proxyquire');
+
+      // When proxyquire is done loading the module, it will restore the module cache
+      proxyquire.preserveCache();
+
+      var pathStub = { extname: function(file) { return 'stubbed'; } };
+
+      // The object definition for Foo is loaded from foo-object.js
+      // and now includes a reference to the stubbed `path` module
+      proxyquire.load('./foo-object', { 'path': pathStub });
+
+      // A new version of Foo is created based on the definition loaded above.
+      var foo = new Foo();
+      assert.equal('STUBBED', foo.bigExt('file.txt'));
+
+      // The file is not reloaded, since it is cached.
+      // This means the object definition is not reloaded and it still has
+      // a reference to the stubbed `path` module
+      require('./foo-object');
+
+      // Since `require` was used for this, the result should be '.TXT'
+      // however it is using the cached module and the most recent object definition
+      var foo = new Foo();
+      assert.equal('STUBBED', foo.bigExt('file.txt'));
+    });
+```
+
 ## Examples
 
 **We are testing foo which depends on bar:**
