@@ -60,6 +60,7 @@ assert.equal(foo.basenameAllCaps('/a/b/file.txt'), 'FILE.TXT');
 		- [Prevent call thru for all future stubs resolved by a proxyquire instance](#prevent-call-thru-for-all-future-stubs-resolved-by-a-proxyquire-instance)
 		- [Re-enable call thru for all future stubs resolved by a proxyquire instance](#re-enable-call-thru-for-all-future-stubs-resolved-by-a-proxyquire-instance)
 		- [All together, now](#all-together-now)
+	- [Forcing require to reload modules](#forcing-require-to-reload-modules)
 	- [Examples](#examples)
 - [Backwards Compatibility for proxyquire v0.3.x](#backwards-compatibility-for-proxyquire-v03x)
 - [More Examples](#more-examples)
@@ -150,17 +151,47 @@ proxyquire.callThru();
 var foo2 = proxyquire('./foo', stubs);
 ```
 
+### Forcing require to reload modules
+
+In most situations, this is not needed.  Typically, you will only need this if the module under test is creating globals that reference the dependency being stubbed.
+
+To override dependencies within a module, `proxyquire` has to reload the module and replace the dependencies with those you chose to stub.  By default, after doing this `proxyquire` will restore the state of require's cache to how it found it.  In this way, Singletons and other design patterns continue to work as expected.
+
+However, this default behavior will break globals that were created with a reference to the stubbed dependency.  To fix this, you can force the next `require` to reload the module by using `noPreserveCache()`.
+
+```
+// Calling require caches './foo' to illustrate this example
+var original = require('./foo');
+
+// Turn off the default behavior of preserving the state of require.cache
+var proxyquire = require('proxyquire').noPreserveCache();
+var foo = proxyquire('./foo', stubs);
+
+// At this point, require.cache for './foo' has been deleted
+// Calling require reloads the module and caches it again
+var foo2 = require('./foo');
+assert.notEqual(foo2, original);
+```
+Optionally, you can re-enable the default behavior of preserving require.cache.
+```
+proxyquire.preserveCache();
+
+var foo3 = proxyquire('./foo', stubs);
+var foo4 = require('./foo');
+assert.equals(foo4, foo2);
+```
+
 ## Examples
 
 **We are testing foo which depends on bar:**
 
 ```javascript
 // bar.js module
-module.exports = { 
+module.exports = {
     toAtm: function (val) { return  0.986923267 * val; }
 };
 
-// foo.js module 
+// foo.js module
 // requires bar which we will stub out in tests
 var bar = require('./bar');
 [ ... ]
