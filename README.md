@@ -10,7 +10,7 @@ v2](https://github.com/substack/browserify).
 
 # Features
 
-- **no changes to your code** are necessary 
+- **no changes to your code** are necessary
 - non overriden methods of a module behave like the original
 - mocking framework agnostic, if it can stub a function then it works with proxyquire
 - "use strict" compliant
@@ -22,11 +22,11 @@ v2](https://github.com/substack/browserify).
 ```javascript
 var path = require('path');
 
-module.exports.extnameAllCaps = function (file) { 
+module.exports.extnameAllCaps = function (file) {
   return path.extname(file).toUpperCase();
 };
 
-module.exports.basenameAllCaps = function (file) { 
+module.exports.basenameAllCaps = function (file) {
   return path.basename(file).toUpperCase();
 };
 ```
@@ -78,7 +78,7 @@ Two simple steps to override require in your tests:
 
 - **request**: path to the module to be tested e.g., `../lib/foo`
 - **stubs**: key/value pairs of the form `{ modulePath: stub, ... }`
-    - module paths are relative to the tested module **not** the test file 
+    - module paths are relative to the tested module **not** the test file
     - therefore specify it exactly as in the require statement inside the tested file
     - values themselves are key/value pairs of functions/properties and the appropriate override
 
@@ -130,12 +130,107 @@ var foo = proxyquire
         './bar' : { toAtm: function (val) { ... } }
 
         // for 'path' module they will be made
-      , path: { 
-          extname: function (file) { ... } 
+      , path: {
+          extname: function (file) { ... }
         , '@noCallThru': false
         }
     });
 ```
+
+### Globally override require
+
+Use the `@global` property to override every `require` of a module, even transitively.
+
+```javascript
+// foo.js
+var bar = require('bar');
+
+module.exports = function() {
+  bar();
+}
+
+// bar.js
+var baz = require('baz');
+
+module.exports = function() {
+  baz.method();
+}
+
+// baz.js
+module.exports = {
+  method: function() {
+    console.info('hello');
+  }
+}
+
+// test.js
+var stubs = {
+  'baz': {
+    method: function(val) {
+      console.info('goodbye');
+    },
+    '@global': true
+  }
+};
+
+var proxyquire = require('proxyquire');
+
+var foo = proxyquire('foo', stubs);
+foo();  // 'goodbye' is printed to stdout
+```
+
+There is one important caveat with global overrides:
+
+*Any module setup code will be re-executed.*
+
+This is because node.js caches the return value of `require`
+
+Say you have a module, C, that you wish to stub.  You require module A which contains `require('B')`.  Module B in turn contains `require('C')`. If module B has already been required elsewhere then when module A receives the cached version of module B and proxyquire has no opportunity to inject the stub for C.
+
+Proxyquire works around this problem by ignoring the module cache when any module stubs are specified as `@global`.
+
+This can cause unexpected behaviour. If module B looked like this:
+
+```javascript
+var fs = require('fs')
+  , C = require('C');
+
+// will get executed twice
+var file = fs.openSync('/tmp/foo.txt', 'w');
+
+module.exports = function() {
+  return new C(file);
+};
+```
+
+The file at `/tmp/foo.txt` could be created and/or truncated more than once.
+
+### Globally overriding require at runtime
+
+Say you have a module that looks like this:
+
+```javascript
+module.exports = function() {
+  var d = require('d');
+  d.method();
+};
+```
+The invocation of `require('d')` will happen at runtime and not when the containing module is requested via `require`.  If you want to globally override `d` above, use the `@runtimeGlobal` property:
+
+```javascript
+var stubs = {
+  'd': {
+    method: function(val) {
+      console.info('hello world');
+    },
+    '@runtimeGlobal': true
+  }
+};
+```
+
+This will cause module setup code to be re-excuted just like `@global`, but with the difference that it will happen every time the module is requested via `require` at runtime as no module will ever be cached.
+
+This can cause subtle bugs so if you can guarantee that your modules will not vary their `require` behaviour at runtime, use `@global` instead.
 
 ### All together, now
 
@@ -154,7 +249,7 @@ var foo2 = proxyquire('./foo', stubs);
 ### Forcing proxyquire to reload modules
 
 In most situations it is fine to have proxyquire behave exactly like nodejs `require`, i.e. modules that are loaded once
-get pulled from the cache the next time. 
+get pulled from the cache the next time.
 
 For some tests however you need to ensure that the module gets loaded fresh everytime, i.e. if that causes initializing
 some dependency or some module state.
@@ -238,20 +333,20 @@ barStub.toAtm = function (val) { return -1 * val; /* or now */ };
 
 // Resolve foo and override multiple of its dependencies in one step - oh my!
 var foo = proxyquire('./foo', {
-    './bar' : { 
-      toAtm: function (val) { return 0; /* wonder what happens now */ } 
+    './bar' : {
+      toAtm: function (val) { return 0; /* wonder what happens now */ }
     }
-  , path    : { 
-      extname: function (file) { return 'exterminate the name of ' + file; } 
+  , path    : {
+      extname: function (file) { return 'exterminate the name of ' + file; }
     }
 });
 ```
 
 # Backwards Compatibility for proxyquire v0.3.x
 
-To upgrade your project from v0.3.x to v0.4.x, a nifty compat function has been included. 
+To upgrade your project from v0.3.x to v0.4.x, a nifty compat function has been included.
 
-Simply do a global find and replace for `require('proxyquire')` and change them to `require('proxyquire').compat()`. 
+Simply do a global find and replace for `require('proxyquire')` and change them to `require('proxyquire').compat()`.
 
 This returns an object that wraps the result of `proxyquire()` that provides exactly the same API as v0.3.x.
 
@@ -267,4 +362,3 @@ look through the [tests](https://github.com/thlorenz/proxyquire/blob/master/test
 
 - test async APIs synchronously: [examples/async](https://github.com/thlorenz/proxyquire/tree/master/examples/async).
 - using proxyquire with [Sinon.JS](http://sinonjs.org/): [examples/sinon](https://github.com/thlorenz/proxyquire/tree/master/examples/sinon).
-
