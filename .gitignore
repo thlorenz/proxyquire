@@ -20,3 +20,5 @@ spikes
 
 *.idea
 *.iml
+.DS_Store
+coverage

@@ -1,6 +1,6 @@
 {
   "name": "proxyquire",
-  "version": "0.6.0",
+  "version": "1.0.0",
   "description": "Proxies nodejs require in order to allow overriding dependencies during testing.",
   "main": "index.js",
   "scripts": {
@@ -29,8 +29,8 @@
     }
   ],
   "devDependencies": {
-    "mocha": "1.3.x",
-    "should": "0.6.x",
-    "sinon": "~1.4.2"
+    "mocha": "~1.18",
+    "should": "~3.3",
+    "sinon": "~1.9"
   }
 }
