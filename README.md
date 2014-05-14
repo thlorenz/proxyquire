@@ -344,14 +344,9 @@ var foo = proxyquire('./foo', {
 
 # Backwards Compatibility for proxyquire v0.3.x
 
-To upgrade your project from v0.3.x to v0.4.x, a nifty compat function has been included.
+Compatibility mode with proxyquire v0.3.x has been removed.
 
-Simply do a global find and replace for `require('proxyquire')` and change them to `require('proxyquire').compat()`.
-
-This returns an object that wraps the result of `proxyquire()` that provides exactly the same API as v0.3.x.
-
-If your test scripts relied on the fact that v0.3.x stored `noCallThru` in the module scope, you can use
-`require('proxyquire').compat(true)` to use a global compat object, instead.
+You should update your code to use the newer API but if you can't, pin the version of proxyquire in your package.json file to ~0.6 in order to continue using the older style.
 
 # More Examples
 

@@ -4,7 +4,7 @@
   "description": "Proxies nodejs require in order to allow overriding dependencies during testing.",
   "main": "index.js",
   "scripts": {
-    "test": "istanbul cover _mocha"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
@@ -29,9 +29,8 @@
     }
   ],
   "devDependencies": {
-    "mocha": "^1.18",
-    "should": "^3.3",
-    "sinon": "^1.4.2",
-    "istanbul": "^0.2"
+    "mocha": "~1.18",
+    "should": "~3.3",
+    "sinon": "~1.9"
   }
 }
