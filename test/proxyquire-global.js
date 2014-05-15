@@ -7,7 +7,7 @@ var assert = require('assert')
 
 var proxyquire = require('..');
 
-describe('global', function () {
+describe('global flags set', function () {
   it('should override require globally', function () {
     var stubs = {
       './baz': {
@@ -38,5 +38,37 @@ describe('global', function () {
 
     assert.equal(realFoo(), false);
     assert.equal(proxiedFoo(), true);
+  });
+});
+
+describe('global flags not set', function () {
+  it('should not override require globally', function () {
+    var stubs = {
+      './baz': {
+        method: function() {
+          return true;
+        }
+      }
+    };
+
+    var proxiedFoo = proxyquire('./samples/global/foo', stubs);
+
+    assert.equal(realFoo(), false);
+    assert.equal(proxiedFoo(), false);
+  });
+
+  it('should not override require globally even when require\'s execution is deferred', function () {
+    var stubs = {
+      './baz': {
+        method: function() {
+          return true;
+        }
+      }
+    };
+
+    var proxiedFoo = proxyquire('./samples/global/foo-deferred', stubs);
+
+    assert.equal(realFoo(), false);
+    assert.equal(proxiedFoo(), false);
   });
 });
