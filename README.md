@@ -52,18 +52,28 @@ assert.equal(foo.extnameAllCaps('file.txt'), 'EXTERMINATE, EXTERMINATE THE FILE.
 assert.equal(foo.basenameAllCaps('/a/b/file.txt'), 'FILE.TXT');
 ```
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
 
 - [Usage](#usage)
 - [API](#api)
-	- [Preventing call thru to original dependency](#preventing-call-thru-to-original-dependency)
-		- [Prevent call thru for all future stubs resolved by a proxyquire instance](#prevent-call-thru-for-all-future-stubs-resolved-by-a-proxyquire-instance)
-		- [Re-enable call thru for all future stubs resolved by a proxyquire instance](#re-enable-call-thru-for-all-future-stubs-resolved-by-a-proxyquire-instance)
-		- [All together, now](#all-together-now)
-	- [Forcing proxyquire to reload modules](#forcing-proxyquire-to-reload-modules)
-	- [Examples](#examples)
+  - [Preventing call thru to original dependency](#preventing-call-thru-to-original-dependency)
+    - [Prevent call thru for all future stubs resolved by a proxyquire instance](#prevent-call-thru-for-all-future-stubs-resolved-by-a-proxyquire-instance)
+    - [Re-enable call thru for all future stubs resolved by a proxyquire instance](#re-enable-call-thru-for-all-future-stubs-resolved-by-a-proxyquire-instance)
+      - [All together, now](#all-together-now)
+  - [Forcing proxyquire to reload modules](#forcing-proxyquire-to-reload-modules)
+  - [Globally override require](#globally-override-require)
+    - [Caveat](#caveat)
+    - [Globally override require during module initialization](#globally-override-require-during-module-initialization)
+    - [Why is proxyquire messing with my `require` cache?](#why-is-proxyquire-messing-with-my-require-cache)
+    - [Globally override require during module runtime](#globally-override-require-during-module-runtime)
 - [Backwards Compatibility for proxyquire v0.3.x](#backwards-compatibility-for-proxyquire-v03x)
+- [Examples](#examples)
 - [More Examples](#more-examples)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 
 # Usage
 
@@ -137,9 +147,89 @@ var foo = proxyquire
     });
 ```
 
-### Globally override require
+#### All together, now
+
+```javascript
+var proxyquire = require('proxyquire').noCallThru();
+
+// all methods for foo's dependencies will have to be stubbed out since proxyquire will not call through
+var foo = proxyquire('./foo', stubs);
+
+proxyquire.callThru();
+
+// only some methods for foo's dependencies will have to be stubbed out here since proxyquire will now call through
+var foo2 = proxyquire('./foo', stubs);
+```
+
+## Forcing proxyquire to reload modules
+
+In most situations it is fine to have proxyquire behave exactly like nodejs `require`, i.e. modules that are loaded once
+get pulled from the cache the next time.
+
+For some tests however you need to ensure that the module gets loaded fresh everytime, i.e. if that causes initializing
+some dependency or some module state.
+
+For this purpose proxyquire exposes the `noPreserveCache` function.
+
+```js
+// ensure we don't get any module from the cache, but to load it fresh every time
+var proxyquire = require('proxyquire').noPreserveCache();
+
+var foo1 = proxyquire('./foo', stubs);
+var foo2 = proxyquire('./foo', stubs);
+var foo3 = require('./foo');
+
+// foo1, foo2 and foo3 are different instances of the same module
+assert.notEqual(foo1, foo2);
+assert.notEqual(foo1, foo3);
+```
+
+`require.preserveCache` allows you to restore the behavior to match nodejs's `require` again.
+
+```js
+proxyquire.preserveCache();
+
+var foo1 = proxyquire('./foo', stubs);
+var foo2 = proxyquire('./foo', stubs);
+var foo3 = require('./foo');
+
+// foo1, foo2 and foo3 are the same instance
+ssert.equal(foo1, foo2);
+ssert.equal(foo1, foo3);
+```
+
+
+## Globally override require
 
 Use the `@global` property to override every `require` of a module, even transitively.
+
+### Caveat
+
+You should **think very hard about alternatives before using this feature**. Why, because it's intrusive and as you'll
+see if you read on it changes the default behavior of module initialization which means that code runs differently
+during testing than it does normally.
+
+Additionally it **makes it harder to reason about how your tests work**. 
+
+> Yeah, we are mocking `fs` three levels down in `bar`, so that's why we have to set it up when testing `foo`
+
+**WAAAT???**
+
+If you write proper unit tests you should never have a need for this. So here are some techniques to consider:
+
+- test each module in isolation
+- make sure your modules are small enough and do only one thing
+- stub out dependencies direclty instead of stubbing something inside your dependencies
+- if you are testing `bar` and `bar` calls `foo.read` and `foo.read` calls `fs.readFile` proceed as follows
+  - **do not** stub out `fs.readFile` globally
+  - instead stub out `foo` so you can control what `foo.read` returns without ever even hitting `fs`
+
+OK, made it past the warnings and still feel like you need this? Read on then but you are on your own now, this is as
+far as I'll go ;)
+
+Watch out for more warnings below.
+
+### Globally override require during module initialization
 
 ```javascript
 // foo.js
@@ -179,17 +269,12 @@ var foo = proxyquire('foo', stubs);
 foo();  // 'goodbye' is printed to stdout
 ```
 
-There is one important caveat with global overrides:
+Be aware that when using global overrides **any module initialization code will be re-executed for each require.**
 
-*Any module setup code will be re-executed.*
+This is not normally the case since node.js caches the return value of `require`, however to make global overrides work ,
+`proxyquire` bypasses the module cache. This may cause **unexpected behaviour if a module's initialization causes side effects**.
 
-This is because node.js caches the return value of `require`
-
-Say you have a module, C, that you wish to stub.  You require module A which contains `require('B')`.  Module B in turn contains `require('C')`. If module B has already been required elsewhere then when module A receives the cached version of module B and proxyquire has no opportunity to inject the stub for C.
-
-Proxyquire works around this problem by ignoring the module cache when any module stubs are specified as `@global`.
-
-This can cause unexpected behaviour. If module B looked like this:
+As an example consider this module which opens a file during its initialization:
 
 ```javascript
 var fs = require('fs')
@@ -205,7 +290,15 @@ module.exports = function() {
 
 The file at `/tmp/foo.txt` could be created and/or truncated more than once.
 
-### Globally overriding require at runtime
+### Why is proxyquire messing with my `require` cache?
+
+Say you have a module, C, that you wish to stub.  You require module A which contains `require('B')`. Module B in turn
+contains `require('C')`. If module B has already been required elsewhere then when module A receives the cached version
+of module B and proxyquire would have no opportunity to inject the stub for C.
+
+Therefore when using the `@global` flag, `proxyquire` will bypass the `require` cache.
+
+### Globally override require during module runtime
 
 Say you have a module that looks like this:
 
@@ -215,7 +308,8 @@ module.exports = function() {
   d.method();
 };
 ```
-The invocation of `require('d')` will happen at runtime and not when the containing module is requested via `require`.  If you want to globally override `d` above, use the `@runtimeGlobal` property:
+The invocation of `require('d')` will happen at runtime and not when the containing module is requested via `require`.
+If you want to globally override `d` above, use the `@runtimeGlobal` property:
 
 ```javascript
 var stubs = {
@@ -228,62 +322,19 @@ var stubs = {
 };
 ```
 
-This will cause module setup code to be re-excuted just like `@global`, but with the difference that it will happen every time the module is requested via `require` at runtime as no module will ever be cached.
+This will cause module setup code to be re-excuted just like `@global`, but with the difference that it will happen
+every time the module is requested via `require` at runtime as no module will ever be cached.
 
-This can cause subtle bugs so if you can guarantee that your modules will not vary their `require` behaviour at runtime, use `@global` instead.
+This can cause subtle bugs so if you can guarantee that your modules will not vary their `require` behaviour at runtime,
+use `@global` instead.
 
-### All together, now
+# Backwards Compatibility for proxyquire v0.3.x
 
-```javascript
-var proxyquire = require('proxyquire').noCallThru();
+Compatibility mode with proxyquire v0.3.x **has been removed**.
 
-// all methods for foo's dependencies will have to be stubbed out since proxyquire will not call through
-var foo = proxyquire('./foo', stubs);
+You should update your code to use the newer API but if you can't, pin the version of proxyquire in your package.json file to ~0.6 in order to continue using the older style.
 
-proxyquire.callThru();
-
-// only some methods for foo's dependencies will have to be stubbed out here since proxyquire will now call through
-var foo2 = proxyquire('./foo', stubs);
-```
-
-### Forcing proxyquire to reload modules
-
-In most situations it is fine to have proxyquire behave exactly like nodejs `require`, i.e. modules that are loaded once
-get pulled from the cache the next time.
-
-For some tests however you need to ensure that the module gets loaded fresh everytime, i.e. if that causes initializing
-some dependency or some module state.
-
-For this purpose proxyquire exposes the `noPreserveCache` function.
-
-```js
-// ensure we don't get any module from the cache, but to load it fresh every time
-var proxyquire = require('proxyquire').noPreserveCache();
-
-var foo1 = proxyquire('./foo', stubs);
-var foo2 = proxyquire('./foo', stubs);
-var foo3 = require('./foo');
-
-// foo1, foo2 and foo3 are different instances of the same module
-assert.notEqual(foo1, foo2);
-assert.notEqual(foo1, foo3);
-```
-
-`require.preserveCache` allows you to restore the behavior to match nodejs's `require` again.
-
-```js
-proxyquire.preserveCache();
-
-var foo1 = proxyquire('./foo', stubs);
-var foo2 = proxyquire('./foo', stubs);
-var foo3 = require('./foo');
-
-// foo1, foo2 and foo3 are the same instance
-ssert.equal(foo1, foo2);
-ssert.equal(foo1, foo3);
-```
-
-## Examples
+# Examples
 
 **We are testing foo which depends on bar:**
 
@@ -341,12 +392,6 @@ var foo = proxyquire('./foo', {
     }
 });
 ```
-
-# Backwards Compatibility for proxyquire v0.3.x
-
-Compatibility mode with proxyquire v0.3.x has been removed.
-
-You should update your code to use the newer API but if you can't, pin the version of proxyquire in your package.json file to ~0.6 in order to continue using the older style.
 
 # More Examples
 
