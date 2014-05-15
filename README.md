@@ -219,7 +219,7 @@ If you write proper unit tests you should never have a need for this. So here ar
 
 - test each module in isolation
 - make sure your modules are small enough and do only one thing
-- stub out dependencies direclty instead of stubbing something inside your dependencies
+- stub out dependencies directly instead of stubbing something inside your dependencies
 - if you are testing `bar` and `bar` calls `foo.read` and `foo.read` calls `fs.readFile` proceed as follows
   - **do not** stub out `fs.readFile` globally
   - instead stub out `foo` so you can control what `foo.read` returns without ever even hitting `fs`
