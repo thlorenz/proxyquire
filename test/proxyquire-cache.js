@@ -74,5 +74,12 @@ describe("Proxyquire", function() {
       assert.equal('', foo.state);
       assert.notEqual(foo, original);
     });
+
+    it('deletes the require.cache for the module being stubbed', function() {
+      var proxyquire = require('..').noPreserveCache();
+
+      var foo = proxyquire.load('./samples/foo', { 'path': { } });
+      assert.equal(undefined, require.cache[require.resolve('./samples/foo')]);
+    });
   });
 });
