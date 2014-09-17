@@ -161,6 +161,33 @@ proxyquire.callThru();
 var foo2 = proxyquire('./foo', stubs);
 ```
 
+## Using proxyquire to remove modules
+
+Some libraries may behave differently in the presence of absence of a
+package, for example:
+
+```javascript
+var cluster;
+try {
+  cluster = require('cluster');
+} catch(e) {
+  // cluster module is not present.
+  cluster = null
+}
+if (cluster) {
+  /// Then provide some functionality on a cluster-aware version of node.js.
+} else {
+  // How do we exercise this path on a moern node.js that has cluster built-in?
+}
+```
+
+To exercise this type of code, proxyquire can remove a package. Just
+set the stub for the specified package to null:
+
+```javascript
+var foo = proxyquire('./foo', { cluster: null });
+```
+
 ## Forcing proxyquire to reload modules
 
 In most situations it is fine to have proxyquire behave exactly like nodejs `require`, i.e. modules that are loaded once
