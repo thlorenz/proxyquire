@@ -14,7 +14,7 @@ describe('Illegal parameters to resolve give meaningful errors', function () {
 
   function throws(action, regex) {
     assert.throws(action, function (err) {
-      return err.name === 'ProxyquireError' && regex.test(err.message);
+      return err.name === 'ProxyquireError' && regex.test(err.message) && regex.test(err.toString());
     });
   }
 
