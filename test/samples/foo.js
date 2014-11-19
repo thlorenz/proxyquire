@@ -1,5 +1,8 @@
 var stats = require('./stats')
   , bar = require('./bar')
+  , boof = require('./boof')
+  , foonum = require('./foonum')
+  , foobool = require('./foobool')
   , path = require('path')
   ;
 
@@ -28,5 +31,8 @@ module.exports = {
   , bigRab: bigRab
   , bigExt: bigExt
   , bigBas: bigBas
+  , boof: boof
+  , foonum: foonum
+  , foobool: foobool
   , state: ''
 };
