@@ -62,7 +62,7 @@ assert.equal(foo.basenameAllCaps('/a/b/file.txt'), 'FILE.TXT');
     - [Prevent call thru for all future stubs resolved by a proxyquire instance](#prevent-call-thru-for-all-future-stubs-resolved-by-a-proxyquire-instance)
     - [Re-enable call thru for all future stubs resolved by a proxyquire instance](#re-enable-call-thru-for-all-future-stubs-resolved-by-a-proxyquire-instance)
       - [All together, now](#all-together-now)
-  - [Using proxyquire to simulate the absence of Modules](using-proxyquire-to-simulate-the-absence-of-modules)
+  - [Using proxyquire to simulate the absence of Modules](#using-proxyquire-to-simulate-the-absence-of-modules)
   - [Forcing proxyquire to reload modules](#forcing-proxyquire-to-reload-modules)
   - [Globally override require](#globally-override-require)
     - [Caveat](#caveat)
