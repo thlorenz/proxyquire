@@ -62,6 +62,7 @@ assert.equal(foo.basenameAllCaps('/a/b/file.txt'), 'FILE.TXT');
     - [Prevent call thru for all future stubs resolved by a proxyquire instance](#prevent-call-thru-for-all-future-stubs-resolved-by-a-proxyquire-instance)
     - [Re-enable call thru for all future stubs resolved by a proxyquire instance](#re-enable-call-thru-for-all-future-stubs-resolved-by-a-proxyquire-instance)
       - [All together, now](#all-together-now)
+  - [Using proxyquire to simulate the absence of Modules](using-proxyquire-to-simulate-the-absence-of-modules)
   - [Forcing proxyquire to reload modules](#forcing-proxyquire-to-reload-modules)
   - [Globally override require](#globally-override-require)
     - [Caveat](#caveat)
@@ -161,7 +162,7 @@ proxyquire.callThru();
 var foo2 = proxyquire('./foo', stubs);
 ```
 
-## Using proxyquire to remove modules
+## Using proxyquire to simulate the absence of Modules
 
 Some libraries may behave differently in the presence of absence of a
 package, for example:
@@ -175,14 +176,14 @@ try {
   cluster = null
 }
 if (cluster) {
-  /// Then provide some functionality on a cluster-aware version of node.js.
+  // Then provide some functionality for a cluster-aware version of Node.js
 } else {
-  // How do we exercise this path on a moern node.js that has cluster built-in?
+  // and some alternative for a cluster-unaware version.
 }
 ```
 
-To exercise this type of code, proxyquire can remove a package. Just
-set the stub for the specified package to null:
+To exercise the second branch of the `if` statement, you can make proxyquire pretend the package isn't present by
+setting the stub for it to `null`. This works even if a `cluster` module is actually present.
 
 ```javascript
 var foo = proxyquire('./foo', { cluster: null });
