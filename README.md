@@ -6,7 +6,8 @@ Proxies nodejs's require in order to make overriding dependencies during testing
 
 If you want to stub dependencies for your client side modules, try
 [proxyquireify](https://github.com/thlorenz/proxyquireify), a proxyquire for [browserify
-v2](https://github.com/substack/browserify).
+v2](https://github.com/substack/browserify) or [proxyquire-universal](https://github.com/bendrucker/proxyquire-universal) 
+to test in both Node and the browser.
 
 # Features
 
