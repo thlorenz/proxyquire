@@ -66,8 +66,8 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
       describe('and then delete overrides of stubs after resolve', function () {
 
         beforeEach(function () {
-          barber.bar = undefined;
-          barber.rab = undefined;
+          delete barber.bar;
+          delete barber.rab;
         })
 
         it('reverts to original behavior when module is required inside function call', function () {
