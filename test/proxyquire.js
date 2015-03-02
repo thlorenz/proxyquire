@@ -189,4 +189,14 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
 })
 
 
+describe('When proxying core modules', function() {
 
+  it('prevents TypeErrors from being thrown', function() {
+    assert.doesNotThrow(function() {
+      proxyquire('./samples/coremodules', {
+        'fs': require('fs')
+      });
+    }, TypeError);
+  })
+
+})
