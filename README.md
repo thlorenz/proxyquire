@@ -55,7 +55,7 @@ assert.equal(foo.basenameAllCaps('/a/b/file.txt'), 'FILE.TXT');
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Usage](#usage)
 - [API](#api)
@@ -70,6 +70,7 @@ assert.equal(foo.basenameAllCaps('/a/b/file.txt'), 'FILE.TXT');
     - [Globally override require during module initialization](#globally-override-require-during-module-initialization)
     - [Why is proxyquire messing with my `require` cache?](#why-is-proxyquire-messing-with-my-require-cache)
     - [Globally override require during module runtime](#globally-override-require-during-module-runtime)
+  - [Modules That Export Functions](#modules-that-export-functions)
 - [Backwards Compatibility for proxyquire v0.3.x](#backwards-compatibility-for-proxyquire-v03x)
 - [Examples](#examples)
 - [More Examples](#more-examples)
@@ -356,6 +357,26 @@ every time the module is requested via `require` at runtime as no module will ev
 
 This can cause subtle bugs so if you can guarantee that your modules will not vary their `require` behaviour at runtime,
 use `@global` instead.
+
+## Modules That Export Functions
+
+Even if you want to override a module that exports a function directly, you can still set special properties like `@global`. You can use a named function or assign your stub function to a variable to add properties:
+
+```js
+foo['@global'] = true;
+function foo () {}
+proxyquire('./bar', {
+  foo: foo
+});
+```
+
+```js
+var foo = function () {};
+foo['@global'] = true;
+proxyquire('./bar', {
+  foo: foo
+});
+```
 
 # Backwards Compatibility for proxyquire v0.3.x
 
