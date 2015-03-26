@@ -1,4 +1,4 @@
-# proxyquire [![Build Status](https://secure.travis-ci.org/thlorenz/proxyquire.png)](http://travis-ci.org/thlorenz/proxyquire)
+# proxyquire [![Build Status](https://secure.travis-ci.org/thlorenz/proxyquire.svg)](http://travis-ci.org/thlorenz/proxyquire)
 
 [![NPM](https://nodei.co/npm/proxyquire.png?downloads=true&stars=true)](https://nodei.co/npm/proxyquire/)
 
