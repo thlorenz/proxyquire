@@ -70,7 +70,7 @@ assert.equal(foo.basenameAllCaps('/a/b/file.txt'), 'FILE.TXT');
     - [Globally override require during module initialization](#globally-override-require-during-module-initialization)
     - [Why is proxyquire messing with my `require` cache?](#why-is-proxyquire-messing-with-my-require-cache)
     - [Globally override require during module runtime](#globally-override-require-during-module-runtime)
-  - [Modules That Export Functions](#modules-that-export-functions)
+  - [Configuring proxyquire by setting stub properties](#configuring-proxyquire-by-setting-stub-properties)
 - [Backwards Compatibility for proxyquire v0.3.x](#backwards-compatibility-for-proxyquire-v03x)
 - [Examples](#examples)
 - [More Examples](#more-examples)
@@ -358,7 +358,7 @@ every time the module is requested via `require` at runtime as no module will ev
 This can cause subtle bugs so if you can guarantee that your modules will not vary their `require` behaviour at runtime,
 use `@global` instead.
 
-## Modules That Export Functions
+## Configuring proxyquire by setting stub properties
 
 Even if you want to override a module that exports a function directly, you can still set special properties like `@global`. You can use a named function or assign your stub function to a variable to add properties:
 
@@ -370,11 +370,13 @@ proxyquire('./bar', {
 });
 ```
 
+And if your stub is in a separate module where `module.exports = foo`:
+
 ```js
-var foo = function () {};
-foo['@global'] = true;
-proxyquire('./bar', {
-  foo: foo
+var foostub = require('../stubs/foostub');
+foostub['@global'] = true;
+proxyquire('bar, {
+  foo: foostub
 });
 ```
 
