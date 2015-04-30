@@ -29,6 +29,7 @@
     }
   ],
   "devDependencies": {
+    "graceful-fs": "~3.0.6",
     "mocha": "~1.18",
     "should": "~3.3",
     "sinon": "~1.9"
