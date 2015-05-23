@@ -22,12 +22,7 @@
     "stub"
   ],
   "author": "Thorsten Lorenz",
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "https://github.com/thlorenz/proxyquire/blob/master/LICENSE"
-    }
-  ],
+  "license": "MIT",
   "devDependencies": {
     "mocha": "~1.18",
     "should": "~3.3",
