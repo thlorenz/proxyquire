@@ -59,4 +59,16 @@ describe('Illegal parameters to resolve give meaningful errors', function () {
       throws(act,  /invalid argument: "stubs".+needs to be an object/i);
     })
   })
+
+  describe('when I pass an undefined stub', function () {
+    function act () {
+      proxyquire('./samples/foo', {
+        myStub: undefined
+      })
+    }
+
+    it('throws an exception with the stub key', function () {
+      throws(act, /Invalid stub: "myStub" cannot be undefined/)
+    })
+  })
 })
