@@ -132,7 +132,9 @@ var proxyquireNonStrict = require('proxyquire');
 proxyquire.callThru();
 ```
 
-**Call thru config per module wins:**
+**Call thru configurations per module override `callThru()`:**
+
+Passing `@noCallThru: false` when configuring modules will override `noCallThru()`:
 
 ```javascript
 var foo = proxyquire
