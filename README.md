@@ -377,7 +377,7 @@ And if your stub is in a separate module where `module.exports = foo`:
 ```js
 var foostub = require('../stubs/foostub');
 foostub['@global'] = true;
-proxyquire('bar, {
+proxyquire('bar', {
   foo: foostub
 });
 ```
