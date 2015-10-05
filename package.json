@@ -29,7 +29,7 @@
     "sinon": "~1.9"
   },
   "dependencies": {
-    "fill-keys": "^1.0.0",
+    "fill-keys": "^1.0.2",
     "module-not-found-error": "^1.0.0"
   }
 }
