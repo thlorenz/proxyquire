@@ -226,8 +226,8 @@ var foo2 = proxyquire('./foo', stubs);
 var foo3 = require('./foo');
 
 // foo1, foo2 and foo3 are the same instance
-ssert.equal(foo1, foo2);
-ssert.equal(foo1, foo3);
+assert.equal(foo1, foo2);
+assert.equal(foo1, foo3);
 ```
 
 
