@@ -22,7 +22,7 @@
     "stub"
   ],
   "author": "Thorsten Lorenz",
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "MIT",
   "devDependencies": {
     "mocha": "~1.18",
     "should": "~3.3",
