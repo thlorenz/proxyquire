@@ -168,7 +168,7 @@ var foo2 = proxyquire('./foo', stubs);
 
 ## Using proxyquire to simulate the absence of Modules
 
-Some libraries may behave differently in the presence of absence of a
+Some libraries may behave differently in the presence or absence of a
 package, for example:
 
 ```javascript
