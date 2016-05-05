@@ -81,5 +81,24 @@ describe("Proxyquire", function() {
       var foo = proxyquire.load('./samples/foo', { 'path': { } });
       assert.equal(undefined, require.cache[require.resolve('./samples/foo')]);
     });
+
+    it('deletes the require.cache for the stubs', function() {
+      var proxyquire = require('..').noPreserveCache();
+
+      var bar = {};
+      var foo = proxyquire.load('./samples/cache/foo', { './bar': bar });
+      bar.f.g = function () { return 'a' };
+      bar.h = function () { return 'a' };
+
+      assert.equal(foo.bar.f.g(), 'a')
+      assert.equal(foo.bar.h(), 'a')
+
+      foo = proxyquire.load('./samples/cache/foo', { './bar': {} });
+      assert.equal(foo.bar.h(), 'h')
+      assert.equal(foo.bar.f.g(), 'g')
+
+      assert.equal(undefined, require.cache[require.resolve('./samples/cache/foo')]);
+      assert.equal(undefined, require.cache[require.resolve('./samples/cache/bar')]);
+    });
   });
 });
