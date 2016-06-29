@@ -100,5 +100,13 @@ describe("Proxyquire", function() {
       assert.equal(undefined, require.cache[require.resolve('./samples/cache/foo')]);
       assert.equal(undefined, require.cache[require.resolve('./samples/cache/bar')]);
     });
+
+    it('silences errors when stub lookups fail', function() {
+      var proxyquire = require('..').noPreserveCache();
+
+      assert.doesNotThrow(function () {
+        proxyquire.load('./samples/cache/foo', { './does-not-exist': {} });
+      })
+    });
   });
 });
