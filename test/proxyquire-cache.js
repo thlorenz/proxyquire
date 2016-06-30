@@ -21,6 +21,17 @@ describe("Proxyquire", function() {
   });
 
   describe('preserveCache()', function() {
+
+    it('should return a cache of the module after first proxyquire call', function() {
+        var proxyquire = require('..').preserveCache();
+        var count1 = proxyquire('./samples/count', {});
+        var count2 = proxyquire('./samples/count', {});
+        var count3 = proxyquire('./samples/count', {});
+        assert.equal(count1(), 1);
+        assert.equal(count2(), 2);
+        assert.equal(count3(), 3);
+    });
+
     it('returns a reference to itself, so it can be chained', function() {
       var proxyquire = require('..');
       assert.equal(proxyquire.preserveCache(), proxyquire);
