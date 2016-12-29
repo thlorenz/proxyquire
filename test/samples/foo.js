@@ -1,3 +1,5 @@
+console.log('<<foo.js');
+
 var stats = require('./stats')
   , bar = require('./bar')
   , boof = require('./boof')
@@ -34,6 +36,10 @@ function bigCrypto () {
   return crypto;
 }
 
+function testSub(){
+  return bar.sub();
+}
+
 module.exports = {
     bigBar: bigBar
   , bigRab: bigRab
@@ -44,4 +50,5 @@ module.exports = {
   , foobool: foobool
   , bigCrypto: bigCrypto
   , state: ''
+  , testSub: testSub
 };
