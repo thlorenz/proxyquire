@@ -1,7 +1,6 @@
-console.log('<<sub.js');
-
+console.log('<<sub!');
 module.exports = {
   subFn: function () {
     return 'sub';
   }
-}
+};

@@ -10,6 +10,7 @@ var assert = require('assert')
 
 
 var stubs = {
+  'samples/foo': {},
   'samples/bar': {
     rab: function () {
       return 'resolved'
@@ -19,9 +20,10 @@ var stubs = {
     subFn: function () {
       return 'override';
     },
-    '@override':true
+    '@override': true
   }
 };
+
 
 function resolver(stubs, fileName, module) {
   var dirname = module ? path.dirname(module) : '';
@@ -37,16 +39,28 @@ function resolver(stubs, fileName, module) {
   }
 }
 
+function cloneObject(object) {
+  if (Object.assign) {
+    return Object.assign({}, object);
+  }
+  var result = {};
+  for (var i in object) {
+    if (object.hasOwnProperty(i)) {
+      result[i] = object[i];
+    }
+  }
+  return result;
+}
+
 function wipeCache(stubs, resolver, testCallback) {
   if (!testCallback) {
     testCallback = function () {
       return true;
     }
   }
-  var cache = require.cache;
   var wipeList = [];
   var removedList = [];
-  var newCache = Object.assign({}, cache);
+  var newCache = cloneObject(require.cache);
   var objects = Object.keys(newCache);
   objects.forEach(function (moduleName) {
     var test = resolver(stubs, moduleName);
@@ -75,28 +89,63 @@ function wipeCache(stubs, resolver, testCallback) {
       }
     });
   }
+
   require.cache = Module._cache = newCache;
 }
 
-wipeCache(stubs, resolver, function (moduleName) {
-  return moduleName.indexOf('/samples/') > 0;
-});
-
-var proxyquire = require('..')
-var proxiedFoo = proxyquire.resolveNames(resolver).load('./samples/foo', stubs);
-console.log(proxiedFoo.testSub());
-
-if (0) {
-
-  describe('nameresolver', function () {
-    describe('override', function () {
-      var proxyquire = require('..')
-
-      it('proxyquire can load module buy half name', function () {
-        var proxiedFoo = proxyquire.resolveNames(resolver).load('./samples/foo', stubs);
-
-        assert.equal(proxiedFoo.bigRab(), 'RESOLVED');
-      });
-    });
+function wipe() {
+  wipeCache(stubs, resolver, function (moduleName) {
+    return moduleName.indexOf('/samples/') > 0;
   });
 }
+
+describe('nameresolver', function () {
+  describe('override', function () {
+    var proxyquire = require('..')
+
+    it('proxyquire can load module buy half name', function () {
+      require('./samples/foo');
+      var proxiedFoo = proxyquire.resolveNames(resolver).load('./samples/foo', stubs);
+
+      assert.equal(proxiedFoo.testSub(), 'sub');
+      assert.equal(proxiedFoo.bigRab(), 'RESOLVED');
+    });
+
+    it('proxyquire can override deep module ', function () {
+      var foo = require('./samples/foo');
+      assert.equal(foo.testSub(), 'sub');
+      wipe();
+      var proxiedFoo = proxyquire.resolveNames(resolver).load('./samples/foo', {
+        '/sub.js': {
+          subFn: function () {
+            return 'override';
+          },
+          '@override': true
+        }
+      });
+      assert.equal(proxiedFoo.testSub(), 'override');
+      assert.equal(proxiedFoo.bigRab(), 'RAB');
+    });
+
+
+    it('proxyquire can override deep module via overriden module', function () {
+      wipe();
+      var proxiedFoo = proxyquire.resolveNames(resolver).callThru().load('./samples/foo', {
+        'samples/bar': {
+          rab: function () {
+            return 'resolved'
+          }
+        },
+        '/sub.js': {
+          subFn: function () {
+            return 'override';
+          },
+          '@override': true
+        }
+      });
+      assert.equal(proxiedFoo.testSub(), 'override');
+      assert.equal(proxiedFoo.bigRab(), 'RESOLVED');
+    });
+  });
+});
+

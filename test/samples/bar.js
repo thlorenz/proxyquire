@@ -1,4 +1,4 @@
-var Sub=require('./sub.js');
+var subModule=require('./sub.js');
 
 function bar () {
   return 'bar';
@@ -9,7 +9,7 @@ function rab () {
 }
 
 function sub () {
-  return Sub.subFn();
+  return subModule.subFn();
 }
 
 

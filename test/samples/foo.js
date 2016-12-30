@@ -1,5 +1,3 @@
-console.log('<<foo.js');
-
 var stats = require('./stats')
   , bar = require('./bar')
   , boof = require('./boof')
