@@ -39,6 +39,17 @@ describe('global flags set', function () {
     assert.equal(realFoo(), false);
     assert.equal(proxiedFoo(), true);
   });
+
+  it('should not throw when a native module is required a second time', function () {
+    var stubs = {
+      'foo': {
+        '@global': true
+      }
+    };
+
+    proxyquire('native-hello-world', stubs)
+    proxyquire('native-hello-world', stubs)
+  })
 });
 
 describe('global flags not set', function () {
