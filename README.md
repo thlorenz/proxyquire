@@ -2,7 +2,7 @@
 
 [![NPM](https://nodei.co/npm/proxyquire.png?downloads=true&stars=true)](https://nodei.co/npm/proxyquire/)
 
-Proxies nodejs's require in order to make overriding dependencies during testing easy while staying **totally unobstrusive**.
+Proxies nodejs's require in order to make overriding dependencies during testing easy while staying **totally unobtrusive**.
 
 If you want to stub dependencies for your client side modules, try
 [proxyquireify](https://github.com/thlorenz/proxyquireify), a proxyquire for [browserify
