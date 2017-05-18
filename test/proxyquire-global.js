@@ -83,3 +83,29 @@ describe('global flags not set', function () {
     assert.equal(proxiedFoo(), false);
   });
 });
+
+describe('global in node_modules', function () {
+  it('should not wipe node_modules', function () {
+
+    var test = require('./samples/using-node-modules');
+    assert.equal(test.fn(), "bar0");
+    assert.equal(test.fn(), "bar1");
+    // next call -> bar2 !
+
+    var stubs = {
+      'bar': {
+        '@runtimeGlobal': true
+      }
+    };
+
+    // should wipe
+    assert.equal(proxyquire('./samples/using-node-modules', stubs).fn(), "bar0");
+    assert.equal(proxyquire('./samples/using-node-modules', stubs).fn(), "bar0");
+
+    // next call -> bar2. Module restored from cache
+    assert.equal(proxyquire.onlyForProjectFiles().load('./samples/using-node-modules', stubs).fn(), "bar2");
+    assert.equal(proxyquire.onlyForProjectFiles().load('./samples/using-node-modules', stubs).fn(), "bar3");
+
+    proxyquire.forAllFiles();
+  });
+});
