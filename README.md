@@ -292,14 +292,14 @@ Watch out for more warnings below.
 
 ```javascript
 // foo.js
-var bar = require('bar');
+var bar = require('./bar');
 
 module.exports = function() {
   bar();
 }
 
 // bar.js
-var baz = require('baz');
+var baz = require('./baz');
 
 module.exports = function() {
   baz.method();
@@ -314,7 +314,7 @@ module.exports = {
 
 // test.js
 var stubs = {
-  'baz': {
+  './baz': {
     method: function(val) {
       console.info('goodbye');
     },
@@ -324,7 +324,7 @@ var stubs = {
 
 var proxyquire = require('proxyquire');
 
-var foo = proxyquire('foo', stubs);
+var foo = proxyquire('./foo', stubs);
 foo();  // 'goodbye' is printed to stdout
 ```
 
