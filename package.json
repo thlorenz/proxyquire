@@ -24,6 +24,7 @@
   "author": "Thorsten Lorenz",
   "license": "MIT",
   "devDependencies": {
+    "jshint": "^2.9.5",
     "mocha": "~3.1",
     "native-hello-world": "^1.0.0",
     "should": "~3.3",
