@@ -7,4 +7,4 @@ module.exports = {
   h: function () {
     return 'h'
   }
-};
+}

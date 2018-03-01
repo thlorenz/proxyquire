@@ -1,6 +1,6 @@
 
-module.exports = function() {
-  var bar = require('./bar');
+module.exports = function () {
+  var bar = require('./bar')
 
-  return bar();
+  return bar()
 }

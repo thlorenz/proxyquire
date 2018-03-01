@@ -1,5 +1,5 @@
-var bar = require('./bar');
+var bar = require('./bar')
 
-module.exports = function() {
-  return bar();
+module.exports = function () {
+  return bar()
 }

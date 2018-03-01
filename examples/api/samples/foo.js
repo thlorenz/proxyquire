@@ -1,31 +1,30 @@
 var stats = require('./stats')
-  , bar = require('./bar')
-  , path = require('path')
-  ;
+var bar = require('./bar')
+var path = require('path')
 
-stats.incFooRequires();
+stats.incFooRequires()
 
-function bigBar () { 
+function bigBar () {
   // inline require
-  return require('./bar').bar().toUpperCase();
+  return require('./bar').bar().toUpperCase()
 }
 
 function bigRab () {
   // module wide require
-  return bar.rab().toUpperCase();
+  return bar.rab().toUpperCase()
 }
 
 function bigExt (file) {
-  return path.extname(file).toUpperCase();
+  return path.extname(file).toUpperCase()
 }
 
 function bigBas (file) {
-  return path.basename(file).toUpperCase();
+  return path.basename(file).toUpperCase()
 }
 
 module.exports = {
-    bigBar: bigBar
-  , bigRab: bigRab
-  , bigExt: bigExt
-  , bigBas: bigBas
-};
+  bigBar: bigBar,
+  bigRab: bigRab,
+  bigExt: bigExt,
+  bigBas: bigBas
+}

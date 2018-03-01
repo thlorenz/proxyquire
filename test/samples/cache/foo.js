@@ -1,3 +1,3 @@
-var bar = require('./bar');
+var bar = require('./bar')
 
-module.exports = {bar: bar};
+module.exports = {bar: bar}

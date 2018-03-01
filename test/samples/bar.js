@@ -1,10 +1,9 @@
 function bar () {
-  return 'bar';
+  return 'bar'
 }
 
 function rab () {
-  return 'rab';
+  return 'rab'
 }
 
-module.exports = { bar : bar, rab: rab };
-
+module.exports = { bar: bar, rab: rab }

@@ -1,47 +1,46 @@
 var stats = require('./stats')
-  , bar = require('./bar')
-  , boof = require('./boof')
-  , foonum = require('./foonum')
-  , foobool = require('./foobool')
-  , path = require('path')
-  , crypto
-  ;
+var bar = require('./bar')
+var boof = require('./boof')
+var foonum = require('./foonum')
+var foobool = require('./foobool')
+var path = require('path')
+var crypto
 
 // Require if present.
-try { crypto = require('crypto'); } catch (e) { crypto = 'caught'; }
+try { crypto = require('crypto') } catch (e) { crypto = 'caught' }
 
-stats.incFooRequires();
+stats.incFooRequires()
 
 function bigBar () {
   // inline require
-  return require('./bar').bar().toUpperCase();
+  return require('./bar').bar().toUpperCase()
 }
 
 function bigRab () {
   // module wide require
-  return bar.rab().toUpperCase();
+  return bar.rab().toUpperCase()
 }
 
 function bigExt (file) {
-  return path.extname(file).toUpperCase();
+  return path.extname(file).toUpperCase()
 }
 
 function bigBas (file) {
-  return path.basename(file).toUpperCase();
+  return path.basename(file).toUpperCase()
 }
 
 function bigCrypto () {
-  return crypto;
+  return crypto
 }
 
 module.exports = {
-    bigBar: bigBar
-  , bigRab: bigRab
-  , bigExt: bigExt
-  , bigBas: bigBas
-  , boof: boof
-  , foonum: foonum
-  , foobool: foobool
-  , bigCrypto: bigCrypto
-  , state: ''
-};
+  bigBar: bigBar,
+  bigRab: bigRab,
+  bigExt: bigExt,
+  bigBas: bigBas,
+  boof: boof,
+  foonum: foonum,
+  foobool: foobool,
+  bigCrypto: bigCrypto,
+  state: ''
+}

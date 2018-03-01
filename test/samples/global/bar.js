@@ -1,5 +1,5 @@
-var baz = require('./baz');
+var baz = require('./baz')
 
-module.exports = function() {
-  return baz.method();
+module.exports = function () {
+  return baz.method()
 }

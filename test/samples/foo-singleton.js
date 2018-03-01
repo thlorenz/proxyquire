@@ -1,12 +1,10 @@
-var path = require('path');
+function FooSingleton () { }
 
-function FooSingleton() { }
+var instance = null
+exports.getInstance = function () {
+  if (instance === null) {
+    instance = new FooSingleton()
+  }
 
-var instance = null;
-exports.getInstance = function() {
-    if (instance === null) {
-        instance = new FooSingleton();
-    }
-
-    return instance;
-};
+  return instance
+}
