@@ -3,6 +3,7 @@ var bar = require('./bar')
 var boof = require('./boof')
 var foonum = require('./foonum')
 var foobool = require('./foobool')
+var fooarray = require('./fooarray')
 var path = require('path')
 var crypto
 
@@ -41,6 +42,7 @@ module.exports = {
   boof: boof,
   foonum: foonum,
   foobool: foobool,
+  fooarray: fooarray,
   bigCrypto: bigCrypto,
   state: ''
 }
