@@ -11,7 +11,6 @@ describe('Given foo requires the boof, foonum and foobool modules and  boof is a
   var boofber = 'a_string'
   var foonumber = 4
   var fooboolber = false
-  var emptyarray = []
   var fooarray = ['x', 'y', 'z']
 
   describe('When I resolve foo with boofber stub as boof.', function () {
