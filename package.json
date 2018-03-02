@@ -1,6 +1,6 @@
 {
   "name": "proxyquire",
-  "version": "1.8.0",
+  "version": "2.0.0",
   "description": "Proxies nodejs require in order to allow overriding dependencies during testing.",
   "main": "index.js",
   "scripts": {
