@@ -17,6 +17,15 @@ describe('Proxyquire', function () {
       assert.equal('cached', foo.state)
       assert.equal(foo, original)
     })
+
+    it('does not pollute the cache when module is proxyquired before it is loaded', function () {
+      var proxyquire = require('..')
+
+      proxyquire('./samples/no-call-thru-test', { './required': false })
+      var original = require('./samples/no-call-thru-test')
+
+      assert.equal(original.original, true)
+    })
   })
 
   describe('preserveCache()', function () {
