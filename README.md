@@ -65,13 +65,13 @@ module.exports = function fetch (callback) {
 ```
 
 ```js
-var assert = require('assert');
 var proxyquire = require('proxyquire').noCallThru();
+var assert = require('assert');
 
-var fetch = proxyquire('./use', {
+var fetch = proxyquire('./get', {
   'simple-get': function (url, callback) {
     process.nextTick(function () {
-      callback(null, {'statusCode': 200})
+      callback(null, {statusCode: 200})
     })
   }
 });
