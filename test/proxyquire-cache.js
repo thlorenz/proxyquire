@@ -1,7 +1,5 @@
 'use strict'
 
-/* global describe, it */
-
 var assert = require('assert')
 
 describe('Proxyquire', function () {

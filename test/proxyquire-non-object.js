@@ -1,7 +1,5 @@
 'use strict'
 
-/* global describe, before, it */
-
 var assert = require('assert')
 var proxyquire = require('..')
 var stats = require('./samples/stats')

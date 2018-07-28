@@ -1,7 +1,5 @@
 'use strict'
 
-/* global describe, before, it */
-
 var proxyquire = require('..').noCallThru()
 
 describe('when I require stubs with different extensions', function () {

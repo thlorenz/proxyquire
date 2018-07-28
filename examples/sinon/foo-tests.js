@@ -1,7 +1,5 @@
 'use strict'
 
-/* global describe before after it */
-
 /*
  * These examples demonstrate how to use proxyquire with Sinon.JS (<http://sinonjs.org/>).
  * Run these tests with mocha (<http://visionmedia.github.com/mocha/>).

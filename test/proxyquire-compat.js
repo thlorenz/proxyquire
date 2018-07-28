@@ -1,6 +1,5 @@
 'use strict'
 /* jshint asi:true */
-/* global describe, it */
 
 var proxyquire = require('..')
 
