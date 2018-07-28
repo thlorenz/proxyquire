@@ -1,5 +1,4 @@
 /* jshint asi:true */
-/* global describe, before, beforeEach, it */
 'use strict'
 
 var assert = require('assert')
