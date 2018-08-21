@@ -24,16 +24,16 @@
   "author": "Thorsten Lorenz",
   "license": "MIT",
   "devDependencies": {
-    "mocha": "^3.5.3",
+    "mocha": "^5.2.0",
     "native-hello-world": "^1.0.0",
-    "should": "~3.3",
-    "sinon": "~1.9",
+    "should": "~13.2",
+    "sinon": "~6.1",
     "standard": "^11.0.0"
   },
   "dependencies": {
     "fill-keys": "^1.0.2",
     "module-not-found-error": "^1.0.0",
-    "resolve": "~1.5.0"
+    "resolve": "~1.8.1"
   },
   "standard": {
     "env": [
