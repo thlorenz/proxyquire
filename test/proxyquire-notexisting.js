@@ -15,13 +15,22 @@ describe('When resolving foo that requires stubbed /not/existing/bar.json', func
   })
 })
 
-describe('When resolving foo that requires stubbed /not/existing/bar.json with noCallThru', function () {
-  var foo
-
+describe('When resolving foo that requires stubbed /not/existing/bar.json with @noCallThru', function () {
   it('resolves foo with stubbed bar', function () {
-    foo = proxyquire(fooPath, {
+    var foo = proxyquire(fooPath, {
       '/not/existing/bar.json': { config: 'bar\'s config', '@noCallThru': true }
     })
     assert.equal(foo.config, 'bar\'s config')
+  })
+})
+
+describe('When resolving foo that requires stubbed /not/existing/bar.json with noCallThru()', function () {
+  it('resolves foo with stubbed bar', function () {
+    proxyquire.noCallThru()
+    var foo = proxyquire(fooPath, {
+      '/not/existing/bar.json': { config: 'bar\'s config' }
+    })
+    assert.equal(foo.config, 'bar\'s config')
+    proxyquire.callThru()
   })
 })
