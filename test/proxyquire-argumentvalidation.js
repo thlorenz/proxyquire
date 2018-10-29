@@ -63,4 +63,18 @@ describe('Illegal parameters to resolve give meaningful errors', function () {
       throws(act, /Invalid stub: "myStub" cannot be undefined/)
     })
   })
+
+  describe('when I pass a stub with a key that is not required on the proxyquired object', function () {
+    function act () {
+      const proxyquireThrowOnUnresolvedImports = proxyquire.throwOnUnresolvedImports()
+
+      proxyquireThrowOnUnresolvedImports('./samples/foo', {
+        nonExistent: () => {}
+      })
+    }
+
+    it('throws an exception with the stub key', function () {
+      throws(act, /Invalid stub: "nonExistent" is not required by the proxyquired object/)
+    })
+  })
 })
