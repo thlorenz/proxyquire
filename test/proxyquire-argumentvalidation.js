@@ -66,9 +66,8 @@ describe('Illegal parameters to resolve give meaningful errors', function () {
 
   describe('when I pass a stub with a key that is not required on the proxyquired object', function () {
     function act () {
-      const proxyquireThrowOnUnresolved = proxyquire.throwOnUnresolved()
-
-      proxyquireThrowOnUnresolved('./samples/foo', {
+      proxyquire.throwOnNotFound()
+      proxyquire('./samples/foo', {
         nonExistent: () => {}
       })
     }
