@@ -127,6 +127,41 @@ Two simple steps to override require in your tests:
     - therefore specify it exactly as in the require statement inside the tested file
     - values themselves are key/value pairs of functions/properties and the appropriate override
 
+## Raise error if proxying a modulePath that the module under test does not reference
+
+By default `proxyquire` will stub out modulePaths, whatever their path may be.
+This includes if a dependency is not accessible (wrong file path) or not installed and accessible.
+
+To raise an error if `proxyquire` attempts to load a module that does not exist,
+you can utilize the *throwOnNotFound* function.
+
+**Without throwOnNotFound:**
+```javascript
+proxyquire('./foo', {
+  'doesNotExist': () => {}
+});
+```
+
+The above code snippet will not raise any errors.
+
+**With throwOnNotFound:**
+```javascript
+var proxyquireThrowOnNotFound = require('proxyquire').throwOnNotFound();
+
+proxyquireThrowOnNotFound('./foo', {
+  'doesNotExist': () => {}
+});
+```
+
+This will throw an error when your tests run letting you know that proxyquire
+cannot find `doesNotExist`. Typically, this is occurs when a file was renamed
+in the calling module but was not updated in the proxyquire definition in the
+test.
+
+This method is also chainable with the *callThru* methods:
+
+`var proxyquireThrowOnNotFoundAndNoCallThru = proxyquire.throwOnNotFound().noCallThru()`
+
 ## Preventing call thru to original dependency
 
 By default proxyquire calls the function defined on the *original* dependency whenever it is not found on the stub.
