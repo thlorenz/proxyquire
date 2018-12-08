@@ -136,7 +136,7 @@ describe('Proxyquire', function () {
 
       assert.doesNotThrow(function () {
         proxyquire.load('./samples/require-bar', { './bar': {} })
-      }, 'Unexpected error when loading a require that had a registered stub')
+      }, 'Unexpected error when loading a module that had a registered stub')
     })
   })
 })
