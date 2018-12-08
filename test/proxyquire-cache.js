@@ -115,4 +115,28 @@ describe('Proxyquire', function () {
       })
     })
   })
+
+  describe('requireStubs()', function () {
+    it('returns a reference to itself, so it can be chained', function () {
+      var proxyquire = require('..')
+      assert.equal(proxyquire.requireStubs(), proxyquire)
+    })
+
+    it('throws an error when a require statement without a registered stub is loaded', () => {
+      var proxyquire = require('..')
+      proxyquire.requireStubs()
+
+      assert.throws(function () {
+        proxyquire.load('./samples/require-bar', {})
+      }, function (err) {
+        return (err instanceof Error) &&
+          err.message === 'Module at path "./bar" does not have a registered stub with proxyquire' &&
+          err.code === 'MODULE_NOT_REGISTERED'
+      }, 'Expected an error to be thrown when encountering a require statement for a module without a registered stub')
+
+      assert.doesNotThrow(function () {
+        proxyquire.load('./samples/require-bar', { './bar': {} })
+      }, 'Unexpected error when loading a require that had a registered stub')
+    })
+  })
 })

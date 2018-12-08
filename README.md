@@ -97,6 +97,7 @@ fetch(function (err, res) {
       - [All together, now](#all-together-now)
   - [Using proxyquire to simulate the absence of Modules](#using-proxyquire-to-simulate-the-absence-of-modules)
   - [Forcing proxyquire to reload modules](#forcing-proxyquire-to-reload-modules)
+  - [Require all modules to be registered](#require-all-modules-to-be-registered)
   - [Globally override require](#globally-override-require)
     - [Caveat](#caveat)
     - [Globally override require during module initialization](#globally-override-require-during-module-initialization)
@@ -260,6 +261,28 @@ var foo3 = require('./foo');
 // foo1, foo2 and foo3 are the same instance
 assert.equal(foo1, foo2);
 assert.equal(foo1, foo3);
+```
+
+## Require all modules to be registered
+
+Proxyquire also gives you the ability to require that all modules have a registered stub.  This is useful to ensure that all module dependencies are declared in your tests and can avoid pitfalls such as including modules that:
+  1. run in the background
+  2. contact network dependencies
+  3. contain business logic
+ 
+While it makes sense not to mock certain modules you still may want these same modules to be declared and registered as a dependency in your test which is an explicit way to indicate that they are ok to use in your test without being mocked.
+
+For the purpose of requiring modules to have registered stubs, proxyquire exposes the `requireStubs` function.
+
+```js
+// ensure modules have registered stubs, otherwise cause proxyquire to fail to load
+var proxyquire = require('proxyquire').requireStubs();
+
+// loads fine
+var foo1 = proxyquire('./foo', { path: require('path') });
+
+// throws an error since module "path" has no registered stub
+var foo2 = proxyquire('./foo', {});
 ```
 
 
