@@ -276,7 +276,7 @@ For the purpose of requiring modules to have registered stubs, proxyquire expose
 
 ```js
 // ensure modules have registered stubs, otherwise cause proxyquire to fail to load
-var proxyquire = require('proxyquire').requireStubs();
+var proxyquire = require('proxyquire').requireStubs().noCallThru();
 
 // loads fine
 var foo1 = proxyquire('./foo', { path: require('path') });
@@ -285,6 +285,7 @@ var foo1 = proxyquire('./foo', { path: require('path') });
 var foo2 = proxyquire('./foo', {});
 ```
 
+`requireStubs` is often used in conjunction with `noCallThru` but the two can be used separately.  Modules loaded to support call through behavior can load their dependent modules without stubs being registered.
 
 ## Globally override require
 

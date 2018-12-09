@@ -1,6 +1,7 @@
 'use strict'
 
 var assert = require('assert')
+var ProxyError = require('../lib/proxyquire-error')
 
 describe('Proxyquire', function () {
   describe('load()', function () {
@@ -127,16 +128,38 @@ describe('Proxyquire', function () {
       proxyquire.requireStubs()
 
       assert.throws(function () {
-        proxyquire.load('./samples/require-bar', {})
+        proxyquire.load('./samples/require-stubs/dep2', {})
       }, function (err) {
-        return (err instanceof Error) &&
-          err.message === 'Module at path "./bar" does not have a registered stub with proxyquire' &&
-          err.code === 'MODULE_NOT_REGISTERED'
-      }, 'Expected an error to be thrown when encountering a require statement for a module without a registered stub')
+        return (err instanceof ProxyError) &&
+          err.message === 'Module at path "./dep3" does not have a registered stub with proxyquire'
+      })
 
       assert.doesNotThrow(function () {
-        proxyquire.load('./samples/require-bar', { './bar': {} })
+        proxyquire.load('./samples/require-stubs/dep2', { './dep3': {} })
       }, 'Unexpected error when loading a require that had a registered stub')
+    })
+
+    it('allows call through modules to load their dependencies without registered stubs', function () {
+      var proxyquire = require('..')
+      proxyquire.requireStubs()
+
+      // Default call through behavior still works
+      try {
+        var dep1 = proxyquire.load('./samples/require-stubs/dep1', {
+          './dep2': {}
+        })
+
+        // Dependency Chain:
+        //    - dependency 1 requires depencency 2
+        //    - dependency 2 requires dependency 3
+        //
+        // Notes:
+        //     because call through behavior is allowed dependency 2 is loaded which then loads dependency 3
+        //     even though no stub was registered for dependency 3 ('./dep3')
+        assert.equal(dep1.dep2.dep3.name, 'dep3')
+      } catch (err) {
+        assert.fail(err)
+      }
     })
   })
 })
