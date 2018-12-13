@@ -127,7 +127,7 @@ Two simple steps to override require in your tests:
     - therefore specify it exactly as in the require statement inside the tested file
     - values themselves are key/value pairs of functions/properties and the appropriate override
 
-## Raise error if proxying a modulePath that the module under test does not reference
+## Throw if proxyquire tries to load a stub that does not exist
 
 By default `proxyquire` will stub out modulePaths, whatever their path may be.
 This includes if a dependency is not accessible (wrong file path) or not installed and accessible.
