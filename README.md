@@ -58,6 +58,8 @@ assert.equal(foo.basenameAllCaps('/a/b/file.txt'), 'FILE.TXT');
 
 You can also replace functions directly:
 
+**get.js:**
+
 ```js
 var get    = require('simple-get');
 var assert = require('assert');
@@ -66,6 +68,8 @@ module.exports = function fetch (callback) {
   get('https://api/users', callback);
 };
 ```
+
+**get.test.js:**
 
 ```js
 var proxyquire = require('proxyquire').noCallThru();
