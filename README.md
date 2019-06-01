@@ -252,7 +252,7 @@ assert.notEqual(foo1, foo2);
 assert.notEqual(foo1, foo3);
 ```
 
-`require.preserveCache` allows you to restore the behavior to match nodejs's `require` again.
+`proxyquire.preserveCache` allows you to restore the behavior to match nodejs's `require` again.
 
 ```js
 proxyquire.preserveCache();
