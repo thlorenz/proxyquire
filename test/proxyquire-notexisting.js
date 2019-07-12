@@ -20,7 +20,7 @@ describe('When resolving foo that requires stubbed /not/existing/bar.json with @
     var foo = proxyquire(fooPath, {
       '/not/existing/bar.json': { config: 'bar\'s config', '@noCallThru': true }
     })
-    assert.equal(foo.config, 'bar\'s config')
+    assert.strictEqual(foo.config, 'bar\'s config')
   })
 })
 
@@ -30,7 +30,7 @@ describe('When resolving foo that requires stubbed /not/existing/bar.json with n
     var foo = proxyquire(fooPath, {
       '/not/existing/bar.json': { config: 'bar\'s config' }
     })
-    assert.equal(foo.config, 'bar\'s config')
+    assert.strictEqual(foo.config, 'bar\'s config')
     proxyquire.callThru()
   })
 })

@@ -18,13 +18,13 @@ var foo = proxyquire('./foo', { fs: fsStub })
 /*
 * Test caps locking of returned files
 */
-fsStub.readdir = function (dir, cb) { cb(null, [ 'file1', 'file2' ]) }
+fsStub.readdir = function (dir, cb) { cb(null, ['file1', 'file2']) }
 
 calledBack = false
 foo.filesAllCaps('./somedir', function (err, files) {
-  assert.equal(err, null)
-  assert.equal(files[0], 'FILE1')
-  assert.equal(files[1], 'FILE2')
+  assert.strictEqual(err, null)
+  assert.strictEqual(files[0], 'FILE1')
+  assert.strictEqual(files[1], 'FILE2')
 
   calledBack = true
 })
@@ -38,7 +38,7 @@ assert(calledBack)
 fsStub.readdir = function (dir, cb) { cb(readdirError) }
 
 foo.filesAllCaps('./somedir', function (err, files) {
-  assert.equal(err, readdirError)
+  assert.strictEqual(err, readdirError)
 })
 
 console.log('*** All asserts passed ***')

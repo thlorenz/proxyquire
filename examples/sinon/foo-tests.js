@@ -30,7 +30,7 @@ describe('when path.extname(file) returns ".markdown"', function () {
   })
 
   it('extnameAllCaps returns ".MARKDOWN"', function () {
-    assert.equal(foo.extnameAllCaps(file), '.MARKDOWN')
+    assert.strictEqual(foo.extnameAllCaps(file), '.MARKDOWN')
   })
 })
 
@@ -42,7 +42,7 @@ describe('when fs.readdir calls back with ["file1", "file2"]', function () {
     readdirStub = sinon.stub(fs, 'readdir')
     foo = proxyquire('./foo', { fs: { readdir: readdirStub } })
 
-    readdirStub.withArgs('../simple').yields(null, [ 'file1', 'file2' ])
+    readdirStub.withArgs('../simple').yields(null, ['file1', 'file2'])
   })
 
   after(function () {
@@ -51,9 +51,9 @@ describe('when fs.readdir calls back with ["file1", "file2"]', function () {
 
   it('filesAllCaps calls back with ["FILE1", "FILE2"]', function (done) {
     foo.filesAllCaps('../simple', function (err, files) {
-      assert.equal(err, null)
-      assert.equal(files[0], 'FILE1')
-      assert.equal(files[1], 'FILE2')
+      assert.strictEqual(err, null)
+      assert.strictEqual(files[0], 'FILE1')
+      assert.strictEqual(files[1], 'FILE2')
       done()
     })
   })
@@ -77,8 +77,8 @@ describe('when fs.readdir returns an error', function () {
 
   it('filesAllCaps calls back with that error', function (done) {
     foo.filesAllCaps('../simple', function (err, files) {
-      assert.equal(err, readdirError)
-      assert.equal(files, null)
+      assert.strictEqual(err, readdirError)
+      assert.strictEqual(files, null)
       done()
     })
   })
@@ -101,7 +101,7 @@ describe('when calling filesAllCaps with "../simple"', function () {
     foo.filesAllCaps('../simple', function (err, files) {
       assert.ifError(err)
       assert(fs.readdir.calledOnce)
-      assert.equal(fs.readdir.getCall(0).args[0], '../simple')
+      assert.strictEqual(fs.readdir.getCall(0).args[0], '../simple')
       done()
     })
   })

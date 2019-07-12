@@ -17,21 +17,21 @@ describe('api', function () {
     it('proxyquire can load', function () {
       var proxiedFoo = proxyquire.load('./samples/foo', stubs)
 
-      assert.equal(typeof proxiedFoo, 'object')
+      assert.strictEqual(typeof proxiedFoo, 'object')
       assert.notStrictEqual(realFoo, proxiedFoo)
     })
 
     it('proxyquire can callThru and then load', function () {
       var proxiedFoo = proxyquire.callThru().load('./samples/foo', stubs)
 
-      assert.equal(typeof proxiedFoo, 'object')
+      assert.strictEqual(typeof proxiedFoo, 'object')
       assert.notStrictEqual(realFoo, proxiedFoo)
     })
 
     it('proxyquire can noCallThru and then load', function () {
       var proxiedFoo = proxyquire.noCallThru().load('./samples/foo', stubs)
 
-      assert.equal(typeof proxiedFoo, 'object')
+      assert.strictEqual(typeof proxiedFoo, 'object')
       assert.notStrictEqual(realFoo, proxiedFoo)
     })
   })

@@ -17,6 +17,6 @@ describe('When resolving foo that requires nulled file package', function () {
 describe('When resolving foo that optionally requires nulled crypto package', function () {
   it('catches when resolving crypto', function () {
     var foo = proxyquire(fooPath, { crypto: null })
-    assert.equal(foo.bigCrypto(), 'caught')
+    assert.strictEqual(foo.bigCrypto(), 'caught')
   })
 })
