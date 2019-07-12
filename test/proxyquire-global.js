@@ -18,8 +18,8 @@ describe('global flags set', function () {
 
     var proxiedFoo = proxyquire('./samples/global/foo', stubs)
 
-    assert.equal(realFoo(), false)
-    assert.equal(proxiedFoo(), true)
+    assert.strictEqual(realFoo(), false)
+    assert.strictEqual(proxiedFoo(), true)
   })
 
   it('should override require globally even when require\'s execution is deferred', function () {
@@ -34,13 +34,13 @@ describe('global flags set', function () {
 
     var proxiedFoo = proxyquire('./samples/global/foo-deferred', stubs)
 
-    assert.equal(realFoo(), false)
-    assert.equal(proxiedFoo(), true)
+    assert.strictEqual(realFoo(), false)
+    assert.strictEqual(proxiedFoo(), true)
   })
 
   it('should not throw when a native module is required a second time', function () {
     var stubs = {
-      'foo': {
+      foo: {
         '@global': true
       }
     }
@@ -62,8 +62,8 @@ describe('global flags not set', function () {
 
     var proxiedFoo = proxyquire('./samples/global/foo', stubs)
 
-    assert.equal(realFoo(), false)
-    assert.equal(proxiedFoo(), false)
+    assert.strictEqual(realFoo(), false)
+    assert.strictEqual(proxiedFoo(), false)
   })
 
   it('should not override require globally even when require\'s execution is deferred', function () {
@@ -77,7 +77,7 @@ describe('global flags not set', function () {
 
     var proxiedFoo = proxyquire('./samples/global/foo-deferred', stubs)
 
-    assert.equal(realFoo(), false)
-    assert.equal(proxiedFoo(), false)
+    assert.strictEqual(realFoo(), false)
+    assert.strictEqual(proxiedFoo(), false)
   })
 })

@@ -17,11 +17,11 @@ describe('Multiple requires of same module don\'t affect each other', function (
     })
 
     it('foo1.bigBar() == "BAR1"', function () {
-      assert.equal(foo1.bigBar(), 'BAR1')
+      assert.strictEqual(foo1.bigBar(), 'BAR1')
     })
 
     it('foo2.bigBar() == "BAR2"', function () {
-      assert.equal(foo2.bigBar(), 'BAR2')
+      assert.strictEqual(foo2.bigBar(), 'BAR2')
     })
 
     describe('and I change bar1.bar() to return barone', function () {
@@ -30,11 +30,11 @@ describe('Multiple requires of same module don\'t affect each other', function (
       })
 
       it('foo1.bigBar() == "BARONE"', function () {
-        assert.equal(foo1.bigBar(), 'BARONE')
+        assert.strictEqual(foo1.bigBar(), 'BARONE')
       })
 
       it('foo2.bigBar() == "BAR2"', function () {
-        assert.equal(foo2.bigBar(), 'BAR2')
+        assert.strictEqual(foo2.bigBar(), 'BAR2')
       })
     })
   })

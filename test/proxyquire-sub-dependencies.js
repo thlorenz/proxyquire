@@ -22,10 +22,10 @@ describe('When resolving foo that requires bar and stubbed baz where bar require
   })
 
   it('does not stub baz in bar', function () {
-    assert.equal(foo.bar.baz.testexport, 'test')
+    assert.strictEqual(foo.bar.baz.testexport, 'test')
   })
 
   it('does not affect a normal baz import', function () {
-    assert.equal(baz.testexport, 'test')
+    assert.strictEqual(baz.testexport, 'test')
   })
 })

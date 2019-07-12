@@ -19,26 +19,26 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
     })
 
     it('foo is required 2 times', function () {
-      assert.equal(stats.fooRequires(), 2)
+      assert.strictEqual(stats.fooRequires(), 2)
     })
 
     describe('foo\'s bar is unchanged', function () {
       it('foo.bigBar() == "BAR"', function () {
-        assert.equal(foo.bigBar(), 'BAR')
+        assert.strictEqual(foo.bigBar(), 'BAR')
       })
     })
 
     describe('only stubbed modules have overrides in foober', function () {
       it('foober.bigBar() == "BARBER"', function () {
-        assert.equal(foober.bigBar(), 'BARBER')
+        assert.strictEqual(foober.bigBar(), 'BARBER')
       })
 
       it('foober.bigExt("/folder/test.ext") == ".EXT"', function () {
-        assert.equal(foober.bigExt(file), '.EXT')
+        assert.strictEqual(foober.bigExt(file), '.EXT')
       })
 
       it('foober.bigBas("/folder/test.ext") == "TEST.EXT"', function () {
-        assert.equal(foober.bigBas(file), 'TEST.EXT')
+        assert.strictEqual(foober.bigBas(file), 'TEST.EXT')
       })
     })
 
@@ -49,11 +49,11 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
       })
 
       it('overrides behavior when module is required inside function call', function () {
-        assert.equal(foober.bigBar(), 'FRISEUR')
+        assert.strictEqual(foober.bigBar(), 'FRISEUR')
       })
 
       it('overrides behavior when module is required on top of file', function () {
-        assert.equal(foober.bigRab(), 'RABARBER')
+        assert.strictEqual(foober.bigRab(), 'RABARBER')
       })
 
       describe('and then delete overrides of stubs after resolve', function () {
@@ -63,7 +63,7 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
         })
 
         it('reverts to original behavior when module is required inside function call', function () {
-          assert.equal(foober.bigBar(), 'BAR')
+          assert.strictEqual(foober.bigBar(), 'BAR')
         })
 
         it('doesn\'t properly revert to original behavior when module is required on top of file ', function () {
@@ -85,11 +85,11 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
         })
 
         it('foo.bigExt(file) == "OVERRIDE /FOLDER/TEST.EXT"', function () {
-          assert.equal(foo.bigExt(file), 'OVERRIDE /FOLDER/TEST.EXT')
+          assert.strictEqual(foo.bigExt(file), 'OVERRIDE /FOLDER/TEST.EXT')
         })
 
         it('foo.bigBas(file) == "TEST.EXT"', function () {
-          assert.equal(foo.bigBas(file), 'TEST.EXT')
+          assert.strictEqual(foo.bigBas(file), 'TEST.EXT')
         })
       })
 
@@ -103,7 +103,7 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
         })
 
         it('foo.bigExt(file) == "OVERRIDE /FOLDER/TEST.EXT"', function () {
-          assert.equal(foo.bigExt(file), 'OVERRIDE /FOLDER/TEST.EXT')
+          assert.strictEqual(foo.bigExt(file), 'OVERRIDE /FOLDER/TEST.EXT')
         })
 
         it('foo.bigBas(file) throws', function () {
@@ -127,7 +127,7 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
           })
 
           it('foo.bigExt(file) == "OVERRIDE /FOLDER/TEST.EXT"', function () {
-            assert.equal(foo.bigExt(file), 'OVERRIDE /FOLDER/TEST.EXT')
+            assert.strictEqual(foo.bigExt(file), 'OVERRIDE /FOLDER/TEST.EXT')
           })
 
           it('foo.bigBas(file) throws', function () {
@@ -145,11 +145,11 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
           })
 
           it('foo.bigExt(file) == "OVERRIDE /FOLDER/TEST.EXT"', function () {
-            assert.equal(foo.bigExt(file), 'OVERRIDE /FOLDER/TEST.EXT')
+            assert.strictEqual(foo.bigExt(file), 'OVERRIDE /FOLDER/TEST.EXT')
           })
 
           it('foo.bigBas(file) == "TEST.EXT"', function () {
-            assert.equal(foo.bigBas(file), 'TEST.EXT')
+            assert.strictEqual(foo.bigBas(file), 'TEST.EXT')
           })
         })
 
@@ -165,11 +165,11 @@ describe('Given foo requires the bar and path modules and bar.bar() returns "bar
           })
 
           it('foo.bigExt(file) == "OVERRIDE /FOLDER/TEST.EXT"', function () {
-            assert.equal(foo.bigExt(file), 'OVERRIDE /FOLDER/TEST.EXT')
+            assert.strictEqual(foo.bigExt(file), 'OVERRIDE /FOLDER/TEST.EXT')
           })
 
           it('foo.bigBas(file) == "TEST.EXT"', function () {
-            assert.equal(foo.bigBas(file), 'TEST.EXT')
+            assert.strictEqual(foo.bigBas(file), 'TEST.EXT')
           })
         })
       })

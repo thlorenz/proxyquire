@@ -14,16 +14,16 @@ describe('Given foo requires the boof, foonum and foobool modules and  boof is a
   describe('When I resolve foo with boofber stub as boof.', function () {
     before(function () {
       stats.reset()
-      foo = proxyquire('./samples/foo', {'./boof': boofber})
+      foo = proxyquire('./samples/foo', { './boof': boofber })
     })
 
     it('foo is required 1 times', function () {
-      assert.equal(stats.fooRequires(), 1)
+      assert.strictEqual(stats.fooRequires(), 1)
     })
 
     describe('foo\'s boof is boofber', function () {
       it('foo.boof == boofber', function () {
-        assert.equal(foo.boof, boofber)
+        assert.strictEqual(foo.boof, boofber)
       })
     })
   })
@@ -31,16 +31,16 @@ describe('Given foo requires the boof, foonum and foobool modules and  boof is a
   describe('When I resolve foo with foonumber stub as foonum.', function () {
     before(function () {
       stats.reset()
-      foo = proxyquire('./samples/foo', {'./foonum': foonumber})
+      foo = proxyquire('./samples/foo', { './foonum': foonumber })
     })
 
     it('foo is required 1 times', function () {
-      assert.equal(stats.fooRequires(), 1)
+      assert.strictEqual(stats.fooRequires(), 1)
     })
 
     describe('foo\'s foonum is foonumber', function () {
       it('foo.foonum == foonumber', function () {
-        assert.equal(foo.foonum, foonumber)
+        assert.strictEqual(foo.foonum, foonumber)
       })
     })
   })
@@ -48,16 +48,16 @@ describe('Given foo requires the boof, foonum and foobool modules and  boof is a
   describe('When I resolve foo with fooboolber stub as foobool.', function () {
     before(function () {
       stats.reset()
-      foo = proxyquire('./samples/foo', {'./foobool': fooboolber})
+      foo = proxyquire('./samples/foo', { './foobool': fooboolber })
     })
 
     it('foo is required 1 times', function () {
-      assert.equal(stats.fooRequires(), 1)
+      assert.strictEqual(stats.fooRequires(), 1)
     })
 
     describe('foo\'s foobool is fooboolber', function () {
       it('foo.foobool == fooboolber', function () {
-        assert.equal(foo.foobool, fooboolber)
+        assert.strictEqual(foo.foobool, fooboolber)
       })
     })
   })
@@ -65,16 +65,16 @@ describe('Given foo requires the boof, foonum and foobool modules and  boof is a
   describe('When I resolve foo with ./fooarray stub as fooarray.', function () {
     before(function () {
       stats.reset()
-      foo = proxyquire('./samples/foo', {'./fooarray': fooarray})
+      foo = proxyquire('./samples/foo', { './fooarray': fooarray })
     })
 
     it('foo is required 1 times', function () {
-      assert.equal(stats.fooRequires(), 1)
+      assert.strictEqual(stats.fooRequires(), 1)
     })
 
     describe('foo\'s fooarray is fooarray', function () {
       it('foo.fooarray is fooarray', function () {
-        assert.deepEqual(foo.fooarray, ['x', 'y', 'z'])
+        assert.deepStrictEqual(foo.fooarray, ['x', 'y', 'z'])
       })
     })
   })
@@ -82,16 +82,16 @@ describe('Given foo requires the boof, foonum and foobool modules and  boof is a
   describe('When I resolve foo with ./fooarray stub as empty.', function () {
     before(function () {
       stats.reset()
-      foo = proxyquire('./samples/foo', {'./fooarray': []})
+      foo = proxyquire('./samples/foo', { './fooarray': [] })
     })
 
     it('foo is required 1 times', function () {
-      assert.equal(stats.fooRequires(), 1)
+      assert.strictEqual(stats.fooRequires(), 1)
     })
 
     describe('foo\'s fooarray is the original', function () {
       it('foo.fooarray is empty', function () {
-        assert.deepEqual(foo.fooarray, ['a', 'b', 'c'])
+        assert.deepStrictEqual(foo.fooarray, ['a', 'b', 'c'])
       })
     })
   })
@@ -100,17 +100,17 @@ describe('Given foo requires the boof, foonum and foobool modules and  boof is a
     before(function () {
       stats.reset()
       var empty = []
-      Object.defineProperty(empty, '@noCallThru', {value: true})
-      foo = proxyquire('./samples/foo', {'./fooarray': empty})
+      Object.defineProperty(empty, '@noCallThru', { value: true })
+      foo = proxyquire('./samples/foo', { './fooarray': empty })
     })
 
     it('foo is required 1 times', function () {
-      assert.equal(stats.fooRequires(), 1)
+      assert.strictEqual(stats.fooRequires(), 1)
     })
 
     describe('foo\'s fooarray is empty', function () {
       it('foo.fooarray is empty', function () {
-        assert.deepEqual(foo.fooarray, [])
+        assert.deepStrictEqual(foo.fooarray, [])
       })
     })
   })

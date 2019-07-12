@@ -9,11 +9,11 @@ describe('Proxyquire', function () {
       original.state = 'cached'
 
       var proxyquire = require('..')
-      proxyquire('./samples/foo', { 'path': { } })
+      proxyquire('./samples/foo', { path: { } })
 
       var foo = require('./samples/foo')
-      assert.equal('cached', foo.state)
-      assert.equal(foo, original)
+      assert.strictEqual('cached', foo.state)
+      assert.strictEqual(foo, original)
     })
 
     it('does not pollute the cache when module is proxyquired before it is loaded', function () {
@@ -22,14 +22,14 @@ describe('Proxyquire', function () {
       proxyquire('./samples/no-call-thru-test', { './required': false })
       var original = require('./samples/no-call-thru-test')
 
-      assert.equal(original.original, true)
+      assert.strictEqual(original.original, true)
     })
   })
 
   describe('preserveCache()', function () {
     it('returns a reference to itself, so it can be chained', function () {
       var proxyquire = require('..')
-      assert.equal(proxyquire.preserveCache(), proxyquire)
+      assert.strictEqual(proxyquire.preserveCache(), proxyquire)
     })
 
     it('has Proxyquire restore the cache for the module', function () {
@@ -38,11 +38,11 @@ describe('Proxyquire', function () {
 
       var proxyquire = require('..')
       proxyquire.preserveCache()
-      proxyquire.load('./samples/foo', { 'path': { } })
+      proxyquire.load('./samples/foo', { path: { } })
 
       var foo = require('./samples/foo')
-      assert.equal('cached', foo.state)
-      assert.equal(foo, original)
+      assert.strictEqual('cached', foo.state)
+      assert.strictEqual(foo, original)
     })
 
     it('allows Singletons to function properly', function () {
@@ -50,17 +50,17 @@ describe('Proxyquire', function () {
 
       var proxyquire = require('..')
       proxyquire.preserveCache()
-      proxyquire.load('./samples/foo-singleton', { 'path': { } }).getInstance()
+      proxyquire.load('./samples/foo-singleton', { path: { } }).getInstance()
 
       var fooSingleton = require('./samples/foo-singleton').getInstance()
-      assert.equal(fooSingleton, original)
+      assert.strictEqual(fooSingleton, original)
     })
   })
 
   describe('noPreserveCache()', function () {
     it('returns a reference to itself, so it can be chained', function () {
       var proxyquire = require('..')
-      assert.equal(proxyquire.noPreserveCache(), proxyquire)
+      assert.strictEqual(proxyquire.noPreserveCache(), proxyquire)
     })
 
     it('forces subsequent requires to reload the proxied module', function () {
@@ -68,24 +68,24 @@ describe('Proxyquire', function () {
       original.state = 'cached'
 
       var proxyquire = require('..')
-      proxyquire.load('./samples/foo', { 'path': { } })
+      proxyquire.load('./samples/foo', { path: { } })
 
       var cacheFoo = require('./samples/foo')
-      assert.equal('cached', cacheFoo.state)
-      assert.equal(cacheFoo, original)
+      assert.strictEqual('cached', cacheFoo.state)
+      assert.strictEqual(cacheFoo, original)
 
       proxyquire.noPreserveCache()
-      proxyquire.load('./samples/foo', { 'path': { } })
+      proxyquire.load('./samples/foo', { path: { } })
       var foo = require('./samples/foo')
-      assert.equal('', foo.state)
-      assert.notEqual(foo, original)
+      assert.strictEqual('', foo.state)
+      assert.notStrictEqual(foo, original)
     })
 
     it('deletes the require.cache for the module being stubbed', function () {
       var proxyquire = require('..').noPreserveCache()
 
-      proxyquire.load('./samples/foo', { 'path': { } })
-      assert.equal(undefined, require.cache[require.resolve('./samples/foo')])
+      proxyquire.load('./samples/foo', { path: { } })
+      assert.strictEqual(undefined, require.cache[require.resolve('./samples/foo')])
     })
 
     it('deletes the require.cache for the stubs', function () {
@@ -96,15 +96,15 @@ describe('Proxyquire', function () {
       bar.f.g = function () { return 'a' }
       bar.h = function () { return 'a' }
 
-      assert.equal(foo.bar.f.g(), 'a')
-      assert.equal(foo.bar.h(), 'a')
+      assert.strictEqual(foo.bar.f.g(), 'a')
+      assert.strictEqual(foo.bar.h(), 'a')
 
       foo = proxyquire.load('./samples/cache/foo', { './bar': {} })
-      assert.equal(foo.bar.h(), 'h')
-      assert.equal(foo.bar.f.g(), 'g')
+      assert.strictEqual(foo.bar.h(), 'h')
+      assert.strictEqual(foo.bar.f.g(), 'g')
 
-      assert.equal(undefined, require.cache[require.resolve('./samples/cache/foo')])
-      assert.equal(undefined, require.cache[require.resolve('./samples/cache/bar')])
+      assert.strictEqual(undefined, require.cache[require.resolve('./samples/cache/foo')])
+      assert.strictEqual(undefined, require.cache[require.resolve('./samples/cache/bar')])
     })
 
     it('silences errors when stub lookups fail', function () {

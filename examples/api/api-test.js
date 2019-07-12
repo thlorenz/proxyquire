@@ -14,34 +14,34 @@ foo = proxyquire('./samples/foo', { })
 fooCut = proxyquire('./samples/foo', { './bar': cutBarStub })
 fooWild = proxyquire('./samples/foo', { './bar': wildBarStub })
 
-assert.equal(stats.fooRequires(), 3)
+assert.strictEqual(stats.fooRequires(), 3)
 
-assert.equal(foo.bigBar(), 'BAR')
-assert.equal(fooCut.bigBar(), 'BARBER')
-assert.equal(fooWild.bigBar(), 'BARBAR')
+assert.strictEqual(foo.bigBar(), 'BAR')
+assert.strictEqual(fooCut.bigBar(), 'BARBER')
+assert.strictEqual(fooWild.bigBar(), 'BARBAR')
 
 // non overriden keys call thru by default
-assert.equal(foo.bigRab(), 'RAB')
-assert.equal(fooCut.bigRab(), 'RAB')
+assert.strictEqual(foo.bigRab(), 'RAB')
+assert.strictEqual(fooCut.bigRab(), 'RAB')
 
 // non overridden module path untouched
-assert.equal(foo.bigExt(file), '.EXT')
-assert.equal(fooCut.bigExt(file), '.EXT')
-assert.equal(fooWild.bigExt(file), '.EXT')
-assert.equal(foo.bigBas(file), 'TEST.EXT')
-assert.equal(fooCut.bigBas(file), 'TEST.EXT')
-assert.equal(fooWild.bigBas(file), 'TEST.EXT')
+assert.strictEqual(foo.bigExt(file), '.EXT')
+assert.strictEqual(fooCut.bigExt(file), '.EXT')
+assert.strictEqual(fooWild.bigExt(file), '.EXT')
+assert.strictEqual(foo.bigBas(file), 'TEST.EXT')
+assert.strictEqual(fooCut.bigBas(file), 'TEST.EXT')
+assert.strictEqual(fooWild.bigBas(file), 'TEST.EXT')
 
 // overriding keys after require works for both inline and non inline requires
 cutBarStub.bar = function () { return 'friseur' }
 cutBarStub.rab = function () { return 'rabarber' }
 
-assert.equal(fooCut.bigBar(), 'FRISEUR')
-assert.equal(fooCut.bigRab(), 'RABARBER')
+assert.strictEqual(fooCut.bigBar(), 'FRISEUR')
+assert.strictEqual(fooCut.bigRab(), 'RABARBER')
 
 // autofilling keys on delete only works for inline requires
 cutBarStub.bar = undefined
-assert.equal(fooCut.bigBar(), 'BAR')
+assert.strictEqual(fooCut.bigBar(), 'BAR')
 
 cutBarStub.rab = undefined
 assert.throws(fooCut.bigRab)
@@ -54,8 +54,8 @@ foo = proxyquire('./samples/foo', {
   }
 })
 
-assert.equal(foo.bigExt(file), 'EXTERMINATE, EXTERMINATE THE /SOME/PATH/TEST.EXT')
-assert.equal(foo.bigBas(file), 'TEST.EXT')
+assert.strictEqual(foo.bigExt(file), 'EXTERMINATE, EXTERMINATE THE /SOME/PATH/TEST.EXT')
+assert.strictEqual(foo.bigBas(file), 'TEST.EXT')
 
 // turned off
 foo = proxyquire('./samples/foo', {
@@ -65,7 +65,7 @@ foo = proxyquire('./samples/foo', {
   }
 })
 
-assert.equal(foo.bigExt(file), 'EXTERMINATE, EXTERMINATE THE /SOME/PATH/TEST.EXT')
+assert.strictEqual(foo.bigExt(file), 'EXTERMINATE, EXTERMINATE THE /SOME/PATH/TEST.EXT')
 assert.throws(foo.bigBas)
 
 // turned off globally
@@ -92,7 +92,7 @@ foo = proxyquire
     }
   })
 
-assert.equal(foo.bigBas(file), 'TEST.EXT')
+assert.strictEqual(foo.bigBas(file), 'TEST.EXT')
 
 // turned back on globally
 
@@ -104,7 +104,7 @@ foo = proxyquire
     }
   })
 
-assert.equal(foo.bigBas(file), 'TEST.EXT')
+assert.strictEqual(foo.bigBas(file), 'TEST.EXT')
 
 // turned back off per module
 

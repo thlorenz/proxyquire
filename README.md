@@ -44,16 +44,16 @@ var proxyquire =  require('proxyquire')
 
 // when no overrides are specified, path.extname behaves normally
 var foo = proxyquire('./foo', { 'path': pathStub });
-assert.equal(foo.extnameAllCaps('file.txt'), '.TXT');
+assert.strictEqual(foo.extnameAllCaps('file.txt'), '.TXT');
 
 // override path.extname
 pathStub.extname = function (file) { return 'Exterminate, exterminate the ' + file; };
 
 // path.extname now behaves as we told it to
-assert.equal(foo.extnameAllCaps('file.txt'), 'EXTERMINATE, EXTERMINATE THE FILE.TXT');
+assert.strictEqual(foo.extnameAllCaps('file.txt'), 'EXTERMINATE, EXTERMINATE THE FILE.TXT');
 
 // path.basename and all other path module methods still function as before
-assert.equal(foo.basenameAllCaps('/a/b/file.txt'), 'FILE.TXT');
+assert.strictEqual(foo.basenameAllCaps('/a/b/file.txt'), 'FILE.TXT');
 ```
 
 You can also replace functions directly:
@@ -248,8 +248,8 @@ var foo2 = proxyquire('./foo', stubs);
 var foo3 = require('./foo');
 
 // foo1, foo2 and foo3 are different instances of the same module
-assert.notEqual(foo1, foo2);
-assert.notEqual(foo1, foo3);
+assert.notStrictEqual(foo1, foo2);
+assert.notStrictEqual(foo1, foo3);
 ```
 
 `proxyquire.preserveCache` allows you to restore the behavior to match nodejs's `require` again.
@@ -262,8 +262,8 @@ var foo2 = proxyquire('./foo', stubs);
 var foo3 = require('./foo');
 
 // foo1, foo2 and foo3 are the same instance
-assert.equal(foo1, foo2);
-assert.equal(foo1, foo3);
+assert.strictEqual(foo1, foo2);
+assert.strictEqual(foo1, foo3);
 ```
 
 

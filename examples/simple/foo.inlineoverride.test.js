@@ -10,7 +10,7 @@ var foo
 
 // no overrides yet, so path.extname behaves normally
 foo = proxyquire('./foo', {})
-assert.equal(foo.extnameAllCaps('file.txt'), '.TXT')
+assert.strictEqual(foo.extnameAllCaps('file.txt'), '.TXT')
 
 // override path.extname
 foo = proxyquire('./foo', {
@@ -18,9 +18,9 @@ foo = proxyquire('./foo', {
 })
 
 // path.extname now behaves as we told it to
-assert.equal(foo.extnameAllCaps('file.txt'), 'EXTERMINATE, EXTERMINATE THE FILE.TXT')
+assert.strictEqual(foo.extnameAllCaps('file.txt'), 'EXTERMINATE, EXTERMINATE THE FILE.TXT')
 
 // path.basename on the other hand still functions as before
-assert.equal(foo.basenameAllCaps('/a/b/file.txt'), 'FILE.TXT')
+assert.strictEqual(foo.basenameAllCaps('/a/b/file.txt'), 'FILE.TXT')
 
 console.log('*** All asserts passed ***')
