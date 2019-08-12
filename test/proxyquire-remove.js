@@ -10,6 +10,8 @@ describe('When resolving foo that requires nulled file package', function () {
   it('throws an error', function () {
     assert.throws(function () {
       proxyquire(fooPath, { path: null })
+    }, function (error) {
+      return error.code === 'MODULE_NOT_FOUND'
     })
   })
 })
