@@ -20,7 +20,7 @@ assert.strictEqual(foo.bigBar(), 'BAR')
 assert.strictEqual(fooCut.bigBar(), 'BARBER')
 assert.strictEqual(fooWild.bigBar(), 'BARBAR')
 
-// non overriden keys call thru by default
+// non overridden keys call thru by default
 assert.strictEqual(foo.bigRab(), 'RAB')
 assert.strictEqual(fooCut.bigRab(), 'RAB')
 
