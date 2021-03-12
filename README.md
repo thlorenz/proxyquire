@@ -135,7 +135,29 @@ Two simple steps to override require in your tests:
 
 By default proxyquire calls the function defined on the *original* dependency whenever it is not found on the stub.
 
-If you prefer a more strict behavior you can prevent *callThru* on a per module or contextual basis.
+If you prefer a more strict behavior you can prevent *callThru* on a per module or contextual basis. If your stub is a class or class instance rather than a plain object, you should disable *callThru* to ensure that it is passed through with the correct prototype.
+
+```js
+class MockClass {
+  static '@noCallThru' = true;
+}
+
+var foo = proxyquire('./foo', {
+  './my-class': MockClass
+});
+```
+
+```js
+class MockClass {
+  get '@noCallThru'() {
+    return true;
+  }
+}
+
+var foo = proxyquire('./foo', {
+  './my-class-instance': new MockClass()
+});
+```
 
 If *callThru* is disabled, you can stub out modules that don't even exist on the machine that your tests are running on.
 While I wouldn't recommend this in general, I have seen cases where it is legitimately useful (e.g., when requiring
