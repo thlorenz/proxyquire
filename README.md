@@ -344,13 +344,14 @@ module.exports = {
 }
 
 // test.js
-var stubs = {
-  './baz': {
-    method: function(val) {
-      console.info('goodbye');
-    },
-    '@global': true
+var bazStub = {
+  method: function() {
+    console.info('goodbye');
   }
+};
+  
+var stubs = {
+  './baz': Object.assign(bazStub, {'@global': true}) 
 };
 
 var proxyquire = require('proxyquire');
@@ -423,10 +424,9 @@ use `@global` instead.
 Even if you want to override a module that exports a function directly, you can still set special properties like `@global`. You can use a named function or assign your stub function to a variable to add properties:
 
 ```js
-foo['@global'] = true;
 function foo () {}
 proxyquire('./bar', {
-  foo: foo
+  foo: Object.assign(foo, {'@global': true})
 });
 ```
 
@@ -434,9 +434,8 @@ And if your stub is in a separate module where `module.exports = foo`:
 
 ```js
 var foostub = require('../stubs/foostub');
-foostub['@global'] = true;
 proxyquire('bar', {
-  foo: foostub
+  foo: Object.assign(foostub, {'@global': true})
 });
 ```
 
