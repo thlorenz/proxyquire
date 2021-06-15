@@ -1,10 +1,5 @@
 # proxyquire [![Build Status](https://secure.travis-ci.org/thlorenz/proxyquire.svg?branch=master)](http://travis-ci.org/thlorenz/proxyquire)
 
-<span>
-  <a href="https://nodei.co/npm/proxyquire/"><img src="https://nodei.co/npm/proxyquire.png?downloads=true&stars=true"></a>
-  <a href="https://www.patreon.com/bePatron?u=8663953"><img alt="become a patron" src="https://c5.patreon.com/external/logo/become_a_patron_button.png" height="69px"></a>
-</span>
-
 Proxies nodejs's require in order to make overriding dependencies during testing easy while staying **totally unobtrusive**.
 
 If you want to stub dependencies for your client side modules, try
