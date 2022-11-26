@@ -408,7 +408,7 @@ var stubs = {
 };
 ```
 
-This will cause module setup code to be re-excuted just like `@global`, but with the difference that it will happen
+This will cause module setup code to be re-executed just like `@global`, but with the difference that it will happen
 every time the module is requested via `require` at runtime as no module will ever be cached.
 
 This can cause subtle bugs so if you can guarantee that your modules will not vary their `require` behaviour at runtime,
