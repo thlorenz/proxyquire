@@ -45,8 +45,10 @@ describe('global flags set', function () {
       }
     }
 
-    proxyquire('native-hello-world', stubs)
-    proxyquire('native-hello-world', stubs)
+    // Using 'crypto' instead of 'native-hello-world' as it's a built-in native module
+    // that's always available and doesn't require compilation
+    proxyquire('crypto', stubs)
+    proxyquire('crypto', stubs)
   })
 })
 
