@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04  # Node.js 8 requires older Python for node-gyp compatibility
     strategy:
       matrix:
         node-version: [8]
