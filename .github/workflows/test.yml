@@ -9,7 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [8]
+        node-version:
+          - '8'
+          - '12'
+          - '20'
     steps:
     - uses: actions/checkout@v4
     - name: Setup Python 3.8
