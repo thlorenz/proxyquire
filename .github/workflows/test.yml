@@ -8,12 +8,16 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-20.04  # Node.js 8 requires older Python for node-gyp compatibility
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: [8]
     steps:
     - uses: actions/checkout@v4
+    - name: Setup Python 3.8
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.8'
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
