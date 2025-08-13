@@ -25,7 +25,6 @@
   "license": "MIT",
   "devDependencies": {
     "mocha": "^5.2.0",
-    "native-hello-world": "^1.0.0",
     "should": "^13.2.3",
     "sinon": "^7.3.2",
     "standard": "^13.0.1"
