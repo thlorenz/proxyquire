@@ -1,5 +1,4 @@
 --require should
 --reporter spec
 --ui bdd
---growl
 test
